@@ -1,7 +1,7 @@
 
 
 function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Gas, dLi)
-	dRr = zeros(10)
+	dRr = zeros(eltype(Rone), 10)
 
 	dRr[1] = tr.xFwd*Rone[3]*Rtwo[3] - hetR.xRev[1]*hetDim[3]
     dRr[2] = tr.xFwd*Rone[1]*Rtwo[4] - hetR.xRev[2]*hetDim[3]
