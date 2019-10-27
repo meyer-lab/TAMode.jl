@@ -94,29 +94,27 @@ end
 
 
 function react_module(R, dR, dLi, Gas, r, tr)
-    dRr = SVector{10}([r.binding[0]*R[0]*Gas - r.binding[1]*R[1],
-                       r.binding[2]*R[0]*Gas - r.binding[3]*R[2],
-                       r.binding[2]*R[1]*Gas - r.binding[3]*R[3],
-                       r.binding[0]*R[2]*Gas - r.binding[1]*R[3],
-                       tr.xFwd*R[0]*R[1] - r.xRev[0]*R[4],
-                       tr.xFwd*R[0]*R[2] - r.xRev[1]*R[4],
-                       tr.xFwd*R[0]*R[3] - r.xRev[2]*R[5],
-                       tr.xFwd*R[1]*R[1] - r.xRev[3]*R[5],
-                       tr.xFwd*R[2]*R[2] - r.xRev[4]*R[5],
-                       r.xFwd6[0]*Gas*R[4] - r.xRev[5]*R[5]])
-    if calcReactRate == true
-        reactRate = 
+    dRr = SVector{10}([r.binding[1]*R[1]*Gas - r.binding[2]*R[2],
+                       r.binding[3]*R[1]*Gas - r.binding[4]*R[3],
+                       r.binding[3]*R[2]*Gas - r.binding[4]*R[4],
+                       r.binding[1]*R[3]*Gas - r.binding[2]*R[4],
+                       tr.xFwd*R[1]*R[2] - r.xRev[1]*R[5],
+                       tr.xFwd*R[1]*R[3] - r.xRev[2]*R[5],
+                       tr.xFwd*R[1]*R[4] - r.xRev[3]*R[6],
+                       tr.xFwd*R[2]*R[2] - r.xRev[4]*R[6],
+                       tr.xFwd*R[3]*R[3] - r.xRev[5]*R[6],
+                       r.xFwd6*Gas*R[5] - r.xRev[6]*R[6]])
+    
+    dR[1] += - dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2]; # AXL
+    dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3];       # AXLgas1
+    dR[3] += -2*(dRr[9]) - dRr[6] + dRr[2] - dRr[4];       # AXLgas2
+    dR[4] += -dRr[7] + dRr[3] + dRr[4];                    # AXLgas12
+    dR[5] += -dRr[10] + dRr[6] + dRr[5];                    # AXLdimer1
+    dR[6] += dRr[10] + dRr[9] + dRr[8] + dRr[7];            # AXLdimer2
+    
+    if isnothing(dLi) == false
+        dLi[1] += -dRr[10] - dRr[1] - dRr[2] - dRr[3] - dRr[4]
     end
-    
-    dR[0] += - dRr[6] - dRr[5] - dRr[4] - dRr[0] - dRr[1]; # AXL
-    dR[1] += -2*(dRr[7]) - dRr[4] + dRr[0] - dRr[2];       # AXLgas1
-    dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3];       # AXLgas2
-    dR[3] += -dRr[6] + dRr[2] + dRr[3];                    # AXLgas12
-    dR[4] += -dRr[9] + dRr[5] + dRr[4];                    # AXLdimer1
-    dR[5] += dRr[9] + dRr[8] + dRr[7] + dRr[6];            # AXLdimer2
-        
-    dLi += -dRr[9] - dRr[0] - dRr[1] - dRr[2] - dRr[3];
-    
 end
 
     
