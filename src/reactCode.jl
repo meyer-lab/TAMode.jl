@@ -93,6 +93,33 @@ function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Gas, dL
 end
 
 
+function react_module(R, dR, dLi, Gas, r, tr)
+    dRr = SVector{10}([r.binding[0]*R[0]*Gas - r.binding[1]*R[1],
+                       r.binding[2]*R[0]*Gas - r.binding[3]*R[2],
+                       r.binding[2]*R[1]*Gas - r.binding[3]*R[3],
+                       r.binding[0]*R[2]*Gas - r.binding[1]*R[3],
+                       tr.xFwd*R[0]*R[1] - r.xRev[0]*R[4],
+                       tr.xFwd*R[0]*R[2] - r.xRev[1]*R[4],
+                       tr.xFwd*R[0]*R[3] - r.xRev[2]*R[5],
+                       tr.xFwd*R[1]*R[1] - r.xRev[3]*R[5],
+                       tr.xFwd*R[2]*R[2] - r.xRev[4]*R[5],
+                       r.xFwd6[0]*Gas*R[4] - r.xRev[5]*R[5]])
+    if calcReactRate == true
+        reactRate = 
+    end
+    
+    dR[0] += - dRr[6] - dRr[5] - dRr[4] - dRr[0] - dRr[1]; # AXL
+    dR[1] += -2*(dRr[7]) - dRr[4] + dRr[0] - dRr[2];       # AXLgas1
+    dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3];       # AXLgas2
+    dR[3] += -dRr[6] + dRr[2] + dRr[3];                    # AXLgas12
+    dR[4] += -dRr[9] + dRr[5] + dRr[4];                    # AXLdimer1
+    dR[5] += dRr[9] + dRr[8] + dRr[7] + dRr[6];            # AXLdimer2
+        
+    dLi += -dRr[9] - dRr[0] - dRr[1] - dRr[2] - dRr[3];
+    
+end
+
+    
 function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64, internalFrac::Float64)
 	dextR[:] .+= -extR*intRate + kRec*(1-fElse)*intR*internalFrac # Endocytosis, recycling
 	dintR[:] .+= extR*intRate/internalFrac - kRec*(1-fElse)*intR - kDeg*fElse*intR # Endocytosis, recycling, degradation
