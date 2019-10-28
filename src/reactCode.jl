@@ -105,12 +105,12 @@ function react_module(R, dR, dLi, Gas, r, tr)
                        tr.xFwd*R[3]*R[3] - r.xRev[5]*R[6],
                        r.xFwd6*Gas*R[5] - r.xRev[6]*R[6]])
     
-    dR[1] += - dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2]; # AXL
-    dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3];       # AXLgas1
-    dR[3] += -2*(dRr[9]) - dRr[6] + dRr[2] - dRr[4];       # AXLgas2
-    dR[4] += -dRr[7] + dRr[3] + dRr[4];                    # AXLgas12
-    dR[5] += -dRr[10] + dRr[6] + dRr[5];                    # AXLdimer1
-    dR[6] += dRr[10] + dRr[9] + dRr[8] + dRr[7];            # AXLdimer2
+    dR[1] += - dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2]  # AXL
+    dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3]        # AXLgas1
+    dR[3] += -2*(dRr[9]) - dRr[6] + dRr[2] - dRr[4]        # AXLgas2
+    dR[4] += -dRr[7] + dRr[3] + dRr[4]                     # AXLgas12
+    dR[5] += -dRr[10] + dRr[6] + dRr[5]                    # AXLdimer1
+    dR[6] += dRr[10] + dRr[9] + dRr[8] + dRr[7]            # AXLdimer2
     
     if isnothing(dLi) == false
         dLi[1] += -dRr[10] - dRr[1] - dRr[2] - dRr[3] - dRr[4]
