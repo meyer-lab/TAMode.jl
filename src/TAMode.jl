@@ -19,7 +19,7 @@ function runTAM(tps::Array{Float64,1}, params::Vector)::Array{Float64,2}
 
     prob = ODEProblem(TAM_reacti, u0, (0.0, maximum(tps)), params)
 
-    sol = solve(prob, Rodas4P(); isoutofdomain=domainDef)
+    sol = solve(prob, AutoTsit5(Rosenbrock23()); isoutofdomain=domainDef)
     solut = sol(tps).u
 
     if length(tps) > 1
