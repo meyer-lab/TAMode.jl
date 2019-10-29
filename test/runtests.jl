@@ -24,4 +24,3 @@ end
     # TODO: Lower tolerance
     @test dnorm < 2.0
 end
-

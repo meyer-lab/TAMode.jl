@@ -45,5 +45,4 @@ function runTAM(tps::Array{Float64,1}, params::Vector, gasStim::Float64)::Array{
     return solut
 end
 
-
 end # module
