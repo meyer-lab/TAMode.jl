@@ -118,15 +118,15 @@ function react_module(R, dR, dLi, Gas, r, tr)
 end
 
 function sumIdx (vector, idx) 
-    total = 0
-    for ii in idx 
-        if ii < 0 {
-            total -= vector[-ii]
-        else
-            total += vector[ii]
-        end
-    end
-    return total
+	total = 0
+	for ii in idx 
+		if ii < 0 {
+			total -= vector[-ii]
+		else
+			total += vector[ii]
+		end
+	end
+	return total
 end
     
 function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64, internalFrac::Float64)
@@ -165,6 +165,10 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 	heteroTAM(x_d[1:12],  x_d[26:37], view(dxdt_d, 1:12),  view(dxdt_d, 26:37), r.AT, x_d[50:55], view(dxdt_d, 50:55), r, x_d[13], view(dxdt_d, 13))
 	
 	dxdt_d[13] = -r.kDeg*x_d[13] # Gas6 degradation
+end
+
+function internalTotCalc (state, internalFrac) 
+	return internalSurfCalc(state) + internalSurfCalc(state+6)*internalFrac
 end
 
 
