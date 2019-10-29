@@ -117,6 +117,17 @@ function react_module(R, dR, dLi, Gas, r, tr)
     end
 end
 
+function sumIdx (vector, idx) 
+    total = 0
+    for ii in idx 
+        if ii < 0 {
+            total -= vector[-ii]
+        else
+            total += vector[ii]
+        end
+    end
+    return total
+end
     
 function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64, internalFrac::Float64)
 	dextR[:] .+= -extR*intRate + kRec*(1-fElse)*intR*internalFrac # Endocytosis, recycling
