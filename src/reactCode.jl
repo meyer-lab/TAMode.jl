@@ -93,31 +93,6 @@ function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Gas, dL
 end
 
 
-function react_module(R, dR, dLi, Gas, r, tr)
-    dRr = SVector{10}([r.binding[1]*R[1]*Gas - r.binding[2]*R[2],
-                       r.binding[3]*R[1]*Gas - r.binding[4]*R[3],
-                       r.binding[3]*R[2]*Gas - r.binding[4]*R[4],
-                       r.binding[1]*R[3]*Gas - r.binding[2]*R[4],
-                       tr.xFwd*R[1]*R[2] - r.xRev[1]*R[5],
-                       tr.xFwd*R[1]*R[3] - r.xRev[2]*R[5],
-                       tr.xFwd*R[1]*R[4] - r.xRev[3]*R[6],
-                       tr.xFwd*R[2]*R[2] - r.xRev[4]*R[6],
-                       tr.xFwd*R[3]*R[3] - r.xRev[5]*R[6],
-                       r.xFwd6*Gas*R[5] - r.xRev[6]*R[6]])
-    
-    dR[1] += - dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2]  # AXL
-    dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3]        # AXLgas1
-    dR[3] += -2*(dRr[9]) - dRr[6] + dRr[2] - dRr[4]        # AXLgas2
-    dR[4] += -dRr[7] + dRr[3] + dRr[4]                     # AXLgas12
-    dR[5] += -dRr[10] + dRr[6] + dRr[5]                    # AXLdimer1
-    dR[6] += dRr[10] + dRr[9] + dRr[8] + dRr[7]            # AXLdimer2
-    
-    if isnothing(dLi) == false
-        dLi[1] += -dRr[10] - dRr[1] - dRr[2] - dRr[3] - dRr[4]
-    end
-end
-
-    
 function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64, internalFrac::Float64)
 	dextR[:] .+= -extR*intRate + kRec*(1-fElse)*intR*internalFrac # Endocytosis, recycling
 	dintR[:] .+= extR*intRate/internalFrac - kRec*(1-fElse)*intR - kDeg*fElse*intR # Endocytosis, recycling, degradation
@@ -156,7 +131,9 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 	dxdt_d[13] = -r.kDeg*x_d[13] # Gas6 degradation
 end
 
-
+function internalSurfpYCalc(state)
+	state[5]+
+end
 
 
 
