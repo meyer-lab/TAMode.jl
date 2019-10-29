@@ -132,11 +132,11 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi)
 end
 
 function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates)
-	# react_module(R, dR, &temp, tr->gasCur, r, tr);
-	# react_module(R+6, dR+6, dLi, (*Li)/tr->internalV, r, tr);
-	
+	react_module(R, dR, nothing, tr.gasCur, r, tr);
+	react_module(view(R, 1:6), view(dR, 1:6), dLi, Li/tr.internalV, r, tr);
+
 	dR[1] += r.expression
-	
+
 	trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, R[1:4], R[7:10], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
 	trafFunc(view(dR, 4:5), view(dR, 10:11), tr.pYinternalize, R[4:5], R[10:11], tr.kRec, tr.kDeg, 1.0, tr.internalFrac)
 end
@@ -155,10 +155,3 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 	
 	dxdt_d[13] = -r.kDeg*x_d[13] # Gas6 degradation
 end
-
-
-
-
-
-
-
