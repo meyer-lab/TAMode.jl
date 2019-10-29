@@ -17,7 +17,7 @@ function getAutocrine(params::Vector, funcc, nZero::Int)
     @assert all(params .>= 0.0)
     
     # TODO: Replace with steady-state
-    probInit = ODEProblem(TAM_reacti, zeros(nZero), 10000000.0, params)
+    probInit = ODEProblem(TAM_reacti, zeros(eltype(params), nZero), 10000000.0, params)
     solInit = solve(probInit, AutoTsit5(Rosenbrock23()))
     
     return solInit(10000000.0)
