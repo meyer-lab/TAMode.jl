@@ -24,7 +24,7 @@ function getAutocrine(params::Vector, funcc, nZero::Int)
 end
 
 
-function runTAM(tps::Array{Float64,1}, params::Vector, gasStim::Float64)::Array{Float64,2}
+function runTAM(tps::Array{Float64,1}, params::Vector, gasStim::Float64)::Matrix
     @assert all(params .>= 0.0)
     @assert all(tps .>= 0.0)
 
