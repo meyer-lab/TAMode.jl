@@ -139,7 +139,6 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi)
 	return dnorm
 end
 
-
 function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates)
 	dnorm = react_module(R, dR, nothing, tr.gasCur, r, tr)
 	dnorm += react_module(view(R, 1:6), view(dR, 1:6), dLi, Li/tr.internalV, r, tr)
@@ -151,7 +150,6 @@ function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates)
 
 	return dnorm
 end
-
 
 function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 	fill!(dxdt_d, 0.0)
