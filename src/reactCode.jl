@@ -1,3 +1,5 @@
+
+
 mutable struct TAMrates{T}
 	binding::MVector{4, T} # fwd/rev binding rate for Ig1, then Ig2
 	xRev::MVector{6, T} # xRev 1, 2, 3, 4, 5, 6
