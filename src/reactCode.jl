@@ -1,5 +1,3 @@
-
-
 mutable struct TAMrates{T}
 	binding::MVector{4, T} # fwd/rev binding rate for Ig1, then Ig2
 	xRev::MVector{6, T} # xRev 1, 2, 3, 4, 5, 6
@@ -16,10 +14,13 @@ end
 
 
 mutable struct Rates{T}
-	AXL::TAMrates{T}
+    #=AXL::TAMrates{T}
 	MerTK::TAMrates{T}
-	Tyro3::TAMrates{T}
-	internalize::T # Non-pY species internalization rate.
+	Tyro3::TAMrates{T}=#
+    TAMs = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
+    TAMs::TAMs
+	
+    internalize::T # Non-pY species internalization rate.
 	pYinternalize::T # pY species internalization rate.
 	fElse::T # Recycling fraction for non-D2 species.
 	kRec::T # Recycling rate.
@@ -29,9 +30,11 @@ mutable struct Rates{T}
 	internalV::T
 	gasCur::T
 	
-	AM::hetRates{T}
+	#=AM::hetRates{T}
 	AT::hetRates{T}
-	MT::hetRates{T}
+	MT::hetRates{T}=#
+    hetR = @SLVector TAMrates{T} (:AM,:AT,:MT)
+    hetR::hetR
 end
 
 
@@ -171,7 +174,75 @@ function internalTotCalc (state, internalFrac)
 	return internalSurfCalc(state) + internalSurfCalc(state+6)*internalFrac
 end
 
-
+function detailedBalance (out::Rates)
+   
+    for T in out.TAMs 
+        KD1 = T.binding[2]/T.binding[1]
+        KD2 = T.binding[3]/T.binding[2]
+        
+        if T.binding[2] <= T.binding[2]
+            T.xRev[1] = T.binding[4]
+            T.xRev[2] = T.xRev[1]*KD1/KD2
+        else
+            T.xRev[2] = T.binding[2]
+            T.xRev[1] = T.xRev[2]*KD2/KD1 
+        end
+    end  
+    
+    for ii = 2:3
+        out.TAMs[ii].xFwd6 = max(out.TAMs[ii].binding[1], out.TAMs[ii].binding[3])
+        out.TAMs[ii].xRev[5] = out.TAMs[1].xRev[6]*out.TAMs[ii].binding[2]*out.TAMs[ii].binding[4]/out.TAMs[1].binding[4]/out.TAMs[1].binding[2];
+    end
+    
+    for T in out.TAMs
+        KD1 = T.binding[2]/T.binding[1]
+        KD2 = T.binding[4]/T.binding[3]
+            
+        T.xRev[5] = T.xRev[6]*KD1*T.xRev[1]/KD2/KD2/T.xFwd6;
+        T.xRev[4] = T.xRev[5]*KD2*KD2/KD1/KD1;
+        T.xRev[3] = T.xRev[4]*KD1/KD2;
+    end
+    
+    #=for ii = 1:3
+            hetRates * const A = &out.hetR[ii];
+            const unsigned int * const Ai = hetRi[ii];
+            
+            // ligand binding to the one ligand dimer
+            KD11 = out.TAMs[Ai[0]].binding[1] / out.TAMs[hetRi[ii][0]].binding[0];
+            KD12 = out.TAMs[Ai[1]].binding[1] / out.TAMs[hetRi[ii][1]].binding[0];
+            KD21 = out.TAMs[Ai[0]].binding[3] / out.TAMs[hetRi[ii][0]].binding[2];
+            KD22 = out.TAMs[Ai[1]].binding[3] / out.TAMs[hetRi[ii][1]].binding[2];
+            
+            A->xFwd15 = std::fmax(out.TAMs[Ai[1]].binding[0],out.TAMs[Ai[0]].binding[2]);
+            A->xFwd16 = std::fmax(out.TAMs[Ai[0]].binding[0],out.TAMs[Ai[1]].binding[2]);
+            
+            A->xRev[0] = out.TAMs[hetRi[ii][0]].xRev[4]*KD12/KD11;
+            A->xRev[1] = A->xRev[0]*KD21/KD12;
+            A->xRev[2] = KD22*KD21/KD11/KD12*A->xRev[0];
+            A->xRev[3] = A->xRev[0]*KD22/KD11;
+            
+            if (out.TAMs[Ai[0]].binding[1] <= out.TAMs[Ai[0]].binding[3]) {
+                A->xRev[7] = out.TAMs[Ai[0]].binding[1];
+                A->xRev[5] = A->xRev[7]*KD11/KD21;
+            } else {
+                A->xRev[5] = out.TAMs[Ai[0]].binding[3];
+                A->xRev[7] = A->xRev[5]*KD21/KD11;
+            }
+            
+            if (out.TAMs[Ai[1]].binding[1] <= out.TAMs[Ai[1]].binding[3]) {
+                A->xRev[4] = out.TAMs[Ai[1]].binding[1];
+                A->xRev[6] = A->xRev[4]*KD22/KD12;
+            } else {
+                A->xRev[6] = out.TAMs[Ai[1]].binding[3];
+                A->xRev[4] = A->xRev[6]*KD12/KD22;
+            }
+            
+            A->xRev[8] = A->xRev[0]*KD21/KD12;
+            A->xRev[9] = A->xRev[2]*KD11/KD22;
+        }
+        
+        return out;=#
+end
 
 
 
