@@ -14,13 +14,9 @@ end
 
 
 mutable struct Rates{T}
-    #=AXL::TAMrates{T}
-	MerTK::TAMrates{T}
-	Tyro3::TAMrates{T}=#
-    TAMs = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
-    TAMs::TAMs
-	
-    internalize::T # Non-pY species internalization rate.
+	TAMs = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
+
+	internalize::T # Non-pY species internalization rate.
 	pYinternalize::T # pY species internalization rate.
 	fElse::T # Recycling fraction for non-D2 species.
 	kRec::T # Recycling rate.
@@ -29,12 +25,8 @@ mutable struct Rates{T}
 	internalFrac::T
 	internalV::T
 	gasCur::T
-	
-	#=AM::hetRates{T}
-	AT::hetRates{T}
-	MT::hetRates{T}=#
-    hetR = @SLVector TAMrates{T} (:AM,:AT,:MT)
-    hetR::hetR
+
+	hetR = @SLVector TAMrates{T} (:AM,:AT,:MT)
 end
 
 
