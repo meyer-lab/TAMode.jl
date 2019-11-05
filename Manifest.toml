@@ -18,12 +18,6 @@ git-tree-sha1 = "981354dab938901c2b607a213e62d9defa50b698"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
 version = "1.2.1"
 
-[[BandedMatrices]]
-deps = ["FillArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "Random", "SparseArrays"]
-git-tree-sha1 = "98412ac667364be42033ea60a760bceb158e8453"
-uuid = "aae01518-5342-5314-be14-df237901396f"
-version = "0.13.0"
-
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
@@ -35,27 +29,15 @@ version = "0.8.10"
 
 [[BinaryProvider]]
 deps = ["Libdl", "SHA"]
-git-tree-sha1 = "29995a7b317bbd06be147e1974a3541ce2502dca"
+git-tree-sha1 = "5b08ed6036d9d3f0ee6369410b830f8873d4024c"
 uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.5.7"
-
-[[BlockArrays]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "f58a4335816434b7c283bb9933b374b158a25b34"
-uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "0.10.1"
-
-[[BlockBandedMatrices]]
-deps = ["BandedMatrices", "BlockArrays", "Distributed", "FillArrays", "LazyArrays", "LinearAlgebra", "MatrixFactorizations", "Pkg", "Profile", "Random", "SharedArrays", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "8a18b56627d71860232c48a53a51cb88958efc00"
-uuid = "ffab5731-97b5-5995-9138-79e8c1846df0"
-version = "0.5.2"
+version = "0.5.8"
 
 [[CSTParser]]
 deps = ["Tokenize"]
-git-tree-sha1 = "c69698c3d4a7255bc1b4bc2afc09f59db910243b"
+git-tree-sha1 = "99dda94f5af21a4565dc2b97edf6a95485f116c3"
 uuid = "00ebfdb7-1f24-5e51-bd34-a7502290713f"
-version = "0.6.2"
+version = "1.0.0"
 
 [[Calculus]]
 deps = ["Compat"]
@@ -91,15 +73,15 @@ uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[DiffEqBase]]
 deps = ["ArrayInterface", "Compat", "DiffEqDiffTools", "Distributed", "DocStringExtensions", "FunctionWrappers", "IterativeSolvers", "IteratorInterfaceExtensions", "LinearAlgebra", "MuladdMacro", "Parameters", "Printf", "RecipesBase", "RecursiveArrayTools", "RecursiveFactorization", "Requires", "Roots", "SparseArrays", "StaticArrays", "Statistics", "SuiteSparse", "TableTraits", "TreeViews"]
-git-tree-sha1 = "a7ab2f4c083745d6ab0825180365cc1e424ec03e"
+git-tree-sha1 = "05a10ee594cc6a810b3c0e337b6b61405f387ef3"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.4.1"
+version = "6.4.2"
 
 [[DiffEqCallbacks]]
-deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
-git-tree-sha1 = "307eda7b109cf1f236fbbb19976562146af386e1"
+deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
+git-tree-sha1 = "0cb6b3481df064100cf6a2f3c457e7e024edb9e9"
 uuid = "459566f4-90b8-5000-8ac3-15dfb0a30def"
-version = "2.8.0"
+version = "2.9.0"
 
 [[DiffEqDiffTools]]
 deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
@@ -141,17 +123,11 @@ git-tree-sha1 = "85e1ce16aa9b98793df704e17e7a0ceadefe404f"
 uuid = "d4d017d3-3776-5f7e-afef-a10c40355c18"
 version = "1.5.1"
 
-[[FillArrays]]
-deps = ["LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "de38b0253ade98340fabaf220f368f6144541938"
-uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.7.4"
-
 [[ForwardDiff]]
 deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "NaNMath", "Random", "SpecialFunctions", "StaticArrays"]
-git-tree-sha1 = "e2c81741a8be50de143ecddee942396894f47750"
+git-tree-sha1 = "adf88d6da1f0294058f38295becf8807986bb7d0"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
-version = "0.10.4"
+version = "0.10.5"
 
 [[FunctionWrappers]]
 deps = ["Compat"]
@@ -185,12 +161,6 @@ version = "0.8.1"
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
-
-[[LazyArrays]]
-deps = ["FillArrays", "LinearAlgebra", "MacroTools", "StaticArrays"]
-git-tree-sha1 = "01ec151cd0418fb05294b0230471765e0a65adb1"
-uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "0.12.3"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -227,12 +197,6 @@ version = "0.5.1"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 
-[[MatrixFactorizations]]
-deps = ["LinearAlgebra", "Random", "Test"]
-git-tree-sha1 = "42f7931fac4068709a8412d3766e9a2bfc91e451"
-uuid = "a3b82374-2e81-5b9e-98ce-41277c0e4c87"
-version = "0.2.0"
-
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
@@ -250,9 +214,9 @@ version = "7.5.0"
 
 [[NLsolve]]
 deps = ["DiffEqDiffTools", "Distances", "ForwardDiff", "LineSearches", "LinearAlgebra", "NLSolversBase", "Printf", "Reexport"]
-git-tree-sha1 = "c9578878f56f425a2160f5b436c7f79a154d154c"
+git-tree-sha1 = "be25a8486c7be4b075165315e201fa5d199073f1"
 uuid = "2774e3e8-f4cf-5e23-947b-6d7e65073b56"
-version = "4.1.0"
+version = "4.2.0"
 
 [[NaNMath]]
 deps = ["Compat"]
@@ -268,9 +232,9 @@ version = "1.1.0"
 
 [[OrdinaryDiffEq]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "DiffEqDiffTools", "ExponentialUtilities", "ForwardDiff", "GenericSVD", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "NLsolve", "Parameters", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays"]
-git-tree-sha1 = "1a641fb4269f643ca8ada2e23917d892432ae52d"
+git-tree-sha1 = "d5b15b63a76146da84079aeabaf9d7f692afbcdf"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "5.18.0"
+version = "5.19.0"
 
 [[Parameters]]
 deps = ["OrderedCollections"]
@@ -357,10 +321,10 @@ deps = ["LinearAlgebra", "Random"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[SparseDiffTools]]
-deps = ["Adapt", "ArrayInterface", "BandedMatrices", "BlockBandedMatrices", "DataStructures", "DiffEqDiffTools", "ForwardDiff", "LightGraphs", "LinearAlgebra", "Requires", "SparseArrays", "VertexSafeGraphs"]
-git-tree-sha1 = "c1c5fee07ff2d640aa132c777e89d0fdd6c9e777"
+deps = ["Adapt", "ArrayInterface", "DataStructures", "DiffEqDiffTools", "ForwardDiff", "LightGraphs", "LinearAlgebra", "Requires", "SparseArrays", "VertexSafeGraphs"]
+git-tree-sha1 = "10537f7c6d3cfda414c7b9fb378bbd165f92735c"
 uuid = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
-version = "0.9.1"
+version = "0.10.1"
 
 [[SpecialFunctions]]
 deps = ["BinDeps", "BinaryProvider", "Libdl"]
