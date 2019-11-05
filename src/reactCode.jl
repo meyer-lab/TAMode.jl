@@ -131,8 +131,16 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 	dxdt_d[13] = -r.kDeg*x_d[13] # Gas6 degradation
 end
 
-function internalSurfpYCalc(state)
-	state[5]+
+function swapIgs(out::Rates)
+    detailedBalance(out)
+    
+    for T in out.TAMs
+        T.binding[1], T.binding[3] = T.binding[3], T.binding[1]
+        T.binding[2], T.binding[4] = T.binding[4], T.binding[2]
+        T.xRev[4], T.xRev[5] = T.xRev[5], T.xRev[4]
+    end
+    
+    return detailedBalance(out)
 end
 
 
