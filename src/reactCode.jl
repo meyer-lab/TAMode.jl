@@ -8,14 +8,6 @@ mutable struct TAMrates{T}
 end
 
 
-mutable struct comprates{T} #do we want this to be T and what does {T} mean
-    rr::Rates #do i need values for all the rates and does this want to be in the reactCode file or a new one
-    fraction::T #Fraction of cell surface covered with PtdSer
-    partIn::T #Partitioning rate into PtdSer regions
-    gasPart::T #Partitioning of ligand into PtdSer region
-end
-
-
 mutable struct hetRates{T}
 	xRev::MVector{10, T} # xRev 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
 	xFwd15::T
