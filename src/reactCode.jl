@@ -1,3 +1,5 @@
+
+
 mutable struct TAMrates{T}
 	binding::MVector{4, T} # fwd/rev binding rate for Ig1, then Ig2
 	xRev::MVector{6, T} # xRev 1, 2, 3, 4, 5, 6
@@ -16,6 +18,7 @@ end
 TAMs = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
 hetR = @SLVector TAMrates{T} (:AM,:AT,:MT)
 mutable struct Rates{T}
+<<<<<<< HEAD
     #=AXL::TAMrates{T}
 	MerTK::TAMrates{T}
 	Tyro3::TAMrates{T}=#
@@ -23,6 +26,11 @@ mutable struct Rates{T}
     TAMs::TAMs
 	
     internalize::T # Non-pY species internalization rate.
+=======
+	TAMs = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
+
+	internalize::T # Non-pY species internalization rate.
+>>>>>>> 90aa48f19ba44d55f65961ae6e20dde66c445757
 	pYinternalize::T # pY species internalization rate.
 	fElse::T # Recycling fraction for non-D2 species.
 	kRec::T # Recycling rate.
@@ -31,12 +39,17 @@ mutable struct Rates{T}
 	internalFrac::T
 	internalV::T
 	gasCur::T
+<<<<<<< HEAD
 	
 	#=AM::hetRates{T}
 	AT::hetRates{T}
 	MT::hetRates{T}=#
     
     hetR::hetR
+=======
+
+	hetR = @SLVector TAMrates{T} (:AM,:AT,:MT)
+>>>>>>> 90aa48f19ba44d55f65961ae6e20dde66c445757
 end
 
 
@@ -130,6 +143,7 @@ function react_module(R, dR, dLi, Gas, r::TAMrates, tr::Rates)
 end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 function sumIdx (vector, idx) 
 	total = 0
 	for ii in idx 
@@ -146,6 +160,10 @@ end
 
 " Handles trafficking of receptor and ligand. "
 >>>>>>> b2da8def52c24598284866f51a450fffa40daa15
+=======
+
+" Handles trafficking of receptor and ligand. "
+>>>>>>> 90aa48f19ba44d55f65961ae6e20dde66c445757
 function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64, internalFrac::Float64)
 	dextR[:] .+= -extR*intRate + kRec*(1-fElse)*intR*internalFrac # Endocytosis, recycling
 	dintR[:] .+= extR*intRate/internalFrac - kRec*(1-fElse)*intR - kDeg*fElse*intR # Endocytosis, recycling, degradation
@@ -179,6 +197,7 @@ function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 	r = param(params)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.AXL, r)
 	TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.MerTK, r)
 	TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.Tyro3, r)
@@ -187,12 +206,26 @@ function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 	heteroTAM(x_d[14:25], x_d[26:37], view(dxdt_d, 14:25), view(dxdt_d, 26:37), r.MT, x_d[44:49], view(dxdt_d, 44:49), r, x_d[13], view(dxdt_d, 13))
 	heteroTAM(x_d[1:12],  x_d[26:37], view(dxdt_d, 1:12),  view(dxdt_d, 26:37), r.AT, x_d[50:55], view(dxdt_d, 50:55), r, x_d[13], view(dxdt_d, 13))
 	
+=======
+	dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.AXL, r)
+	dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.MerTK, r)
+	dnorm += TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.Tyro3, r)
+
+	dnorm += heteroTAM(x_d[1:12],  x_d[14:25], view(dxdt_d, 1:12),  view(dxdt_d, 14:25), r.AM, x_d[38:43], view(dxdt_d, 38:43), r, x_d[13], view(dxdt_d, 13))
+	dnorm += heteroTAM(x_d[14:25], x_d[26:37], view(dxdt_d, 14:25), view(dxdt_d, 26:37), r.MT, x_d[44:49], view(dxdt_d, 44:49), r, x_d[13], view(dxdt_d, 13))
+	dnorm += heteroTAM(x_d[1:12],  x_d[26:37], view(dxdt_d, 1:12),  view(dxdt_d, 26:37), r.AT, x_d[50:55], view(dxdt_d, 50:55), r, x_d[13], view(dxdt_d, 13))
+
+>>>>>>> 90aa48f19ba44d55f65961ae6e20dde66c445757
 	dxdt_d[13] = -r.kDeg*x_d[13] # Gas6 degradation
+
+	return dnorm
 end
 
-function internalTotCalc (state, internalFrac) 
-	return internalSurfCalc(state) + internalSurfCalc(state+6)*internalFrac
+
+function TAM_reacti(dxdt_d, x_d, params, t)
+	TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 end
+
 
 function detailedBalance (out::Rates)
    
@@ -260,6 +293,7 @@ function detailedBalance (out::Rates)
         
     end
 end
+<<<<<<< HEAD
 
 =======
 	dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.AXL, r)
@@ -279,3 +313,5 @@ end
 function TAM_reacti(dxdt_d, x_d, params, t)
 	TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 end
+=======
+>>>>>>> 90aa48f19ba44d55f65961ae6e20dde66c445757
