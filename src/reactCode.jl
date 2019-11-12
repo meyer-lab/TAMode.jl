@@ -15,12 +15,12 @@ mutable struct hetRates{T}
 end
 
 
-TAMs = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
-hetR = @SLVector TAMrates{T} (:AM,:AT,:MT)
+TAMsType{T} = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
+hetRType{T} = @SLVector TAMrates{T} (:AM,:AT,:MT)
+
+
 mutable struct Rates{T}
-
-	TAMs = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
-
+	TAMs::TAMsType
 	internalize::T # Non-pY species internalization rate.
 	pYinternalize::T # pY species internalization rate.
 	fElse::T # Recycling fraction for non-D2 species.
@@ -30,8 +30,7 @@ mutable struct Rates{T}
 	internalFrac::T
 	internalV::T
 	gasCur::T
-
-	hetR = @SLVector TAMrates{T} (:AM,:AT,:MT)
+	hetR::hetRType
 end
 
 
@@ -158,10 +157,6 @@ function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 	fill!(dxdt_d, 0.0)
 	r = param(params)
 
-function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
-	fill!(dxdt_d, 0.0)
-	r = param(params)
-
 	dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.AXL, r)
 	dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.MerTK, r)
 	dnorm += TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.Tyro3, r)
@@ -181,7 +176,7 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 end
 
 
-function detailedBalance (out::Rates)
+function detailedBalance(out::Rates)
    
     for T in out.TAMs 
         KD1 = T.binding[2]/T.binding[1]
@@ -211,7 +206,10 @@ function detailedBalance (out::Rates)
     end
     
     # ligand binding to the one ligand dimer
-    for x in [AXL, Mer, Mer] && y in [Mer, Tyro, Tyro] && A in out.hetR        
+    for ii in 1:3
+    	x = [:Axl, :Axl, :MerTK][ii]
+    	y = [:MerTK, :Tyro3, :Tyro3][ii]
+    	A = view(out.hetR, ii)
         
         KD11 = out.TAMs[x].binding[2]/out.TAMs[x].binding[1]
         KD12 = out.TAMs[y].binding[2]/out.TAMs[y].binding[1]
