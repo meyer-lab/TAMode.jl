@@ -109,7 +109,7 @@ function react_module(R, dR, dLi, Gas, r::TAMrates, tr::Rates)
                        tr.xFwd*R[2]*R[2] - r.xRev[4]*R[6],
                        tr.xFwd*R[3]*R[3] - r.xRev[5]*R[6],
                        r.xFwd6*Gas*R[5] - r.xRev[6]*R[6]])
-    
+
 	dR[1] += - dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2] # AXL
 	dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3] # AXLgas1
 	dR[3] += -2*(dRr[9]) - dRr[6] + dRr[2] - dRr[4] # AXLgas2
@@ -175,3 +175,14 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 	TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 end
 
+function swapIgs(out::Rates)
+    detailedBalance(out)
+    
+    for T in out.TAMs
+        T.binding[1], T.binding[3] = T.binding[3], T.binding[1]
+        T.binding[2], T.binding[4] = T.binding[4], T.binding[2]
+        T.xRev[4], T.xRev[5] = T.xRev[5], T.xRev[4]
+    end
+    
+    return detailedBalance(out)
+end
