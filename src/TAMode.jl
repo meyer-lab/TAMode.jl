@@ -6,6 +6,8 @@ using SteadyStateDiffEq
 using LinearAlgebra
 
 include("reactCode.jl")
+include("compModel.jl")
+include("bothLigands.jl")
 
 
 function domainDef(u, p, t)
