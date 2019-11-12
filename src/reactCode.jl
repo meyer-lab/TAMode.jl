@@ -170,12 +170,6 @@ function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 	return dnorm
 end
 
-
-function TAM_reacti(dxdt_d, x_d, params, t)
-	TAM_reacti_dnorm(dxdt_d, x_d, params, t)
-end
-
-
 function detailedBalance(out::Rates)
    
     for T in out.TAMs 
