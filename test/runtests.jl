@@ -1,6 +1,7 @@
 using Test
 using Profile
 using TAMode
+using LinearAlgebra
 
 tps = [0.1, 1.0, 10.0, 100.0]
 params = ones(15) * 0.5
@@ -29,18 +30,14 @@ end
     rr = TAMode.param(params)
     rrSwap = TAMode.swapIgs(rr)
 
-    data = TAMode.runTAM(tps, rr, 10)
-    dataSwap = TAMode.runTAM(tps, rrSwap, 10)
+    data = TAMode.runTAM(tps, rr, 10.0)
+    dataSwap = TAMode.runTAM(tps, rrSwap, 10.0)
 
-    for ii in 1:size(data.pY)
-        @test data.pY .≈ dataSwap.pY
-        @test ≈ ((data.total[ii] - dataSwap.total[ii])/(data.total[ii] + dataSwap.total[ii] + 1e-6), 0, 1e-6)
-        @test ≈ ((data.surf[ii] - dataSwap.surf[ii])/(data.surf[ii] + dataSwap.surf[ii] + 1e-6), 0, 1e-6)
-        @test ≈ ("surfpY", (data.surfPY[ii] - dataSwap.surfPY[ii])/(data.surfPY[ii] + dataSwap.surfPY[ii] + 1e-6), 0, 1e-6) # assert with message?
-    end
-    
-    for ii in 1:size(data.surfL)
-        @test ≈ ((data.surfL[ii] - dataSwap.surfL[ii])/(data.surfL[ii] + dataSwap.surfL[ii] + 1e-6), 0, 1e-6)
-    end
+    # Test that the phosphorylated receptor matches up
+    @test all(data * TAMode.pY .≈ dataSwap * TAMode.pY)
+    #@test ≈ ((data.total[ii] - dataSwap.total[ii])/(data.total[ii] + dataSwap.total[ii] + 1e-6), 0, 1e-6)
+    #@test ≈ ((data.surf[ii] - dataSwap.surf[ii])/(data.surf[ii] + dataSwap.surf[ii] + 1e-6), 0, 1e-6)
+    #@test ≈ ("surfpY", (data.surfPY[ii] - dataSwap.surfPY[ii])/(data.surfPY[ii] + dataSwap.surfPY[ii] + 1e-6), 0, 1e-6) # assert with message?
+    #@test ≈ ((data.surfL[ii] - dataSwap.surfL[ii])/(data.surfL[ii] + dataSwap.surfL[ii] + 1e-6), 0, 1e-6)
 end
 
