@@ -4,6 +4,7 @@ using OrdinaryDiffEq
 using StaticArrays
 using SteadyStateDiffEq
 using LinearAlgebra
+using LabelledArrays
 
 include("reactCode.jl")
 include("compModel.jl")
