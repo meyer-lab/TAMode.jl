@@ -25,3 +25,20 @@ end
     @test dnorm < 2.0
 end
 
+@testset "Check if there's no receptor" begin
+   
+    
+    for i=2:3
+        rr::Rates = TAM.param(paramR.getTrafP()) #param is moved from reactcode.hpp
+        
+        rr.
+        
+        tt::TAM = TAM(rr) #TAM is a constructor
+        
+        data::TAMout = tt.calcStim(tps,10)
+        
+        for t=0:size(tps)
+            @test ≈ (data.total[i+3*t],0,1e-6)
+        end
+    end
+end
