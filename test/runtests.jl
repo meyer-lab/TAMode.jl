@@ -26,19 +26,15 @@ end
 end
 
 @testset "Check if there's no receptor" begin
-   
-    
-    for i=2:3
-        rr::Rates = TAM.param(paramR.getTrafP()) #param is moved from reactcode.hpp
-        
+    for i in 1:3
+        rr = TAM.param(params)
+
         rr.TAMs[i].expression = 0.0 #I don't know if we can use TAMs here... still working on this line
         
         tt::TAM = TAM(rr) #TAM is a constructor
         
         data::TAMout = tt.calcStim(tps,10)
-        
-        for t=0:size(tps)
-            @test ≈ (data.total[i+3*t],0,1e-6)
-        end
+
+        @test ≈ (data.total[i+3*t],0,1e-6)
     end
 end
