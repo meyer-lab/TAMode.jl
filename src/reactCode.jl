@@ -16,7 +16,7 @@ end
 
 
 TAMsType{T} = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
-hetRType{T} = @SLVector hetRates{T} (:AM,:AT,:MT)
+hetRType{T} = @SLVector hetRates{T} (:AM,:MT,:AT)
 
 
 mutable struct Rates{T}
@@ -154,13 +154,13 @@ function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 	fill!(dxdt_d, 0.0)
 	r = param(params)
 
-	dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.AXL, r)
-	dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.MerTK, r)
-	dnorm += TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.Tyro3, r)
+	dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.TAMs.Axl, r)
+	dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.TAMs.MerTK, r)
+	dnorm += TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.TAMs.Tyro3, r)
 
-	dnorm += heteroTAM(x_d[1:12],  x_d[14:25], view(dxdt_d, 1:12),  view(dxdt_d, 14:25), r.AM, x_d[38:43], view(dxdt_d, 38:43), r, x_d[13], view(dxdt_d, 13))
-	dnorm += heteroTAM(x_d[14:25], x_d[26:37], view(dxdt_d, 14:25), view(dxdt_d, 26:37), r.MT, x_d[44:49], view(dxdt_d, 44:49), r, x_d[13], view(dxdt_d, 13))
-	dnorm += heteroTAM(x_d[1:12],  x_d[26:37], view(dxdt_d, 1:12),  view(dxdt_d, 26:37), r.AT, x_d[50:55], view(dxdt_d, 50:55), r, x_d[13], view(dxdt_d, 13))
+	dnorm += heteroTAM(x_d[1:12],  x_d[14:25], view(dxdt_d, 1:12),  view(dxdt_d, 14:25), r.hetR.AM, x_d[38:43], view(dxdt_d, 38:43), r, x_d[13], view(dxdt_d, 13))
+	dnorm += heteroTAM(x_d[14:25], x_d[26:37], view(dxdt_d, 14:25), view(dxdt_d, 26:37), r.hetR.MT, x_d[44:49], view(dxdt_d, 44:49), r, x_d[13], view(dxdt_d, 13))
+	dnorm += heteroTAM(x_d[1:12],  x_d[26:37], view(dxdt_d, 1:12),  view(dxdt_d, 26:37), r.hetR.AT, x_d[50:55], view(dxdt_d, 50:55), r, x_d[13], view(dxdt_d, 13))
 
 	dxdt_d[13] = -r.kDeg*x_d[13] # Gas6 degradation
 
@@ -198,7 +198,7 @@ function detailedBalance(out::Rates)
     
     # ligand binding to the one ligand dimer
     for ii in 1:3
-    	x = [:Axl, :Axl, :MerTK][ii]
+    	x = [:Axl, :MerTK, :Axl][ii]
     	y = [:MerTK, :Tyro3, :Tyro3][ii]
         
         KD11 = out.TAMs[x].binding[2]/out.TAMs[x].binding[1]
