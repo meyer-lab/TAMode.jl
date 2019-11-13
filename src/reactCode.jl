@@ -16,11 +16,11 @@ end
 
 
 TAMsType{T} = @SLVector TAMrates{T} (:Axl,:MerTK,:Tyro3)
-hetRType{T} = @SLVector TAMrates{T} (:AM,:AT,:MT)
+hetRType{T} = @SLVector hetRates{T} (:AM,:AT,:MT)
 
 
 mutable struct Rates{T}
-	TAMs::TAMsType
+	TAMs::TAMsType{T}
 	internalize::T # Non-pY species internalization rate.
 	pYinternalize::T # pY species internalization rate.
 	fElse::T # Recycling fraction for non-D2 species.
@@ -30,7 +30,7 @@ mutable struct Rates{T}
 	internalFrac::T
 	internalV::T
 	gasCur::T
-	hetR::hetRType
+	hetR::hetRType{T}
 end
 
 
@@ -44,20 +44,17 @@ function param(params::Vector)
 	MerTK = TAMrates{eltype(params)}([fBnd, fBnd*params[12], fBnd, fBnd*params[13]], zeros(6), params[9], 0.0)
 	Tyro3 = TAMrates{eltype(params)}([fBnd, fBnd*params[14], fBnd, fBnd*params[15]], zeros(6), params[10], 0.0)
 
+	TAM = TAMsType{eltype(params)}(AXL, MerTK, Tyro3)
+
 	hetR = hetRates{eltype(params)}(zeros(10), 0.0, 0.0)
+	hetRs = hetRType{eltype(params)}(hetR, deepcopy(hetR), deepcopy(hetR))
 
-	out = Rates{eltype(params)}(AXL, MerTK, Tyro3, params[1], params[2], params[3],
-								params[4], params[5], params[6], 0.5, 623.0, params[7],
-								hetR, deepcopy(hetR), deepcopy(hetR))
+	out = Rates{eltype(params)}(TAM, params[1], params[2], params[3],
+								params[4], params[5], params[6], 0.5, 623.0, params[7], hetRs)
 
+	out.TAMs.Axl.xRev[5] = 0.0144 # From Kariolis et al
 
-	out.AXL.xRev[5] = 0.0144 # From Kariolis et al
-
-	# ==== Detailed balance
-
-	# TODO: Add.
-
-	return out
+	return detailedBalance(out)
 end
 
 
@@ -134,7 +131,7 @@ end
 " Handles hetero-receptor interactions. "
 function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi)
 	dnorm = het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, tr.gasCur, nothing)
-	dnorm += het_module(view(Rone, 7:10), view(Rtwo, 7:10), view(dRone, 7:10), view(dRtwo, 7:10), hetR, view(hetDim, 4:6), view(dhetDim, 4:6), tr, Li / tr.internalV, dLi);
+	dnorm += het_module(view(Rone, 7:10), view(Rtwo, 7:10), view(dRone, 7:10), view(dRtwo, 7:10), hetR, view(hetDim, 4:6), view(dhetDim, 4:6), tr, Li / tr.internalV, dLi)
 
 	trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, hetDim[1:3], hetDim[4:6], tr.kRec, tr.kDeg, 1.0, tr.internalFrac)
 
@@ -187,57 +184,57 @@ function detailedBalance(out::Rates)
     
     for ii = 2:3
         out.TAMs[ii].xFwd6 = max(out.TAMs[ii].binding[1], out.TAMs[ii].binding[3])
-        out.TAMs[ii].xRev[5] = out.TAMs[1].xRev[6]*out.TAMs[ii].binding[2]*out.TAMs[ii].binding[4]/out.TAMs[1].binding[4]/out.TAMs[1].binding[2];
+        out.TAMs[ii].xRev[5] = out.TAMs[1].xRev[6]*out.TAMs[ii].binding[2]*out.TAMs[ii].binding[4]/out.TAMs[1].binding[4]/out.TAMs[1].binding[2]
     end
     
     for T in out.TAMs
         KD1 = T.binding[2]/T.binding[1]
         KD2 = T.binding[4]/T.binding[3]
             
-        T.xRev[5] = T.xRev[6]*KD1*T.xRev[1]/KD2/KD2/T.xFwd6;
-        T.xRev[4] = T.xRev[5]*KD2*KD2/KD1/KD1;
-        T.xRev[3] = T.xRev[4]*KD1/KD2;
+        T.xRev[5] = T.xRev[6]*KD1*T.xRev[1]/KD2/KD2/T.xFwd6
+        T.xRev[4] = T.xRev[5]*KD2*KD2/KD1/KD1
+        T.xRev[3] = T.xRev[4]*KD1/KD2
     end
     
     # ligand binding to the one ligand dimer
     for ii in 1:3
     	x = [:Axl, :Axl, :MerTK][ii]
     	y = [:MerTK, :Tyro3, :Tyro3][ii]
-    	A = view(out.hetR, ii)
         
         KD11 = out.TAMs[x].binding[2]/out.TAMs[x].binding[1]
         KD12 = out.TAMs[y].binding[2]/out.TAMs[y].binding[1]
         KD21 = out.TAMs[x].binding[4]/out.TAMs[x].binding[3]
         KD22 = out.TAMs[y].binding[4]/out.TAMs[y].binding[3]
         
-        A.xfwd15 = max(out.TAMs[y].binding[1], out.TAMs[x].binding[3])
-        A.xfwd16 = max(out.TAMs[x].binding[1], out.TAMs[y].binding[3])
+        out.hetR[ii].xFwd15 = max(out.TAMs[y].binding[1], out.TAMs[x].binding[3])
+        out.hetR[ii].xFwd16 = max(out.TAMs[x].binding[1], out.TAMs[y].binding[3])
         
-        A.xRev[1] = out.TAMs[x].xRev[5]*KD12/KD11;
-        A.xRev[2] = A.xRev[1]*KD21/KD12;
-        A.xRev[3] = KD22*KD21/KD11/KD12*A.xRev[1];
-        A.xRev[4] = A.xRev[1]*KD22/KD11;
+        out.hetR[ii].xRev[1] = out.TAMs[x].xRev[5]*KD12/KD11
+        out.hetR[ii].xRev[2] = out.hetR[ii].xRev[1]*KD21/KD12
+        out.hetR[ii].xRev[3] = KD22*KD21/KD11/KD12*out.hetR[ii].xRev[1]
+        out.hetR[ii].xRev[4] = out.hetR[ii].xRev[1]*KD22/KD11
         
         if out.TAMs[x].binding[2] <= out.TAMs[x].binding[4] 
-            A.xRev[8] = out.TAMs[x].binding[2]
-            A.xRev[6] = A.xRev[9]*KD11/KD21;
+            out.hetR[ii].xRev[8] = out.TAMs[x].binding[2]
+            out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
         else 
-            A.xRev[6] = out.TAMs[x].binding[4]
-            A.xRev[8] = A.xRev[6]*KD21/KD11
+            out.hetR[ii].xRev[6] = out.TAMs[x].binding[4]
+            out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
         end
             
          if out.TAMs[y].binding[2] <= out.TAMs[y].binding[4] 
-            A.xRev[8] = out.TAMs[y].binding[2]
-            A.xRev[6] = A.xRev[9]*KD11/KD21;
+            out.hetR[ii].xRev[8] = out.TAMs[y].binding[2]
+            out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
         else 
-            A.xRev[6] = out.TAMs[y].binding[4]
-            A.xRev[8] = A.xRev[6]*KD21/KD11
+            out.hetR[ii].xRev[6] = out.TAMs[y].binding[4]
+            out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
         end
             
-        A.xRev[9] = A.xRev[1]*KD21/KD12
-        A.xRev[10] = A.xRev[3]*KD11/KD22
-        
+        out.hetR[ii].xRev[9] = out.hetR[ii].xRev[1]*KD21/KD12
+        out.hetR[ii].xRev[10] = out.hetR[ii].xRev[3]*KD11/KD22
     end
+
+    return out
 end
 
 function TAM_reacti(dxdt_d, x_d, params, t)
