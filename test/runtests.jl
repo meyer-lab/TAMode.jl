@@ -17,7 +17,7 @@ end
 
 
 @testset "Check for detailed balance at steady-state." begin
-    uLong = TAMode.runTAM([10.0], params, 100.0)
+    uLong = TAMode.runTAM([1000.0], params, 100.0)
 
     dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, params, 0.0)
 
