@@ -33,7 +33,7 @@ end
     dataSwap = TAMode.runTAM(tps, rrSwap, 10)
 
     for ii in 1:size(data.pY)
-        @test ≈ ((data.pY[ii] - dataSwap.pY[ii])/(data.pY[ii] + dataSwap.pY[ii] + 1e-6), 0, 1e-6)
+        @test data.pY .≈ dataSwap.pY
         @test ≈ ((data.total[ii] - dataSwap.total[ii])/(data.total[ii] + dataSwap.total[ii] + 1e-6), 0, 1e-6)
         @test ≈ ((data.surf[ii] - dataSwap.surf[ii])/(data.surf[ii] + dataSwap.surf[ii] + 1e-6), 0, 1e-6)
         @test ≈ ("surfpY", (data.surfPY[ii] - dataSwap.surfPY[ii])/(data.surfPY[ii] + dataSwap.surfPY[ii] + 1e-6), 0, 1e-6) # assert with message?
