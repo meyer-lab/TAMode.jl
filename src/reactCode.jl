@@ -96,16 +96,16 @@ end
 " Tracks the individual receptor-ligand interactions within a given receptor. "
 function react_module(R, dR, dLi, Gas, r::TAMrates, tr::Rates)
 	dRr = SVector{10}([r.binding[1]*R[1]*Gas - r.binding[2]*R[2],
-                       r.binding[3]*R[1]*Gas - r.binding[4]*R[3],
-                       r.binding[3]*R[2]*Gas - r.binding[4]*R[4],
-                       r.binding[1]*R[3]*Gas - r.binding[2]*R[4],
-                       tr.xFwd*R[1]*R[2] - r.xRev[1]*R[5],
-                       tr.xFwd*R[1]*R[3] - r.xRev[2]*R[5],
-                       tr.xFwd*R[1]*R[4] - r.xRev[3]*R[6],
-                       tr.xFwd*R[2]*R[2] - r.xRev[4]*R[6],
-                       tr.xFwd*R[3]*R[3] - r.xRev[5]*R[6],
-                       r.xFwd6*Gas*R[5] - r.xRev[6]*R[6]])
-    
+					   r.binding[3]*R[1]*Gas - r.binding[4]*R[3],
+					   r.binding[3]*R[2]*Gas - r.binding[4]*R[4],
+					   r.binding[1]*R[3]*Gas - r.binding[2]*R[4],
+					   tr.xFwd*R[1]*R[2] - r.xRev[1]*R[5],
+					   tr.xFwd*R[1]*R[3] - r.xRev[2]*R[5],
+					   tr.xFwd*R[1]*R[4] - r.xRev[3]*R[6],
+					   tr.xFwd*R[2]*R[2] - r.xRev[4]*R[6],
+					   tr.xFwd*R[3]*R[3] - r.xRev[5]*R[6],
+					   r.xFwd6*Gas*R[5] - r.xRev[6]*R[6]])
+	
 	dR[1] += - dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2] # AXL
 	dR[2] += -2*(dRr[8]) - dRr[5] + dRr[1] - dRr[3] # AXLgas1
 	dR[3] += -2*(dRr[9]) - dRr[6] + dRr[2] - dRr[4] # AXLgas2
@@ -116,8 +116,8 @@ function react_module(R, dR, dLi, Gas, r::TAMrates, tr::Rates)
 	if isnothing(dLi) == false
 		dLi[1] += -dRr[10] - dRr[1] - dRr[2] - dRr[3] - dRr[4]
 	end
-    
-    return norm(dRr)
+	
+	return norm(dRr)
 end
 
 
@@ -169,72 +169,72 @@ end
 
 function detailedBalance(out::Rates)
    
-    for T in out.TAMs 
-        KD1 = T.binding[2]/T.binding[1]
-        KD2 = T.binding[3]/T.binding[2]
-        
-        if T.binding[2] <= T.binding[2]
-            T.xRev[1] = T.binding[4]
-            T.xRev[2] = T.xRev[1]*KD1/KD2
-        else
-            T.xRev[2] = T.binding[2]
-            T.xRev[1] = T.xRev[2]*KD2/KD1 
-        end
-    end  
-    
-    for ii = 2:3
-        out.TAMs[ii].xFwd6 = max(out.TAMs[ii].binding[1], out.TAMs[ii].binding[3])
-        out.TAMs[ii].xRev[5] = out.TAMs[1].xRev[6]*out.TAMs[ii].binding[2]*out.TAMs[ii].binding[4]/out.TAMs[1].binding[4]/out.TAMs[1].binding[2]
-    end
-    
-    for T in out.TAMs
-        KD1 = T.binding[2]/T.binding[1]
-        KD2 = T.binding[4]/T.binding[3]
-            
-        T.xRev[5] = T.xRev[6]*KD1*T.xRev[1]/KD2/KD2/T.xFwd6
-        T.xRev[4] = T.xRev[5]*KD2*KD2/KD1/KD1
-        T.xRev[3] = T.xRev[4]*KD1/KD2
-    end
-    
-    # ligand binding to the one ligand dimer
-    for ii in 1:3
-    	x = [:Axl, :MerTK, :Axl][ii]
-    	y = [:MerTK, :Tyro3, :Tyro3][ii]
-        
-        KD11 = out.TAMs[x].binding[2]/out.TAMs[x].binding[1]
-        KD12 = out.TAMs[y].binding[2]/out.TAMs[y].binding[1]
-        KD21 = out.TAMs[x].binding[4]/out.TAMs[x].binding[3]
-        KD22 = out.TAMs[y].binding[4]/out.TAMs[y].binding[3]
-        
-        out.hetR[ii].xFwd15 = max(out.TAMs[y].binding[1], out.TAMs[x].binding[3])
-        out.hetR[ii].xFwd16 = max(out.TAMs[x].binding[1], out.TAMs[y].binding[3])
-        
-        out.hetR[ii].xRev[1] = out.TAMs[x].xRev[5]*KD12/KD11
-        out.hetR[ii].xRev[2] = out.hetR[ii].xRev[1]*KD21/KD12
-        out.hetR[ii].xRev[3] = KD22*KD21/KD11/KD12*out.hetR[ii].xRev[1]
-        out.hetR[ii].xRev[4] = out.hetR[ii].xRev[1]*KD22/KD11
-        
-        if out.TAMs[x].binding[2] <= out.TAMs[x].binding[4] 
-            out.hetR[ii].xRev[8] = out.TAMs[x].binding[2]
-            out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
-        else 
-            out.hetR[ii].xRev[6] = out.TAMs[x].binding[4]
-            out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
-        end
-            
-         if out.TAMs[y].binding[2] <= out.TAMs[y].binding[4] 
-            out.hetR[ii].xRev[8] = out.TAMs[y].binding[2]
-            out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
-        else 
-            out.hetR[ii].xRev[6] = out.TAMs[y].binding[4]
-            out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
-        end
-            
-        out.hetR[ii].xRev[9] = out.hetR[ii].xRev[1]*KD21/KD12
-        out.hetR[ii].xRev[10] = out.hetR[ii].xRev[3]*KD11/KD22
-    end
+	for T in out.TAMs 
+		KD1 = T.binding[2]/T.binding[1]
+		KD2 = T.binding[3]/T.binding[2]
+		
+		if T.binding[2] <= T.binding[2]
+			T.xRev[1] = T.binding[4]
+			T.xRev[2] = T.xRev[1]*KD1/KD2
+		else
+			T.xRev[2] = T.binding[2]
+			T.xRev[1] = T.xRev[2]*KD2/KD1 
+		end
+	end  
+	
+	for ii = 2:3
+		out.TAMs[ii].xFwd6 = max(out.TAMs[ii].binding[1], out.TAMs[ii].binding[3])
+		out.TAMs[ii].xRev[5] = out.TAMs[1].xRev[6]*out.TAMs[ii].binding[2]*out.TAMs[ii].binding[4]/out.TAMs[1].binding[4]/out.TAMs[1].binding[2]
+	end
+	
+	for T in out.TAMs
+		KD1 = T.binding[2]/T.binding[1]
+		KD2 = T.binding[4]/T.binding[3]
+			
+		T.xRev[5] = T.xRev[6]*KD1*T.xRev[1]/KD2/KD2/T.xFwd6
+		T.xRev[4] = T.xRev[5]*KD2*KD2/KD1/KD1
+		T.xRev[3] = T.xRev[4]*KD1/KD2
+	end
+	
+	# ligand binding to the one ligand dimer
+	for ii in 1:3
+		x = [:Axl, :MerTK, :Axl][ii]
+		y = [:MerTK, :Tyro3, :Tyro3][ii]
+		
+		KD11 = out.TAMs[x].binding[2]/out.TAMs[x].binding[1]
+		KD12 = out.TAMs[y].binding[2]/out.TAMs[y].binding[1]
+		KD21 = out.TAMs[x].binding[4]/out.TAMs[x].binding[3]
+		KD22 = out.TAMs[y].binding[4]/out.TAMs[y].binding[3]
+		
+		out.hetR[ii].xFwd15 = max(out.TAMs[y].binding[1], out.TAMs[x].binding[3])
+		out.hetR[ii].xFwd16 = max(out.TAMs[x].binding[1], out.TAMs[y].binding[3])
+		
+		out.hetR[ii].xRev[1] = out.TAMs[x].xRev[5]*KD12/KD11
+		out.hetR[ii].xRev[2] = out.hetR[ii].xRev[1]*KD21/KD12
+		out.hetR[ii].xRev[3] = KD22*KD21/KD11/KD12*out.hetR[ii].xRev[1]
+		out.hetR[ii].xRev[4] = out.hetR[ii].xRev[1]*KD22/KD11
+		
+		if out.TAMs[x].binding[2] <= out.TAMs[x].binding[4] 
+			out.hetR[ii].xRev[8] = out.TAMs[x].binding[2]
+			out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
+		else 
+			out.hetR[ii].xRev[6] = out.TAMs[x].binding[4]
+			out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
+		end
+			
+		if out.TAMs[y].binding[2] <= out.TAMs[y].binding[4] 
+			out.hetR[ii].xRev[8] = out.TAMs[y].binding[2]
+			out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
+		else 
+			out.hetR[ii].xRev[6] = out.TAMs[y].binding[4]
+			out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
+		end
+			
+		out.hetR[ii].xRev[9] = out.hetR[ii].xRev[1]*KD21/KD12
+		out.hetR[ii].xRev[10] = out.hetR[ii].xRev[3]*KD11/KD22
+	end
 
-    return out
+	return out
 end
 
 function TAM_reacti(dxdt_d, x_d, params, t)
