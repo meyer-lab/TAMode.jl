@@ -31,7 +31,7 @@ end
     for i=2:3
         rr::Rates = TAM.param(paramR.getTrafP()) #param is moved from reactcode.hpp
         
-        rr.
+        rr.TAMs[i].expression = 0.0 #I don't know if we can use TAMs here... still working on this line
         
         tt::TAM = TAM(rr) #TAM is a constructor
         
