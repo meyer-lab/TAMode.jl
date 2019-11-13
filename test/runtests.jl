@@ -26,7 +26,7 @@ end
 end
 
 
-@testset "Check if there's no receptor" begin
+@testset "Check if there's no receptor that we don't see any." begin
     for i in 1:3
         rr = TAMode.param(params)
         rr.TAMs[i].expression = 0.0
