@@ -1,4 +1,7 @@
 
+const internalFrac = 0.5
+const internalV = 623.0
+
 
 mutable struct TAMrates{T}
 	binding::MVector{4, T} # fwd/rev binding rate for Ig1, then Ig2
@@ -27,11 +30,18 @@ mutable struct Rates{T}
 	kRec::T # Recycling rate.
 	kDeg::T # Degradation rate.
 	xFwd::T
-	internalFrac::T
-	internalV::T
 	gasCur::T
 	hetR::hetRType{T}
 end
+
+
+# Mark surface species
+surface = vcat(ones(6), zeros(6), 0, ones(6), zeros(6), ones(6), zeros(6), ones(3), zeros(3), ones(3), zeros(3), ones(3), zeros(3))
+pY = vcat(zeros(4), ones(2), 0, zeros(4), ones(2), zeros(4), ones(2), ones(18))
+ligPiece = [0, 1, 0, 0, 0, 1]
+boundLig = vcat(ligPiece, ligPiece, 0, ligPiece, ligPiece, ligPiece, ligPiece, ones(18))
+totalPiece = [1, 1, 1, 1, 2, 2]
+total = vcat(totalPiece, totalPiece*internalFrac, 0, totalPiece, totalPiece*internalFrac, totalPiece, totalPiece*internalFrac, 2*ones(3), 2*ones(3)*internalFrac, 2*ones(3), 2*ones(3)*internalFrac, 2*ones(3), 2*ones(3)*internalFrac)
 
 
 " Setup the parameters for the full TAM receptor model. "
@@ -50,7 +60,7 @@ function param(params::Vector)
 	hetRs = hetRType{eltype(params)}(hetR, deepcopy(hetR), deepcopy(hetR))
 
 	out = Rates{eltype(params)}(TAM, params[1], params[2], params[3],
-								params[4], params[5], params[6], 0.5, 623.0, params[7], hetRs)
+								params[4], params[5], params[6], params[7], hetRs)
 
 	out.TAMs.Axl.xRev[5] = 0.0144 # From Kariolis et al
 
@@ -122,7 +132,7 @@ end
 
 
 " Handles trafficking of receptor and ligand. "
-function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64, internalFrac::Float64)
+function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64)
 	dextR[:] .+= -extR*intRate + kRec*(1-fElse)*intR*internalFrac # Endocytosis, recycling
 	dintR[:] .+= extR*intRate/internalFrac - kRec*(1-fElse)*intR - kDeg*fElse*intR # Endocytosis, recycling, degradation
 end
@@ -131,28 +141,33 @@ end
 " Handles hetero-receptor interactions. "
 function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi)
 	dnorm = het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, tr.gasCur, nothing)
-	dnorm += het_module(view(Rone, 7:10), view(Rtwo, 7:10), view(dRone, 7:10), view(dRtwo, 7:10), hetR, view(hetDim, 4:6), view(dhetDim, 4:6), tr, Li / tr.internalV, dLi)
+	dnorm += het_module(view(Rone, 7:10), view(Rtwo, 7:10), view(dRone, 7:10), view(dRtwo, 7:10), hetR, view(hetDim, 4:6), view(dhetDim, 4:6), tr, Li/internalV, dLi)
 
-	trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, hetDim[1:3], hetDim[4:6], tr.kRec, tr.kDeg, 1.0, tr.internalFrac)
+	trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, hetDim[1:3], hetDim[4:6], tr.kRec, tr.kDeg, 1.0)
 
 	return dnorm
 end
 
 function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates)
 	dnorm = react_module(R, dR, nothing, tr.gasCur, r, tr)
-	dnorm += react_module(view(R, 1:6), view(dR, 1:6), dLi, Li/tr.internalV, r, tr)
+	dnorm += react_module(view(R, 1:6), view(dR, 1:6), dLi, Li/internalV, r, tr)
 
 	dR[1] += r.expression
 
-	trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, R[1:4], R[7:10], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
-	trafFunc(view(dR, 4:5), view(dR, 10:11), tr.pYinternalize, R[4:5], R[10:11], tr.kRec, tr.kDeg, 1.0, tr.internalFrac)
+	trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, R[1:4], R[7:10], tr.kRec, tr.kDeg, tr.fElse)
+	trafFunc(view(dR, 4:5), view(dR, 10:11), tr.pYinternalize, R[4:5], R[10:11], tr.kRec, tr.kDeg, 1.0)
 
 	return dnorm
 end
 
 function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
 	fill!(dxdt_d, 0.0)
-	r = param(params)
+
+	if params isa Rates
+		r = params
+	else
+		r = param(params)
+	end
 
 	dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.TAMs.Axl, r)
 	dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.TAMs.MerTK, r)

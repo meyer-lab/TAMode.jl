@@ -33,7 +33,12 @@ function runTAM(tps::Array{Float64,1}, params::Vector, gasStim::Float64)::Array{
 
     solInit = getAutocrine(params, TAM_reacti, 55)
 
-    params[7] = gasStim
+    if params isa Rates
+        params.gasCur = gasStim
+    else
+        params[7] = gasStim
+    end
+
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
 
     sol = solve(prob, AutoTsit5(Rosenbrock23()); isoutofdomain=domainDef)
