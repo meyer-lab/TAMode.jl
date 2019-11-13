@@ -35,6 +35,11 @@ mutable struct Rates{T}
 end
 
 
+# Mark surface species
+surface = [ones(6), zeros(6), 1, ones(6), zeros(6), ones(6), zeros(6), ones(3), zeros(3), ones(3), zeros(3), ones(3), zeros(3)]
+pY = [zeros(4), ones(2), 0, zeros(4), ones(2), zeros(4), ones(2), ones(18)]
+
+
 " Setup the parameters for the full TAM receptor model. "
 function param(params::Vector)
 	@assert all(params .>= 0.0)
