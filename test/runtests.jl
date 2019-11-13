@@ -25,3 +25,14 @@ end
     @test dnorm < 2.0
 end
 
+
+@testset "Test that if none of the ligand is expressed, we don't end up seeing any." begin
+    
+    rr = TAMode.param()
+    
+    rr.autocrine = 0
+    
+    tt = TAM(rr)
+    
+end
+
