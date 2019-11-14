@@ -33,7 +33,7 @@ end
     data = TAMode.runTAM(tps, rr, 0.0)
 
     @test all(data * TAMode.pY .≈ 0)
-    @test all(data * TAMode.surfL .≈ 0)
+    @test all(data * TAMode.boundLig .≈ 0)
 end
 
 
