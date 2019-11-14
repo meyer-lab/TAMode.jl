@@ -26,6 +26,17 @@ end
 end
 
 
+@testset "Test that if none of the ligand is expressed, we don't end up seeing any." begin
+    rr = TAMode.param(params)
+    rr.gasCur = 0.0
+
+    data = TAMode.runTAM(tps, rr, 0.0)
+
+    @test all(data * TAMode.pY .≈ 0)
+    @test all(data * TAMode.boundLig .≈ 0)
+end
+
+
 @testset "Check if there's no receptor that we don't see any." begin
     for i in 1:3
         rr = TAMode.param(params)
