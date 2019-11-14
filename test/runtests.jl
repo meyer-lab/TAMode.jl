@@ -2,7 +2,7 @@ using Test
 using Profile
 using TAMode
 
-tps = [0.1, 1.0, 10.0, 100.0]
+tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
 params = ones(15) * 0.5
 
 
