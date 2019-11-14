@@ -28,11 +28,14 @@ end
 
 @testset "Test that if none of the ligand is expressed, we don't end up seeing any." begin
     
-    rr = TAMode.param()
+    rr = TAMode.param(params)
     
     rr.autocrine = 0
     
-    tt = TAM(rr)
+    data = TAMode.runTAM(tps, rr, 0.0)
+    
+    @test all(data * TAMode.pY .≈ 0)
+    @test all(data* TAMode.surfL .≈ 0)
     
 end
 
