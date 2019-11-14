@@ -25,3 +25,14 @@ end
     @test dnorm < 2.0
 end
 
+
+@testset "Check if there's no receptor that we don't see any." begin
+    for i in 1:3
+        rr = TAMode.param(params)
+        rr.TAMs[i].expression = 0.0
+
+        data = TAMode.runTAM(tps, rr, 1.0)
+
+        @test all(data * TAMode.recpSpecific[i] .≈ 0.0)
+    end
+end
