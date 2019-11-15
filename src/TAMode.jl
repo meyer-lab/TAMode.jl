@@ -19,7 +19,6 @@ end
 function getAutocrine(params, funcc, nZero::Int)
     # TODO: Replace with steady-state
     probInit = ODEProblem(TAM_reacti, zeros(nZero), 10000000.0, params)
-
     solInit = solve(probInit, AutoTsit5(TRBDF2(linsolve=LinSolveGMRES())); isoutofdomain=domainDef)
 
     return solInit(10000000.0)
