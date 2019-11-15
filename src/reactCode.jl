@@ -42,6 +42,9 @@ ligPiece = [0, 1, 0, 0, 0, 1]
 boundLig = vcat(ligPiece, ligPiece, 0, ligPiece, ligPiece, ligPiece, ligPiece, ones(18))
 totalPiece = [1, 1, 1, 1, 2, 2]
 total = vcat(totalPiece, totalPiece*internalFrac, 0, totalPiece, totalPiece*internalFrac, totalPiece, totalPiece*internalFrac, 2*ones(3), 2*ones(3)*internalFrac, 2*ones(3), 2*ones(3)*internalFrac, 2*ones(3), 2*ones(3)*internalFrac)
+recpSpecific = [vcat(ones(12) , 0, zeros(24), 0.5*ones(6),     zeros(6), 0.5*ones(6)),  # AXL
+				vcat(zeros(12), 0,  ones(12),   zeros(12), 0.5*ones(12),    zeros(6)),  # MerTK
+				vcat(zeros(12), 0, zeros(12),    ones(12),     zeros(6), 0.5*ones(12))] # Tyro3
 
 
 " Setup the parameters for the full TAM receptor model. "
