@@ -1,7 +1,6 @@
 using Test
 using Profile
 using TAMode
-using LinearAlgebra
 
 tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
 params = ones(15) * 0.5
