@@ -35,9 +35,8 @@ end
 
     # Test that the phosphorylated receptor matches up
     @test all(data * TAMode.pY .≈ dataSwap * TAMode.pY)
-    #@test ≈ ((data.total[ii] - dataSwap.total[ii])/(data.total[ii] + dataSwap.total[ii] + 1e-6), 0, 1e-6)
-    #@test ≈ ((data.surf[ii] - dataSwap.surf[ii])/(data.surf[ii] + dataSwap.surf[ii] + 1e-6), 0, 1e-6)
-    #@test ≈ ("surfpY", (data.surfPY[ii] - dataSwap.surfPY[ii])/(data.surfPY[ii] + dataSwap.surfPY[ii] + 1e-6), 0, 1e-6) # assert with message?
-    #@test ≈ ((data.surfL[ii] - dataSwap.surfL[ii])/(data.surfL[ii] + dataSwap.surfL[ii] + 1e-6), 0, 1e-6)
+    @test all(data * TAMode.total .≈ dataSwap * TAMode.total)
+    @test all(data * TAMode.surface .≈ dataSwap * TAMode.surface)
+    @test all(data * TAMode.boundLig .≈ dataSwap * TAMode.boundLig)
 end
 
