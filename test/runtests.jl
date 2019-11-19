@@ -31,10 +31,8 @@ end
     tt.gasCur *= 1000
 
     secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
-    
-    println(dot(firstV, TAMode.total) - dot(secondV, TAMode.total))
 
-    #@test dot(firstV, TAMode.total) - dot(secondV, TAMode.total))
+    @test dot(firstV - secondV, TAMode.total) < 0.0001
 end
 
 
