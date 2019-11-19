@@ -51,3 +51,31 @@ end
         @test all(data * TAMode.recpSpecific[i] .≈ 0.0)
     end
 end
+
+@testset "Make sure that TAM surface don't explode at long time in reaction code." begin
+    
+    tt = TAMode.param(params)
+    
+    tt.gasCur = tt.autocrine
+    
+    #assert
+    
+    firstSurf = tt.getSurf()
+    
+    tt.TAMs[1].expression = 0
+    tt.TAMs[2].expression = 0
+    tt.TAMs[3].expression = 0
+    tt.kRec = 0
+    tt.internalize = 0
+    tt.pYinternalize = 0
+    tt.gasCur*=1000
+    
+    secondSurf = tt.getSurf()
+    
+    for i in 1:3
+       @test all(data*first[i]/) 
+    end
+end
+    
+    
+    
