@@ -56,3 +56,22 @@ end
         @test all(data * TAMode.recpSpecific[i] .≈ 0.0)
     end
 end
+
+@testset "Ensure that system reaches equilibrium." begin
+    tt = TAMode.param(params)
+    tt.gasCur = tt.autocrine
+    dnorm =  #??? think this is calling dnorm of parameters which calls l2 norm
+    #tests that the probability density = 0 which in the C++ is the l2 norm version of the paired doubles
+    #l2 norm calculates the squared root of the sum of the squared vector values
+    @test dnorm < 1.7
+end
+
+#=
+    void testTAMequilibrium() {
+        TAM tt = TAM(TAM::Param(paramR.getTrafP()));
+        tt.p.gasCur = tt.p.autocrine;
+
+        CPPUNIT_ASSERT_NO_THROW(tt.initSystem());
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(tt.getDNorm().first, 0, 1.0E-3);
+    }
+=#
