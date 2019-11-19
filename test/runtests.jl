@@ -57,10 +57,9 @@ end
     end
 end
 
-@testset "Ensure that system reaches equilibrium." begin
-    tt = TAMode.param(params)    
-    uLong = TAMode.runTAM([1000000.0], tt, 100.0)
+@testset "Ensure that system reaches equilibrium." begin  
+    uLong = TAMode.getAutocrine(params)
     dnorm = zeros(55)
     TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
-    @test all(dnorm .≈ 0.0)
+    @test all(dnorm .< 0.05)
 end
