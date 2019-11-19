@@ -20,13 +20,18 @@ end
 
 
 @testset "Check for detailed balance at steady-state." begin
-    uLong = TAMode.runTAM([1000000.0], params, 100.0)
+    rr = TAMode.param(params)
 
-    dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, params, 0.0)
+    rr.TAMs[1].expression = 0.0
+    rr.TAMs[2].expression = 0.0
+    rr.TAMs[3].expression = 0.0
+    rr.kDeg = 0.0
 
-    # TODO: Lower tolerance
-    # Probably have to turn off trafficking to get this to work.
-    @test dnorm < 1.7
+    uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.getAutocrine(params))
+
+    dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, rr, 0.0)
+
+    @test dnorm < 0.05
 end
 
 
