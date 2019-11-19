@@ -30,6 +30,8 @@ end
     tt.gasCur *= 1000
 
     secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
+    
+    println(firstV * TAMode.total - secondV * TAMode.total)
 
     @test all(firstV * TAMode.total .≈ secondV * TAMode.total)
 end
