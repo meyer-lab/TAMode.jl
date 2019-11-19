@@ -1,6 +1,7 @@
 using Test
 using Profile
 using TAMode
+using LinearAlgebra
 
 tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
 params = ones(15) * 0.5
@@ -31,9 +32,9 @@ end
 
     secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
     
-    println(firstV * TAMode.total - secondV * TAMode.total)
+    println(dot(firstV, TAMode.total) - dot(secondV, TAMode.total))
 
-    @test all(firstV * TAMode.total .≈ secondV * TAMode.total)
+    #@test dot(firstV, TAMode.total) - dot(secondV, TAMode.total))
 end
 
 
