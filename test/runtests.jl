@@ -113,6 +113,30 @@ end
     @test all(data * TAMode.boundLig .≈ dataSwap * TAMode.boundLig)
 end
 
+@testset "Make sure code upholds mass conservation." begin
+    #total::Pair{MVector{}} #ladkjfals;dkfj
+    
+    tt = TAMode.param(params)
+    tt.gasCur = tt.autocrine
+    
+    #CPPUNIT_ASSERT_NO_THROW(tt.initSystem());
+    #tt.getAutocrine(params, TAM_reactii, 55)
+    
+    firstTotal = tt.getTot()
+    
+    tt.kDeg = 0
+    tt.TAMs[1].expression = 0
+    tt.TAMs[2].expression = 0
+    tt.TAMs[3].expression = 0
+    tt.gasCur *= 1000 
+    
+    #CPPUNIT_ASSERT_NO_THROW(tt.runToT(1000));
+    
+    secondTotal = tt.getTot()
+    
+    @test all(firstTotal .≈ secondTotal)
+end
+
 
 
 >>>>>>> Not done
