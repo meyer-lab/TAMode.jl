@@ -189,9 +189,9 @@ function detailedBalance(out::Rates)
    
 	for T in out.TAMs 
 		KD1 = T.binding[2]/T.binding[1]
-		KD2 = T.binding[3]/T.binding[2]
+		KD2 = T.binding[4]/T.binding[3]
 		
-		if T.binding[2] <= T.binding[2]
+		if T.binding[4] <= T.binding[2]
 			T.xRev[1] = T.binding[4]
 			T.xRev[2] = T.xRev[1]*KD1/KD2
 		else
@@ -202,7 +202,7 @@ function detailedBalance(out::Rates)
 	
 	for ii = 2:3
 		out.TAMs[ii].xFwd6 = max(out.TAMs[ii].binding[1], out.TAMs[ii].binding[3])
-		out.TAMs[ii].xRev[5] = out.TAMs[1].xRev[6]*out.TAMs[ii].binding[2]*out.TAMs[ii].binding[4]/out.TAMs[1].binding[4]/out.TAMs[1].binding[2]
+		out.TAMs[ii].xRev[6] = out.TAMs[1].xRev[6]*out.TAMs[ii].binding[2]*out.TAMs[ii].binding[4]/out.TAMs[1].binding[4]/out.TAMs[1].binding[2]
 	end
 	
 	for T in out.TAMs
@@ -234,18 +234,18 @@ function detailedBalance(out::Rates)
 		
 		if out.TAMs[x].binding[2] <= out.TAMs[x].binding[4] 
 			out.hetR[ii].xRev[8] = out.TAMs[x].binding[2]
-			out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
+			out.hetR[ii].xRev[6] = out.hetR[ii].xRev[8]*KD11/KD21
 		else 
 			out.hetR[ii].xRev[6] = out.TAMs[x].binding[4]
 			out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
 		end
 			
 		if out.TAMs[y].binding[2] <= out.TAMs[y].binding[4] 
-			out.hetR[ii].xRev[8] = out.TAMs[y].binding[2]
-			out.hetR[ii].xRev[6] = out.hetR[ii].xRev[9]*KD11/KD21
+			out.hetR[ii].xRev[5] = out.TAMs[y].binding[2]
+			out.hetR[ii].xRev[7] = out.hetR[ii].xRev[5]*KD11/KD21
 		else 
-			out.hetR[ii].xRev[6] = out.TAMs[y].binding[4]
-			out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
+			out.hetR[ii].xRev[7] = out.TAMs[y].binding[4]
+			out.hetR[ii].xRev[5] = out.hetR[ii].xRev[7]*KD21/KD11
 		end
 			
 		out.hetR[ii].xRev[9] = out.hetR[ii].xRev[1]*KD21/KD12
