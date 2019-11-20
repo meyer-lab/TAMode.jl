@@ -1,6 +1,7 @@
 using Test
 using Profile
 using TAMode
+using LinearAlgebra
 
 tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
 params = ones(15) * 0.5
@@ -16,6 +17,22 @@ params = ones(15) * 0.5
     @profile TAMode.runTAM(tps, params, 1000.0)
 
     Profile.print(noisefloor=5.0)
+end
+
+
+@testset "Make sure code upholds mass conservation." begin
+    tt = TAMode.param(params)
+    firstV = TAMode.getAutocrine(tt)
+    
+    tt.kDeg = 0
+    tt.TAMs[1].expression = 0
+    tt.TAMs[2].expression = 0
+    tt.TAMs[3].expression = 0
+    tt.gasCur *= 1000
+
+    secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
+
+    @test dot(firstV, TAMode.total) - dot(secondV, TAMode.total) < 0.0001
 end
 
 
