@@ -73,3 +73,10 @@ end
         @test all(data * TAMode.recpSpecific[i] .≈ 0.0)
     end
 end
+
+@testset "Ensure that system reaches equilibrium." begin  
+    uLong = TAMode.getAutocrine(params)
+    dnorm = zeros(55)
+    TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
+    @test all(dnorm .< 0.05)
+end
