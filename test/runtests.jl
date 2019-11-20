@@ -41,6 +41,9 @@ end
 
     data = TAMode.runTAM(tps, rr, 10.0)
     dataSwap = TAMode.runTAM(tps, rrSwap, 10.0)
+    
+    println(data * TAMode.pY - dataSwap * TAMode.pY)
+    println(data * TAMode.total - dataSwap * TAMode.total)
 
     # Test that the phosphorylated receptor matches up
     @test all(data * TAMode.pY .≈ dataSwap * TAMode.pY)
