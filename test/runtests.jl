@@ -56,11 +56,7 @@ end
     
     tt = TAMode.param(params)
     
-    tt.gasCur = tt.autocrine
-    
-    #assert
-    
-    firstSurf = tt.getSurf()
+    firstSurf = TAMode.getAutocrine(tt)
     
     tt.TAMs[1].expression = 0
     tt.TAMs[2].expression = 0
@@ -72,9 +68,8 @@ end
     
     secondSurf = tt.getSurf()
     
-    for i in 1:3
-       @test all(data*first[i]/) 
-    end
+    @test all(firstSurf .≈ secondSurf) 
+
 end
     
     
