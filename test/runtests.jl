@@ -1,6 +1,7 @@
 using Test
 using Profile
 using TAMode
+using LinearAlgebra
 
 tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
 params = ones(15) * 0.5
@@ -19,14 +20,35 @@ params = ones(15) * 0.5
 end
 
 
+@testset "Make sure code upholds mass conservation." begin
+    tt = TAMode.param(params)
+    firstV = TAMode.getAutocrine(tt)
+    
+    tt.kDeg = 0
+    tt.TAMs[1].expression = 0
+    tt.TAMs[2].expression = 0
+    tt.TAMs[3].expression = 0
+    tt.gasCur *= 1000
+
+    secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
+
+    @test dot(firstV, TAMode.total) - dot(secondV, TAMode.total) < 0.0001
+end
+
+
 @testset "Check for detailed balance at steady-state." begin
-    uLong = TAMode.runTAM([1000000.0], params, 100.0)
+    rr = TAMode.param(params)
 
-    dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, params, 0.0)
+    rr.TAMs[1].expression = 0.0
+    rr.TAMs[2].expression = 0.0
+    rr.TAMs[3].expression = 0.0
+    rr.kDeg = 0.0
 
-    # TODO: Lower tolerance
-    # Probably have to turn off trafficking to get this to work.
-    @test dnorm < 1.7
+    uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.getAutocrine(params))
+
+    dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, rr, 0.0)
+
+    @test dnorm < 0.05
 end
 
 
@@ -52,8 +74,8 @@ end
     end
 end
 
+
 @testset "Make sure that TAM surface don't explode at long time in reaction code." begin
-    
     tt = TAMode.param(params)
     
     firstSurf = TAMode.getAutocrine(tt)
@@ -64,13 +86,17 @@ end
     tt.kRec = 0
     tt.internalize = 0
     tt.pYinternalize = 0
-    tt.gasCur*=1000
+    tt.gasCur *= 1000
     
     secondSurf = TAMode.getAutocrine(tt)
     
     @test all(firstSurf .≈ secondSurf) 
-
 end
     
-    
-    
+
+@testset "Ensure that system reaches equilibrium." begin  
+    uLong = TAMode.getAutocrine(params)
+    dnorm = zeros(55)
+    TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
+    @test all(dnorm .< 0.05)
+end
