@@ -66,7 +66,7 @@ end
     tt.pYinternalize = 0
     tt.gasCur*=1000
     
-    secondSurf = tt.getSurf()
+    secondSurf = TAMode.getAutocrine(tt)
     
     @test all(firstSurf .≈ secondSurf) 
 
