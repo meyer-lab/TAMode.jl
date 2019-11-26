@@ -54,7 +54,7 @@ function runTAM(tps::Array{Float64,1}, params, gasStim::Float64)::Array{Float64,
     end
 
     return runTAMinit(tps, params, solInit)
-end
+    end # HI
 
 
 end # module
