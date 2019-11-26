@@ -35,6 +35,21 @@ end
     @test dot(firstV, TAMode.total) - dot(secondV, TAMode.total) < 0.0001
 end
 
+@testset "Test Amount" begin
+    
+    tt = TAMode.param(params)
+    tt.gasCur = 0.0
+    tt.TAMs[1].expression = 10.0
+    tt.TAMS[2].expression = 10.0
+    tt.TAMS[3].expression = 10.0
+    tt.kDeg = 1e8
+    tt.kRec = 0.0
+    tt.internalize = 10.0
+    
+    outt = TAMode.getAutocrine(tt)
+    
+    @test outt .* 135.2 < 1e3 
+end
 
 @testset "Check for detailed balance at steady-state." begin
     rr = TAMode.param(params)
@@ -80,3 +95,5 @@ end
     TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
     @test all(dnorm .< 0.05)
 end
+
+
