@@ -48,7 +48,7 @@ end
     
     outt = TAMode.getAutocrine(tt)
     
-    @test outt .* 135.2 < 1e3 
+    @test outt .* 135.2 .< 1e3 
 end
 
 @testset "Check for detailed balance at steady-state." begin
