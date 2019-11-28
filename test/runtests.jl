@@ -36,8 +36,8 @@ end
 end
 
 @testset "Test Amount" begin
-    
     tt = TAMode.param(params)
+
     tt.gasCur = 0.0
     tt.TAMs[1].expression = 10.0
     tt.TAMS[2].expression = 10.0
@@ -48,7 +48,7 @@ end
     
     outt = TAMode.getAutocrine(tt)
     
-    @test outt .* fgMgConv .< 1e-3  #ask if this is used anywhere else
+    @test outt .* fgMgConv .< 1e-3
 end
 
 
