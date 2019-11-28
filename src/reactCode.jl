@@ -1,6 +1,7 @@
 
 const internalFrac = 0.5
 const internalV = 623.0
+const fgMgConv = 135.2
 
 
 mutable struct TAMrates{T}

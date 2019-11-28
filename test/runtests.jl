@@ -36,6 +36,28 @@ end
 end
 
 
+@testset "Test that receptor and ligand amounts match expectations." begin
+    tt = TAMode.param(params)
+
+    tt.gasCur = 0.0
+    tt.TAMs[1].expression = 10.0
+    tt.TAMs[2].expression = 10.0
+    tt.TAMs[3].expression = 10.0
+    tt.kDeg = 1e8
+    tt.kRec = 0.0
+    tt.internalize = 10.0
+
+    outt = TAMode.getAutocrine(tt)
+
+    # Expect no ligand
+    @test outt[13] ≈ 0.0
+
+    for i in 1:3
+        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol=1.0E-5)
+    end
+end
+
+
 @testset "Check for detailed balance at steady-state." begin
     rr = TAMode.param(params)
 
