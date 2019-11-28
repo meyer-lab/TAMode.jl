@@ -35,7 +35,8 @@ end
     @test dot(firstV, TAMode.total) - dot(secondV, TAMode.total) < 0.0001
 end
 
-@testset "Test Amount" begin
+
+@testset "Test that receptor and ligand amounts match expectations." begin
     tt = TAMode.param(params)
 
     tt.gasCur = 0.0
@@ -45,10 +46,15 @@ end
     tt.kDeg = 1e8
     tt.kRec = 0.0
     tt.internalize = 10.0
-    
+
     outt = TAMode.getAutocrine(tt)
-    
-    @test outt .* fgMgConv .< 1e-3
+
+    # Expect no ligand
+    @test outt[13] ≈ 0.0
+
+    for i in 1:3
+        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol=1.0E-5)
+    end
 end
 
 
