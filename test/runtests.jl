@@ -32,7 +32,7 @@ end
 
     secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
 
-    @test dot(firstV, TAMode.total) - dot(secondV, TAMode.total) < 0.0001
+    @test dot(firstV, TAMode.total) ≈ dot(secondV, TAMode.total)
 end
 
 @testset "Test Amount" begin
@@ -48,7 +48,7 @@ end
     
     outt = TAMode.getAutocrine(tt)
     
-    @test outt .* 135.2 .< 1e-3 
+    @test outt .* fgMgConv .< 1e-3  #ask if this is used anywhere else
 end
 
 @testset "Check for detailed balance at steady-state." begin
