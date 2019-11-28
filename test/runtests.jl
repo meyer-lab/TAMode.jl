@@ -32,7 +32,7 @@ end
 
     secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
 
-    @test dot(firstV, TAMode.total) ≈ dot(secondV, TAMode.total)
+    @test dot(firstV, TAMode.total) - dot(secondV, TAMode.total) < 0.0001
 end
 
 @testset "Test Amount" begin
@@ -50,6 +50,7 @@ end
     
     @test outt .* fgMgConv .< 1e-3  #ask if this is used anywhere else
 end
+
 
 @testset "Check for detailed balance at steady-state." begin
     rr = TAMode.param(params)
@@ -95,5 +96,3 @@ end
     TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
     @test all(dnorm .< 0.05)
 end
-
-
