@@ -96,6 +96,25 @@ end
     end
 end
 
+
+@testset "Make sure that TAM surface don't explode at long time in reaction code." begin
+    tt = TAMode.param(params)
+    firstSurf = TAMode.getAutocrine(tt)
+
+    tt.TAMs[1].expression = 0.0
+    tt.TAMs[2].expression = 0.0
+    tt.TAMs[3].expression = 0.0
+    tt.kRec = 0.0
+    tt.internalize = 0.0
+    tt.pYinternalize = 0.0
+    tt.gasCur *= 10.0
+
+    secondSurf = TAMode.runTAMinit([100.0], tt, firstSurf)
+
+    @test dot(firstSurf, TAMode.surface) ≈ dot(secondSurf, TAMode.surface)
+end
+    
+
 @testset "Ensure that system reaches equilibrium." begin  
     uLong = TAMode.getAutocrine(params)
     dnorm = zeros(55)
