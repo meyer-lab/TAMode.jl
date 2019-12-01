@@ -3,7 +3,7 @@ using Profile
 using TAMode
 using LinearAlgebra
 
-tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
+tps = 10.0 .^ range(-6.0, stop = 4.0, length = 25)
 params = ones(15) * 0.5
 
 
