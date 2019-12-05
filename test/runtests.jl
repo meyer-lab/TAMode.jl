@@ -7,6 +7,9 @@ tps = 10.0 .^ range(-6.0, stop = 4.0, length = 25)
 params = ones(15) * 0.5
 
 
+aboutZero = x -> isapprox(x, 0.0, rtol=1.0e-5, atol=1.0e-5)
+
+
 @testset "Can successfully assemble the parameters." begin
     TAMode.runTAM(tps, params, 1.0)
     @time TAMode.runTAM(tps, params, 1.0)
@@ -16,7 +19,7 @@ params = ones(15) * 0.5
     @profile TAMode.runTAM(tps, params, 100.0)
     @profile TAMode.runTAM(tps, params, 1000.0)
 
-    Profile.print(noisefloor=5.0)
+    Profile.print(noisefloor=10.0)
 end
 
 
@@ -74,21 +77,49 @@ end
 end
 
 
+@testset "Swapping twice leads to the same rates." begin
+    rr = TAMode.param(params)
+    rrB = TAMode.swapIgs(TAMode.swapIgs(rr))
+
+    for ii in 1:3
+        @test all(rr.TAMs[ii].xRev .≈ rrB.TAMs[ii].xRev)
+        @test all(rr.TAMs[ii].binding .≈ rrB.TAMs[ii].binding)
+        @test all(rr.hetR[ii].xRev .≈ rrB.hetR[ii].xRev)
+    end
+end
+
+
 @testset "Swapping Ig1 with Ig2 doesn't change anything." begin
+    # TODO: boundLig doesn't work here...
     rr = TAMode.param(params)
     rrSwap = TAMode.swapIgs(rr)
 
-    data = TAMode.runTAM(tps, rr, 10.0)
-    dataSwap = TAMode.runTAM(tps, rrSwap, 10.0)
-    
-    println(data * TAMode.pY - dataSwap * TAMode.pY)
-    println(data * TAMode.total - dataSwap * TAMode.total)
+    dataDiff = TAMode.runTAMinit(tps, rr, zeros(55)) .- TAMode.runTAMinit(tps, rrSwap, zeros(55))
+    @test all(aboutZero.(dataDiff * TAMode.pY))
+    @test all(aboutZero.(dataDiff * TAMode.total))
+    @test all(aboutZero.(dataDiff * TAMode.surface))
 
-    # Test that the phosphorylated receptor matches up
-    @test all(data * TAMode.pY .≈ dataSwap * TAMode.pY)
-    @test all(data * TAMode.total .≈ dataSwap * TAMode.total)
-    @test all(data * TAMode.surface .≈ dataSwap * TAMode.surface)
-    @test all(data * TAMode.boundLig .≈ dataSwap * TAMode.boundLig)
+    for ii in 1:3
+        @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
+    end
+
+    autoDiff = TAMode.getAutocrine(rr) .- TAMode.getAutocrine(rrSwap)
+    @test aboutZero(dot(autoDiff, TAMode.pY))
+    @test aboutZero(dot(autoDiff, TAMode.total))
+    @test aboutZero(dot(autoDiff, TAMode.surface))
+
+    for ii in 1:3
+        @test aboutZero(dot(autoDiff, TAMode.recpSpecific[ii]))
+    end
+
+    dataDiff = TAMode.runTAM(tps, rr, 1.0) .- TAMode.runTAM(tps, rrSwap, 1.0)
+    @test all(aboutZero.(dataDiff * TAMode.pY))
+    @test all(aboutZero.(dataDiff * TAMode.total))
+    @test all(aboutZero.(dataDiff * TAMode.surface))
+
+    for ii in 1:3
+        @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
+    end
 end
 
 

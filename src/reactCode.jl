@@ -219,20 +219,20 @@ function detailedBalance(out::Rates)
 	for ii in 1:3
 		x = [:Axl, :MerTK, :Axl][ii]
 		y = [:MerTK, :Tyro3, :Tyro3][ii]
-		
+
 		KD11 = out.TAMs[x].binding[2]/out.TAMs[x].binding[1]
 		KD12 = out.TAMs[y].binding[2]/out.TAMs[y].binding[1]
 		KD21 = out.TAMs[x].binding[4]/out.TAMs[x].binding[3]
 		KD22 = out.TAMs[y].binding[4]/out.TAMs[y].binding[3]
-		
+
 		out.hetR[ii].xFwd15 = max(out.TAMs[y].binding[1], out.TAMs[x].binding[3])
 		out.hetR[ii].xFwd16 = max(out.TAMs[x].binding[1], out.TAMs[y].binding[3])
-		
+
 		out.hetR[ii].xRev[1] = out.TAMs[x].xRev[5]*KD12/KD11
 		out.hetR[ii].xRev[2] = out.hetR[ii].xRev[1]*KD21/KD12
 		out.hetR[ii].xRev[3] = KD22*KD21/KD11/KD12*out.hetR[ii].xRev[1]
 		out.hetR[ii].xRev[4] = out.hetR[ii].xRev[1]*KD22/KD11
-		
+
 		if out.TAMs[x].binding[2] <= out.TAMs[x].binding[4] 
 			out.hetR[ii].xRev[8] = out.TAMs[x].binding[2]
 			out.hetR[ii].xRev[6] = out.hetR[ii].xRev[8]*KD11/KD21
@@ -240,7 +240,7 @@ function detailedBalance(out::Rates)
 			out.hetR[ii].xRev[6] = out.TAMs[x].binding[4]
 			out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
 		end
-			
+
 		if out.TAMs[y].binding[2] <= out.TAMs[y].binding[4] 
 			out.hetR[ii].xRev[5] = out.TAMs[y].binding[2]
 			out.hetR[ii].xRev[7] = out.hetR[ii].xRev[5]*KD22/KD12
@@ -261,6 +261,7 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 end
 
 function swapIgs(out::Rates)
+	out = deepcopy(out)
     detailedBalance(out)
     
     for T in out.TAMs
