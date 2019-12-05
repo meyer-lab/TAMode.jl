@@ -243,10 +243,10 @@ function detailedBalance(out::Rates)
 			
 		if out.TAMs[y].binding[2] <= out.TAMs[y].binding[4] 
 			out.hetR[ii].xRev[5] = out.TAMs[y].binding[2]
-			out.hetR[ii].xRev[7] = out.hetR[ii].xRev[5]*KD11/KD21
+			out.hetR[ii].xRev[7] = out.hetR[ii].xRev[5]*KD22/KD12
 		else 
 			out.hetR[ii].xRev[7] = out.TAMs[y].binding[4]
-			out.hetR[ii].xRev[5] = out.hetR[ii].xRev[7]*KD21/KD11
+			out.hetR[ii].xRev[5] = out.hetR[ii].xRev[7]*KD12/KD22
 		end
 			
 		out.hetR[ii].xRev[9] = out.hetR[ii].xRev[1]*KD21/KD12
