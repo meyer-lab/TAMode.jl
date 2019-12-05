@@ -21,11 +21,12 @@ end
 
 function getAutocrine(params)
     uNot = convert(Vector{eltype(params)}, zeros(55))
+    tps = convert(eltype(params), 10000000.0)
 
-    probInit = SteadyStateProblem(TAM_reacti, uNot, params)
-    solInit = solve(probInit, DynamicSS(Rodas5()); isoutofdomain=domainDef)
+    probInit = ODEProblem(TAM_reacti, uNot, tps, params)
+    solInit = solve(probInit, AutoTsit5(TRBDF2()); isoutofdomain=domainDef)
 
-    return solInit.u
+    return solInit(tps)
 end
 
 

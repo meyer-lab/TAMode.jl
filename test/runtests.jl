@@ -17,7 +17,7 @@ params = ones(15) * 0.5
     @profile TAMode.runTAM(tps, params, 100.0)
     @profile TAMode.runTAM(tps, params, 1000.0)
 
-    Profile.print(noisefloor=5.0)
+    Profile.print(noisefloor=10.0)
 end
 
 
