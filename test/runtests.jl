@@ -2,6 +2,7 @@ using Test
 using Profile
 using TAMode
 using LinearAlgebra
+using ForwardDiff
 
 tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
 params = ones(15) * 0.5
@@ -17,6 +18,17 @@ params = ones(15) * 0.5
     @profile TAMode.runTAM(tps, params, 1000.0)
 
     Profile.print(noisefloor=5.0)
+end
+
+
+@testset "Can forward diff through the solver." begin
+    funcc = x -> TAMode.runTAM(tps, x, 1.0) * TAMode.pY
+    g = ForwardDiff.gradient(funcc, params)
+
+    #ga = ForwardDiff.gradient(TAMode.getAutocrine, params)
+
+    println(g)
+    #println(ga)
 end
 
 

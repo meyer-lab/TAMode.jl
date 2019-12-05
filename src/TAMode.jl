@@ -5,6 +5,9 @@ using StaticArrays
 using SteadyStateDiffEq
 using LinearAlgebra
 using LabelledArrays
+using ForwardDiff
+
+numType = Union{Float64, ForwardDiff.Dual}
 
 include("reactCode.jl")
 include("compModel.jl")
@@ -18,14 +21,21 @@ end
 
 function getAutocrine(params)
     # TODO: Replace with steady-state
-    probInit = ODEProblem(TAM_reacti, zeros(55), 10000000.0, params)
+    uNot = convert(Vector{eltype(params)}, zeros(55))
+    tps = convert(eltype(params), 10000000.0)
+
+    probInit = ODEProblem(TAM_reacti, uNot, tps, params)
     solInit = solve(probInit, AutoTsit5(TRBDF2()); isoutofdomain=domainDef)
-    
-    return solInit(10000000.0)
+
+    return solInit(tps)
 end
 
 
-function runTAMinit(tps::Array{Float64,1}, params, solInit::Vector)
+function runTAMinit(tps::Vector, params::Vector, solInit::Vector)
+    ansType = promote_type(eltype(tps), eltype(params), eltype(solInit))
+    tps = convert(Vector{ansType}, tps)
+    solInit = convert(Vector{ansType}, solInit)
+
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
 
     sol = solve(prob, AutoTsit5(TRBDF2()); isoutofdomain=domainDef)
