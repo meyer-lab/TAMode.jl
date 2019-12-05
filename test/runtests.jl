@@ -53,7 +53,7 @@ end
     @test outt[13] ≈ 0.0
 
     for i in 1:3
-        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol=1.0E-5)
+        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol=1.0e-5)
     end
 end
 
@@ -111,7 +111,7 @@ end
 
     secondSurf = TAMode.runTAMinit([100.0], tt, firstSurf)
 
-    @test dot(firstSurf, TAMode.surface) ≈ dot(secondSurf, TAMode.surface)
+    @test isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol=1.0e-5)
 end
     
 
