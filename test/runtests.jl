@@ -4,8 +4,11 @@ using TAMode
 using LinearAlgebra
 using ForwardDiff
 
-tps = [0.1, 1.0, 10.0, 100.0, 1000.0]
+tps = 10.0 .^ range(-6.0, stop = 4.0, length = 25)
 params = ones(15) * 0.5
+
+
+aboutZero = x -> isapprox(x, 0.0, rtol=1.0e-5, atol=1.0e-5)
 
 
 @testset "Can successfully assemble the parameters." begin
@@ -65,7 +68,7 @@ end
     @test outt[13] ≈ 0.0
 
     for i in 1:3
-        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol=1.0E-5)
+        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol=1.0e-5)
     end
 end
 
@@ -83,6 +86,52 @@ end
     dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, rr, 0.0)
 
     @test dnorm < 0.05
+end
+
+
+@testset "Swapping twice leads to the same rates." begin
+    rr = TAMode.param(params)
+    rrB = TAMode.swapIgs(TAMode.swapIgs(rr))
+
+    for ii in 1:3
+        @test all(rr.TAMs[ii].xRev .≈ rrB.TAMs[ii].xRev)
+        @test all(rr.TAMs[ii].binding .≈ rrB.TAMs[ii].binding)
+        @test all(rr.hetR[ii].xRev .≈ rrB.hetR[ii].xRev)
+    end
+end
+
+
+@testset "Swapping Ig1 with Ig2 doesn't change anything." begin
+    # TODO: boundLig doesn't work here...
+    rr = TAMode.param(params)
+    rrSwap = TAMode.swapIgs(rr)
+
+    dataDiff = TAMode.runTAMinit(tps, rr, zeros(55)) .- TAMode.runTAMinit(tps, rrSwap, zeros(55))
+    @test all(aboutZero.(dataDiff * TAMode.pY))
+    @test all(aboutZero.(dataDiff * TAMode.total))
+    @test all(aboutZero.(dataDiff * TAMode.surface))
+
+    for ii in 1:3
+        @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
+    end
+
+    autoDiff = TAMode.getAutocrine(rr) .- TAMode.getAutocrine(rrSwap)
+    @test aboutZero(dot(autoDiff, TAMode.pY))
+    @test aboutZero(dot(autoDiff, TAMode.total))
+    @test aboutZero(dot(autoDiff, TAMode.surface))
+
+    for ii in 1:3
+        @test aboutZero(dot(autoDiff, TAMode.recpSpecific[ii]))
+    end
+
+    dataDiff = TAMode.runTAM(tps, rr, 1.0) .- TAMode.runTAM(tps, rrSwap, 1.0)
+    @test all(aboutZero.(dataDiff * TAMode.pY))
+    @test all(aboutZero.(dataDiff * TAMode.total))
+    @test all(aboutZero.(dataDiff * TAMode.surface))
+
+    for ii in 1:3
+        @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
+    end
 end
 
 
@@ -123,7 +172,7 @@ end
 
     secondSurf = TAMode.runTAMinit([100.0], tt, firstSurf)
 
-    @test dot(firstSurf, TAMode.surface) ≈ dot(secondSurf, TAMode.surface)
+    @test isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol=1.0e-5)
 end
     
 
