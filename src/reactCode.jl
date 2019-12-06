@@ -136,7 +136,7 @@ end
 
 
 " Handles trafficking of receptor and ligand. "
-function trafFunc(dextR, dintR, intRate::numType, extR, intR, kRec::numType, kDeg::numType, fElse::numType)
+function trafFunc(dextR, dintR, intRate, extR, intR, kRec, kDeg, fElse)
 	dextR[:] .+= -extR*intRate + kRec*(1-fElse)*intR*internalFrac # Endocytosis, recycling
 	dintR[:] .+= extR*intRate/internalFrac - kRec*(1-fElse)*intR - kDeg*fElse*intR # Endocytosis, recycling, degradation
 end
