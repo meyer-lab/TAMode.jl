@@ -19,13 +19,7 @@ end
 function getAutocrine(params::Union{Vector{T}, TAMode.Rates{T}})::Vector{T} where {T}
     probInit = SteadyStateProblem(TAM_reacti, zeros(T, 55), params)
 
-    if T == Float64
-        autod = true
-    else
-        autod = false
-    end
-
-    solInit = solve(probInit, DynamicSS(Rosenbrock23(autodiff=autod)); isoutofdomain=domainDef)
+    solInit = solve(probInit, DynamicSS(Rosenbrock23(autodiff=(T == Float64))); isoutofdomain=domainDef)
   
     return solInit.u
 end
@@ -35,13 +29,7 @@ function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, TAMode.Rates{
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
 
-    if T == Float64
-        autod = true
-    else
-        autod = false
-    end
-
-    sol = solve(prob, Rosenbrock23(autodiff=autod); isoutofdomain=domainDef)
+    sol = solve(prob, Rosenbrock23(autodiff=(T == Float64)); isoutofdomain=domainDef)
     solut = sol(tps).u
 
     if length(tps) > 1
