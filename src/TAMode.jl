@@ -16,18 +16,32 @@ function domainDef(u, p, t)
 end
 
 
-function getAutocrine(params)
-    probInit = SteadyStateProblem(TAM_reacti, zeros(eltype(params), 55), params)
-    solInit = solve(probInit, DynamicSS(Rosenbrock23()); isoutofdomain=domainDef)
+function getAutocrine(params::Union{Vector{T}, TAMode.Rates{T}})::Vector{T} where {T}
+    probInit = SteadyStateProblem(TAM_reacti, zeros(T, 55), params)
+
+    if T == Float64
+        autod = true
+    else
+        autod = false
+    end
+
+    solInit = solve(probInit, DynamicSS(Rosenbrock23(autodiff=autod)); isoutofdomain=domainDef)
   
     return solInit.u
 end
 
 
-function runTAMinit(tps::Array{Float64,1}, params, solInit::Vector)
+function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, TAMode.Rates{T}}, solInit::Vector) where {T}
+    solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
 
-    sol = solve(prob, Rosenbrock23(); isoutofdomain=domainDef)
+    if T == Float64
+        autod = true
+    else
+        autod = false
+    end
+
+    sol = solve(prob, Rosenbrock23(autodiff=autod); isoutofdomain=domainDef)
     solut = sol(tps).u
 
     if length(tps) > 1
@@ -41,7 +55,7 @@ end
 
 
 
-function runTAM(tps::Array{Float64,1}, params, gasStim::Float64)
+function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
     solInit = getAutocrine(params)
