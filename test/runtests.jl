@@ -5,7 +5,7 @@ using LinearAlgebra
 using ForwardDiff
 
 tps = 10.0 .^ range(-6.0, stop = 4.0, length = 25)
-params = ones(15) * 0.5
+params = ones(15) * 0.1
 
 
 aboutZero = x -> isapprox(x, 0.0, rtol=1.0e-5, atol=1.0e-5)
@@ -25,13 +25,13 @@ end
 
 
 @testset "Can forward diff through the solver." begin
-    funcc = x -> TAMode.runTAM(tps, x, 1.0) * TAMode.pY
-    g = ForwardDiff.gradient(funcc, params)
+    #funcc = x -> TAMode.runTAM(tps, x, 1.0) * TAMode.pY
+    #g = ForwardDiff.gradient(funcc, params)
 
-    #ga = ForwardDiff.gradient(TAMode.getAutocrine, params)
+    ga = ForwardDiff.gradient(TAMode.getAutocrine, params)
 
-    println(g)
-    #println(ga)
+    #println(g)
+    println(ga)
 end
 
 

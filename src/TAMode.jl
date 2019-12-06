@@ -22,7 +22,7 @@ end
 function getAutocrine(params)
     uNot = convert(Vector{eltype(params)}, zeros(55))
     probInit = SteadyStateProblem(TAM_reacti, uNot, params)
-    solInit = solve(probInit, DynamicSS(Rosenbrock23()); isoutofdomain=domainDef)
+    solInit = solve(probInit, DynamicSS(Rodas5()); isoutofdomain=domainDef)
   
     return solInit.u
 end
@@ -35,7 +35,7 @@ function runTAMinit(tps::Vector, params::Vector, solInit::Vector)
 
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
 
-    sol = solve(prob, Rosenbrock23(); isoutofdomain=domainDef)
+    sol = solve(prob, Rodas5(); isoutofdomain=domainDef)
     solut = sol(tps).u
 
     if length(tps) > 1

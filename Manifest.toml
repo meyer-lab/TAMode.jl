@@ -227,9 +227,9 @@ version = "1.1.0"
 
 [[OrdinaryDiffEq]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "DiffEqDiffTools", "ExponentialUtilities", "ForwardDiff", "GenericSVD", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "Parameters", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays"]
-git-tree-sha1 = "139739cf7fa40b887656cc610d2e36e72612d0cd"
+git-tree-sha1 = "f00ab5763da99ed58b029da74a50488e8e823ce2"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "5.26.2"
+version = "5.26.3"
 
 [[Parameters]]
 deps = ["OrderedCollections"]
