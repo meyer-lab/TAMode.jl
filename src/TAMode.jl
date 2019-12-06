@@ -17,7 +17,7 @@ end
 
 
 function getAutocrine(params)
-    probInit = SteadyStateProblem(TAM_reacti, zeros(55), params)
+    probInit = SteadyStateProblem(TAM_reacti, zeros(eltype(params), 55), params)
     solInit = solve(probInit, DynamicSS(Rosenbrock23()); isoutofdomain=domainDef)
   
     return solInit.u
