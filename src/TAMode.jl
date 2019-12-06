@@ -7,8 +7,6 @@ using LinearAlgebra
 using LabelledArrays
 using ForwardDiff
 
-numType = Union{Float64, ForwardDiff.Dual}
-
 include("reactCode.jl")
 include("compModel.jl")
 include("bothLigands.jl")
