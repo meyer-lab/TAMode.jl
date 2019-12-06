@@ -136,7 +136,7 @@ end
 
 
 " Handles trafficking of receptor and ligand. "
-function trafFunc(dextR, dintR, intRate::Float64, extR, intR, kRec::Float64, kDeg::Float64, fElse::Float64)
+function trafFunc(dextR, dintR, intRate, extR, intR, kRec, kDeg, fElse)
 	dextR[:] .+= -extR*intRate + kRec*(1-fElse)*intR*internalFrac # Endocytosis, recycling
 	dintR[:] .+= extR*intRate/internalFrac - kRec*(1-fElse)*intR - kDeg*fElse*intR # Endocytosis, recycling, degradation
 end
@@ -154,12 +154,12 @@ end
 
 function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates)
 	dnorm = react_module(R, dR, nothing, tr.gasCur, r, tr)
-	dnorm += react_module(view(R, 1:6), view(dR, 1:6), dLi, Li/internalV, r, tr)
+	dnorm += react_module(view(R, 7:12), view(dR, 7:12), dLi, Li/internalV, r, tr)
 
 	dR[1] += r.expression
 
 	trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, R[1:4], R[7:10], tr.kRec, tr.kDeg, tr.fElse)
-	trafFunc(view(dR, 4:5), view(dR, 10:11), tr.pYinternalize, R[4:5], R[10:11], tr.kRec, tr.kDeg, 1.0)
+	trafFunc(view(dR, 5:6), view(dR, 11:12), tr.pYinternalize, R[5:6], R[11:12], tr.kRec, tr.kDeg, 1.0)
 
 	return dnorm
 end
@@ -219,20 +219,20 @@ function detailedBalance(out::Rates)
 	for ii in 1:3
 		x = [:Axl, :MerTK, :Axl][ii]
 		y = [:MerTK, :Tyro3, :Tyro3][ii]
-		
+
 		KD11 = out.TAMs[x].binding[2]/out.TAMs[x].binding[1]
 		KD12 = out.TAMs[y].binding[2]/out.TAMs[y].binding[1]
 		KD21 = out.TAMs[x].binding[4]/out.TAMs[x].binding[3]
 		KD22 = out.TAMs[y].binding[4]/out.TAMs[y].binding[3]
-		
+
 		out.hetR[ii].xFwd15 = max(out.TAMs[y].binding[1], out.TAMs[x].binding[3])
 		out.hetR[ii].xFwd16 = max(out.TAMs[x].binding[1], out.TAMs[y].binding[3])
-		
+
 		out.hetR[ii].xRev[1] = out.TAMs[x].xRev[5]*KD12/KD11
 		out.hetR[ii].xRev[2] = out.hetR[ii].xRev[1]*KD21/KD12
 		out.hetR[ii].xRev[3] = KD22*KD21/KD11/KD12*out.hetR[ii].xRev[1]
 		out.hetR[ii].xRev[4] = out.hetR[ii].xRev[1]*KD22/KD11
-		
+
 		if out.TAMs[x].binding[2] <= out.TAMs[x].binding[4] 
 			out.hetR[ii].xRev[8] = out.TAMs[x].binding[2]
 			out.hetR[ii].xRev[6] = out.hetR[ii].xRev[8]*KD11/KD21
@@ -240,13 +240,13 @@ function detailedBalance(out::Rates)
 			out.hetR[ii].xRev[6] = out.TAMs[x].binding[4]
 			out.hetR[ii].xRev[8] = out.hetR[ii].xRev[6]*KD21/KD11
 		end
-			
+
 		if out.TAMs[y].binding[2] <= out.TAMs[y].binding[4] 
 			out.hetR[ii].xRev[5] = out.TAMs[y].binding[2]
-			out.hetR[ii].xRev[7] = out.hetR[ii].xRev[5]*KD11/KD21
+			out.hetR[ii].xRev[7] = out.hetR[ii].xRev[5]*KD22/KD12
 		else 
 			out.hetR[ii].xRev[7] = out.TAMs[y].binding[4]
-			out.hetR[ii].xRev[5] = out.hetR[ii].xRev[7]*KD21/KD11
+			out.hetR[ii].xRev[5] = out.hetR[ii].xRev[7]*KD12/KD22
 		end
 			
 		out.hetR[ii].xRev[9] = out.hetR[ii].xRev[1]*KD21/KD12
@@ -261,6 +261,7 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 end
 
 function swapIgs(out::Rates)
+	out = deepcopy(out)
     detailedBalance(out)
     
     for T in out.TAMs

@@ -14,9 +14,9 @@ version = "0.0.4"
 
 [[ArrayInterface]]
 deps = ["LinearAlgebra", "Requires", "SparseArrays"]
-git-tree-sha1 = "981354dab938901c2b607a213e62d9defa50b698"
+git-tree-sha1 = "487fc79b7b77cef8391675c0000ccd8e933e3533"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "1.2.1"
+version = "2.0.0"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -55,21 +55,21 @@ uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[DiffEqBase]]
 deps = ["ArrayInterface", "Compat", "DataStructures", "DiffEqDiffTools", "Distributed", "DocStringExtensions", "FunctionWrappers", "IterativeSolvers", "IteratorInterfaceExtensions", "LinearAlgebra", "MuladdMacro", "Parameters", "Printf", "RecipesBase", "RecursiveArrayTools", "RecursiveFactorization", "Requires", "Roots", "SparseArrays", "StaticArrays", "Statistics", "SuiteSparse", "TableTraits", "TreeViews"]
-git-tree-sha1 = "d8fd2c83f3385191495df6f49964138933a6d562"
+git-tree-sha1 = "a484bf139eb4e15df47b2ef82f6e2af0fbb4ad01"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.6.0"
+version = "6.7.0"
 
 [[DiffEqCallbacks]]
 deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
-git-tree-sha1 = "0cb6b3481df064100cf6a2f3c457e7e024edb9e9"
+git-tree-sha1 = "f85da2bade6eb9bee58f06540a8c00d071e9f432"
 uuid = "459566f4-90b8-5000-8ac3-15dfb0a30def"
-version = "2.9.0"
+version = "2.10.0"
 
 [[DiffEqDiffTools]]
 deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
-git-tree-sha1 = "81edfb3a8b55154772bb6080b5db40868e1778ed"
+git-tree-sha1 = "6d83f9b2c2a552bf5ce29c20a526c0cbfd9e5270"
 uuid = "01453d9d-ee7c-5054-8395-0335cb756afa"
-version = "1.4.0"
+version = "1.5.0"
 
 [[DiffResults]]
 deps = ["Compat", "StaticArrays"]
@@ -146,11 +146,11 @@ version = "1.0.0"
 
 [[LabelledArrays]]
 deps = ["LinearAlgebra", "MacroTools", "StaticArrays"]
-git-tree-sha1 = "3a7c71cde21ccc99b4ee5c050562c53089cd01f9"
+git-tree-sha1 = "9881879990696cdf3366132907ed3ee0e5d6b214"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaDiffEq/LabelledArrays.jl"
 uuid = "2ee39098-c373-598a-b85f-a56591580800"
-version = "0.7.1"
+version = "1.0.0"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -178,10 +178,10 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MacroTools]]
-deps = ["Compat", "DataStructures", "Test"]
-git-tree-sha1 = "82921f0e3bde6aebb8e524efc20f4042373c0c06"
+deps = ["DataStructures", "Markdown", "Random"]
+git-tree-sha1 = "e2fc7a55bb2224e203bbd8b59f72b91323233458"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.2"
+version = "0.5.3"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -227,9 +227,9 @@ version = "1.1.0"
 
 [[OrdinaryDiffEq]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "DiffEqDiffTools", "ExponentialUtilities", "ForwardDiff", "GenericSVD", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "Parameters", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays"]
-git-tree-sha1 = "adecd75b740d49dbd5b7c19f2d95fd78dd21addf"
+git-tree-sha1 = "f00ab5763da99ed58b029da74a50488e8e823ce2"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "5.24.0"
+version = "5.26.3"
 
 [[Parameters]]
 deps = ["OrderedCollections"]
@@ -264,9 +264,9 @@ version = "0.7.0"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "RecipesBase", "Requires", "StaticArrays", "Statistics"]
-git-tree-sha1 = "ca98c030a187586521fb72d396e14482365ef77f"
+git-tree-sha1 = "cb0fcf68e2e19e76b84c892b22887f02f10f3d9a"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "1.0.2"
+version = "1.2.0"
 
 [[RecursiveFactorization]]
 deps = ["LinearAlgebra"]
