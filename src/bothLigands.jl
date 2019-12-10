@@ -76,6 +76,3 @@ function react_module(R, dR, curL, r)
 
 	return norm(dRr)
 end
-
-
-
