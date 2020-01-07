@@ -8,7 +8,7 @@ tps = 10.0 .^ range(-6.0, stop = 4.0, length = 25)
 params = ones(15) * 0.5
 
 
-aboutZero = x -> isapprox(x, 0.0, rtol=1.0e-5, atol=1.0e-5)
+aboutZero = x -> isapprox(x, 0.0, rtol = 1.0e-5, atol = 1.0e-5)
 
 
 @testset "Can successfully assemble the parameters." begin
@@ -20,7 +20,7 @@ aboutZero = x -> isapprox(x, 0.0, rtol=1.0e-5, atol=1.0e-5)
     @profile TAMode.runTAM(tps, params, 100.0)
     @profile TAMode.runTAM(tps, params, 1000.0)
 
-    Profile.print(noisefloor=10.0)
+    Profile.print(noisefloor = 10.0)
 end
 
 
@@ -33,7 +33,7 @@ end
 @testset "Make sure code upholds mass conservation." begin
     tt = TAMode.param(params)
     firstV = TAMode.getAutocrine(tt)
-    
+
     tt.kDeg = 0
     tt.TAMs[1].expression = 0
     tt.TAMs[2].expression = 0
@@ -62,8 +62,8 @@ end
     # Expect no ligand
     @test outt[13] ≈ 0.0
 
-    for i in 1:3
-        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol=1.0e-5)
+    for i = 1:3
+        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol = 1.0e-5)
     end
 end
 
@@ -88,7 +88,7 @@ end
     rr = TAMode.param(params)
     rrB = TAMode.swapIgs(TAMode.swapIgs(rr))
 
-    for ii in 1:3
+    for ii = 1:3
         @test all(rr.TAMs[ii].xRev .≈ rrB.TAMs[ii].xRev)
         @test all(rr.TAMs[ii].binding .≈ rrB.TAMs[ii].binding)
         @test all(rr.hetR[ii].xRev .≈ rrB.hetR[ii].xRev)
@@ -106,7 +106,7 @@ end
     @test all(aboutZero.(dataDiff * TAMode.total))
     @test all(aboutZero.(dataDiff * TAMode.surface))
 
-    for ii in 1:3
+    for ii = 1:3
         @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
     end
 
@@ -115,7 +115,7 @@ end
     @test aboutZero(dot(autoDiff, TAMode.total))
     @test aboutZero(dot(autoDiff, TAMode.surface))
 
-    for ii in 1:3
+    for ii = 1:3
         @test aboutZero(dot(autoDiff, TAMode.recpSpecific[ii]))
     end
 
@@ -124,7 +124,7 @@ end
     @test all(aboutZero.(dataDiff * TAMode.total))
     @test all(aboutZero.(dataDiff * TAMode.surface))
 
-    for ii in 1:3
+    for ii = 1:3
         @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
     end
 end
@@ -142,7 +142,7 @@ end
 
 
 @testset "Check if there's no receptor that we don't see any." begin
-    for i in 1:3
+    for i = 1:3
         rr = TAMode.param(params)
         rr.TAMs[i].expression = 0.0
 
@@ -167,11 +167,11 @@ end
 
     secondSurf = TAMode.runTAMinit([100.0], tt, firstSurf)
 
-    @test isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol=1.0e-5)
+    @test isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol = 1.0e-5)
 end
-    
 
-@testset "Ensure that system reaches equilibrium." begin  
+
+@testset "Ensure that system reaches equilibrium." begin
     uLong = TAMode.getAutocrine(params)
     dnorm = zeros(55)
     TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
