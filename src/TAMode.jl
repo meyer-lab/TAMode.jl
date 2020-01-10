@@ -11,17 +11,20 @@ include("compModel.jl")
 include("bothLigands.jl")
 
 
+const solTol = 1.0e-9
+
 function domainDef(u, p, t)
-    return any(x -> x < 0.0, u)
+    return any(x -> x < -solTol, u)
 end
+
+const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => domainDef])
 
 
 function getAutocrine(params::Union{Vector{T}, TAMode.Rates{T}})::Vector{T} where {T}
     probInit = SteadyStateProblem(TAM_reacti, zeros(T, 55), params)
 
-    solInit = solve(probInit, DynamicSS(Rosenbrock23(autodiff = (T == Float64))); isoutofdomain = domainDef)
-
-    return solInit.u
+    sol = Rodas5(autodiff = (T == Float64))
+    return solve(probInit, DynamicSS(sol); options...).u
 end
 
 
@@ -29,8 +32,8 @@ function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, TAMode.Rates{
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
 
-    sol = solve(prob, Rosenbrock23(autodiff = (T == Float64)); isoutofdomain = domainDef)
-    solut = sol(tps).u
+    sol = Rodas5(autodiff = (T == Float64))
+    solut = solve(prob, sol; saveat = tps, options...).u
 
     if length(tps) > 1
         solut = vcat(transpose.(solut)...)
