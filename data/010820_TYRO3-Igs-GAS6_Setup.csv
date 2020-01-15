@@ -1,0 +1,19 @@
+"This is processed data only including associaton and dissociation stages. Each stage is 600s, for total 1200s.",,,,,,,
+"Essentially this processing should align at Baseline_2, and therefore association should be normalized on Y-axis to start.",,,,,,,
+"There is no control subtracted in this data, note 2 controls however, G and H. I wanted to give you both options to view.",,,,,,,
+"G = T-Ig loaded, association and dissociation in buffer",,,,,,,
+"H= BSA loaded, association in high conc GAS6, dissociation buffer",,,,,,,
+"If necessary and see drift effects from buffer, there are ways to achieve better controls.",,,,,,,
+"The exact start time for each lane corresponds to time in total run, so for example timepoint 1 in T1 is 222.21s, in plotting this in prism I just normalized this first timepoint of associaiton to 0s",,,,,,,
+And every time point thereafter has 222.21s subtracted from entire column.,,,,,,,
+,,,,,,,
+,,,,,,,
+,,,,,4,5,6
+,A,T1,T2,TFL,50nM,50nM,50nM
+,B,T1,T2,TFL,25nM,25nM,25nM
+,C,T1,T2,TFL,12.5nM,12.5nM,12.5nM
+,D,T1,T2,TFL,6.25nM,6.25nM,6.25nM
+,E,T1,T2,TFL,3.125nM,3.125nM,3.125nM
+,F,T1,T2,TFL,1.56nM,1.56nM,1.56nM
+,G,T1,T2,TFL,0nm,0nm,0nm
+,H,BSA,BSA,BSA,50nM,50nM,50nM

@@ -11,25 +11,29 @@ include("compModel.jl")
 include("bothLigands.jl")
 
 
+const solTol = 1.0e-9
+
 function domainDef(u, p, t)
-    return any(x -> x < 0.0, u)
+    return any(x -> x < -solTol, u)
+end
+
+const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => domainDef])
+
+
+function getAutocrine(params::Union{Vector{T}, TAMode.Rates{T}})::Vector{T} where {T}
+    probInit = SteadyStateProblem(TAM_reacti, zeros(T, 55), params)
+
+    sol = Rodas5(autodiff = (T == Float64))
+    return solve(probInit, DynamicSS(sol); options...).u
 end
 
 
-function getAutocrine(params)
-    # TODO: Replace with steady-state
-    probInit = ODEProblem(TAM_reacti, zeros(55), 10000000.0, params)
-    solInit = solve(probInit, AutoTsit5(TRBDF2()); isoutofdomain=domainDef)
-    
-    return solInit(10000000.0)
-end
-
-
-function runTAMinit(tps::Array{Float64,1}, params, solInit::Vector)
+function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, TAMode.Rates{T}}, solInit::Vector) where {T}
+    solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
 
-    sol = solve(prob, AutoTsit5(TRBDF2()); isoutofdomain=domainDef)
-    solut = sol(tps).u
+    sol = Rodas5(autodiff = (T == Float64))
+    solut = solve(prob, sol; saveat = tps, options...).u
 
     if length(tps) > 1
         solut = vcat(transpose.(solut)...)
@@ -42,7 +46,7 @@ end
 
 
 
-function runTAM(tps::Array{Float64,1}, params, gasStim::Float64)::Array{Float64,2}
+function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
     solInit = getAutocrine(params)

@@ -79,6 +79,8 @@ end
 
 
 @testset "Swapping twice leads to the same rates." begin
+<<<<<<< HEAD
+=======
     rr = TAMode.param(params)
     rrB = TAMode.swapIgs(TAMode.swapIgs(rr))
 
@@ -122,3 +124,85 @@ end
         @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
     end
 end
+
+
+@testset "Test that if none of the ligand is expressed, we don't end up seeing any." begin
+>>>>>>> 5176cfba9be2026baada4805ed3cd2065fbb6cef
+    rr = TAMode.param(params)
+    rrB = TAMode.swapIgs(TAMode.swapIgs(rr))
+
+    for ii = 1:3
+        @test all(rr.TAMs[ii].xRev .≈ rrB.TAMs[ii].xRev)
+        @test all(rr.TAMs[ii].binding .≈ rrB.TAMs[ii].binding)
+        @test all(rr.hetR[ii].xRev .≈ rrB.hetR[ii].xRev)
+    end
+end
+
+
+<<<<<<< HEAD
+@testset "Swapping Ig1 with Ig2 doesn't change anything." begin
+    # TODO: boundLig doesn't work here...
+    rr = TAMode.param(params)
+    rrSwap = TAMode.swapIgs(rr)
+=======
+@testset "Check if there's no receptor that we don't see any." begin
+    for i = 1:3
+        rr = TAMode.param(params)
+        rr.TAMs[i].expression = 0.0
+>>>>>>> 5176cfba9be2026baada4805ed3cd2065fbb6cef
+
+    dataDiff = TAMode.runTAMinit(tps, rr, zeros(55)) .- TAMode.runTAMinit(tps, rrSwap, zeros(55))
+    @test all(aboutZero.(dataDiff * TAMode.pY))
+    @test all(aboutZero.(dataDiff * TAMode.total))
+    @test all(aboutZero.(dataDiff * TAMode.surface))
+
+    for ii = 1:3
+        @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
+    end
+
+<<<<<<< HEAD
+    autoDiff = TAMode.getAutocrine(rr) .- TAMode.getAutocrine(rrSwap)
+    @test aboutZero(dot(autoDiff, TAMode.pY))
+    @test aboutZero(dot(autoDiff, TAMode.total))
+    @test aboutZero(dot(autoDiff, TAMode.surface))
+
+    for ii = 1:3
+        @test aboutZero(dot(autoDiff, TAMode.recpSpecific[ii]))
+    end
+
+    dataDiff = TAMode.runTAM(tps, rr, 1.0) .- TAMode.runTAM(tps, rrSwap, 1.0)
+    @test all(aboutZero.(dataDiff * TAMode.pY))
+    @test all(aboutZero.(dataDiff * TAMode.total))
+    @test all(aboutZero.(dataDiff * TAMode.surface))
+
+    for ii = 1:3
+        @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
+    end
+end
+=======
+
+@testset "Make sure that TAM surface don't explode at long time in reaction code." begin
+    tt = TAMode.param(params)
+    firstSurf = TAMode.getAutocrine(tt)
+
+    tt.TAMs[1].expression = 0.0
+    tt.TAMs[2].expression = 0.0
+    tt.TAMs[3].expression = 0.0
+    tt.kRec = 0.0
+    tt.internalize = 0.0
+    tt.pYinternalize = 0.0
+    tt.gasCur *= 10.0
+
+    secondSurf = TAMode.runTAMinit([100.0], tt, firstSurf)
+
+    @test_broken isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol = 1.0e-5)
+end
+
+
+@testset "Ensure that system reaches equilibrium." begin
+    uLong = TAMode.getAutocrine(params)
+    dnorm = zeros(55)
+    TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
+    @test all(dnorm .< 0.05)
+end
+>>>>>>> 5176cfba9be2026baada4805ed3cd2065fbb6cef
