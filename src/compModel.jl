@@ -12,6 +12,6 @@ function compParamm(compIn::Vector)
     ppparams.fraction = compIn[1]
     ppparams.partIn = compIn[2]
     ppparams.gasPart = compIn[3]
-    
+
     return ppparams
 end
