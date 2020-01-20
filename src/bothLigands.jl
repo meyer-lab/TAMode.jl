@@ -28,20 +28,15 @@ end
 
 
 function TAM_react(const R::T, const dR::T)
-    tr = view(pparams,:,:)
-    
+   
     react_module(R, dR, tr.curL) # We give the same internal ligand address as below because it will be overwritten
-    react_module(R+iR, dR+iR, {{R[15+iR]/tr.internalV, R[16+iR]/tr.internalV}})
+    react_module(R+iR, dR+iR, (R[15+iR]/tr.internalV, R[16+iR]/tr.internalV))
 
     dR[1] += tr.expression
 
-    for UInt i = 1:8
-        trafFunc(@view dR[i], @view dR[i+iR], tr.internalize, R[i], R[i+iR], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
-    end
+    trafFunc(@view dR[1:8], @view dR[(1:8)+(1:8)*R], tr.internalize, R[1:8], R[1:8)+(1:8)*R], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
     
-    for UInt i = 9:13
-        trafFunc(@view dR[i], @view dR[i+iR], tr.pYinternalize, R[i], R[i+iR], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
-    end
+    trafFunc(@view dR[9:13], @view dR[(9:13)+(9:13)*R], tr.pYinternalize, R[9:13], R[(9:13)+(9:13)*R], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
         
     return 0
 end
