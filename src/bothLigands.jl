@@ -84,14 +84,14 @@ end
 # @param[in] R  Double vector for current state of model
 # @param dR  Double vector for returning derivative of current state
 # @return Always returns 0 for success
-function TAM_react(const R::T, const dR::T)
+function TAM_react(R::Vector, dR::Vector)
     react_module(R, dR, tr.curL) # We give the same internal ligand address as below because it will be overwritten
-    react_module(R+iR, dR+iR, (R[15+iR]/tr.internalV, R[16+iR]/tr.internalV))
+    react_module(@view R[14:end], @view dR[14:end], R[29:30] / tr.internalV)
 
     dR[1] += tr.expression
 
-    trafFunc(@view dR[1:8], @view dR[(1:8)+(1:8)*R], tr.internalize, R[1:8], R[(1:8)+(1:8)*R], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
-    trafFunc(@view dR[9:13], @view dR[(9:13)+(9:13)*R], tr.pYinternalize, R[9:13], R[(9:13)+(9:13)*R], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
+    trafFunc(@view dR[1:9], @view dR[15:23], tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
+    trafFunc(@view dR[10:14], @view dR[24:28], tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
 
     return 0
 end
