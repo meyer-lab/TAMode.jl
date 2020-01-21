@@ -58,7 +58,7 @@ function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
     end
 
     return runTAMinit(tps, params, solInit)
-    end
+end
 
 
 end # module
