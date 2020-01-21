@@ -92,7 +92,7 @@ function TAM_react(const R::T, const dR::T)
 
     dR[1] += tr.expression
 
-    trafFunc(@view dR[1:8], @view dR[(1:8)+(1:8)*R], tr.internalize, R[1:8], R[1:8)+(1:8)*R], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
+    trafFunc(@view dR[1:8], @view dR[(1:8)+(1:8)*R], tr.internalize, R[1:8], R[(1:8)+(1:8)*R], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
     
     trafFunc(@view dR[9:13], @view dR[(9:13)+(9:13)*R], tr.pYinternalize, R[9:13], R[(9:13)+(9:13)*R], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
         
