@@ -78,3 +78,20 @@ function react_module(R, dR, curL, r)
 
     return norm(dRr)
 end
+
+
+# @brief Callback function from CVode to handle ODE solving
+# @param[in] R  Double vector for current state of model
+# @param dR  Double vector for returning derivative of current state
+# @return Always returns 0 for success
+function TAM_react(R::Vector, dR::Vector)
+    react_module(R, dR, tr.curL) # We give the same internal ligand address as below because it will be overwritten
+    react_module(view(R, 14:30), view(dR, 14:30), view(R, 29:30) / tr.internalV)
+
+    dR[1] += tr.expression
+
+    trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
+    trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
+
+    return 0
+end
