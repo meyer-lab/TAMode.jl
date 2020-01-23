@@ -8,13 +8,13 @@ end
 
 
 function compParamm(compIn::Vector)
-     ppparams = comprates{eltype(compIn)}
-     ppparams.rr = param(compIn[4:end])
-     ppparams.fraction = compIn[1]
-     ppparams.partIn = compIn[2]
-     ppparams.gasPart = compIn[3]
+    ppparams = comprates{eltype(compIn)}
+    ppparams.rr = param(compIn[4:end])
+    ppparams.fraction = compIn[1]
+    ppparams.partIn = compIn[2]
+    ppparams.gasPart = compIn[3]
 
-     return ppparams
+    return ppparams
 end
 
 
