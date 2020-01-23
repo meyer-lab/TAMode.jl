@@ -6,6 +6,18 @@ mutable struct comprates{T} #do we want this to be T and what does {T} mean
     gasPart::T #Partitioning of ligand into PtdSer region
 end
 
+
+function compParamm(compIn::Vector)
+     ppparams = comprates{eltype(compIn)}
+     ppparams.rr = param(compIn[4:end])
+     ppparams.fraction = compIn[1]
+     ppparams.partIn = compIn[2]
+     ppparams.gasPart = compIn[3]
+
+     return ppparams
+end
+
+
 function calcStim(tps::Array{Float64,1}, params, gasStim::Float64)::Array{Float64,2}
     @assert all(tps .>= 0.0)
 
