@@ -23,9 +23,9 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[ChainRulesCore]]
 deps = ["MuladdMacro"]
-git-tree-sha1 = "4bc1dc18d0a00b4c8ed3951f5918aec2aeaa014d"
+git-tree-sha1 = "eb54d7349210f37c142e58d67668951efc1e5cdc"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.5.5"
+version = "0.6.1"
 
 [[CommonSubexpressions]]
 deps = ["Test"]
@@ -55,9 +55,9 @@ uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[DiffEqBase]]
 deps = ["ArrayInterface", "ChainRulesCore", "Compat", "DataStructures", "Distributed", "DocStringExtensions", "FunctionWrappers", "IterativeSolvers", "IteratorInterfaceExtensions", "LinearAlgebra", "MuladdMacro", "Parameters", "Printf", "RecipesBase", "RecursiveArrayTools", "RecursiveFactorization", "Requires", "Roots", "SparseArrays", "StaticArrays", "Statistics", "SuiteSparse", "TableTraits", "TreeViews", "ZygoteRules"]
-git-tree-sha1 = "6b1a5b2649c661652d969c880c41ffccc066d6c3"
+git-tree-sha1 = "3ef848bc1b8b09ce3cc14b53ddd0b4abec0407ae"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.13.0"
+version = "6.13.1"
 
 [[DiffEqCallbacks]]
 deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
@@ -316,9 +316,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[SparseDiffTools]]
 deps = ["Adapt", "ArrayInterface", "Compat", "DataStructures", "FiniteDiff", "ForwardDiff", "InteractiveUtils", "LightGraphs", "LinearAlgebra", "Requires", "SparseArrays", "VertexSafeGraphs"]
-git-tree-sha1 = "fd9df3f0c4fa56e23f8aee125197c19449357060"
+git-tree-sha1 = "f65937edd6d1e9ba48da16315c14c12568867dd6"
 uuid = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
-version = "1.3.2"
+version = "1.3.3"
 
 [[SpecialFunctions]]
 deps = ["OpenSpecFun_jll"]
