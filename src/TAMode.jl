@@ -7,7 +7,6 @@ using LinearAlgebra
 using LabelledArrays
 using Turing
 using CSV
-using DataFrames
 
 include("reactCode.jl")
 include("compModel.jl")
