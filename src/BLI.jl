@@ -2,18 +2,18 @@ gas6_T1 = "../data/T1-010820.csv"
 gas6_T2 = "../data/T2-010820.csv"
 gas6_TFL = "../data/TFL-010820.csv"
 
-function R1Calc(conc, Kon, Kdis, tps)
-    """ Calculation for binding step. """
-    KD = Kdis / Kon
 
-    return conc / (KD + conc) * (1 .- (1 / (exp.((Kon * conc + Kdis) * tps))))
+""" Calculation for binding step. """
+function R1Calc(conc::Real, Kon::Real, Kdis::Real, tps)
+    return conc / (Kdis / Kon + conc) * (1 .- (1 / (exp.((Kon * conc + Kdis) * tps))))
 end
 
-function R2Calc(Req, Kdis, tps)
-    """ Calculation for unbinding step. """
 
-    return Req * exp.(-Kdis * tps)
+""" Calculation for unbinding step. """
+function R2Calc(R::Real, Kdis::Real, tps)
+    return R * exp.(-Kdis * tps)
 end
+
 
 function importData(cond)
     df = CSV.read(cond)
