@@ -25,7 +25,7 @@ function Lsparam(params::Vector)
         
     @assert all(params .>= 0)
 
-    const fwdDef = 0.06
+    fwdDef = 0.06
 
     out.internalize = 0.03
     out.pYinternalize = 0.3
@@ -61,7 +61,7 @@ function Lsparam(params::Vector)
     out.xRev[7] = out.PBinding[4]
     out.xRev[15] = out.xFwd27 * out.xRev[8] / out.xRev[7] * out.PBinding[2] / out.PBinding[1]
     out.xRev[16] = out.xFwd29 * out.xRev[1] / out.xRev[4] * out.GBinding[2] / out.GBinding[1]
-        
+
     return out
 end
 
