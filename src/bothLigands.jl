@@ -37,8 +37,6 @@ function Lsparam(params::Vector)
     out.autocrine = params[2:3]
     out.curL = (0, 0)
 
-    size_t TAMsel = Tyro
-
     out.expression = params[4]
 
     out.GBinding = (fwdDef, params[5], fwdDef, params[6])
