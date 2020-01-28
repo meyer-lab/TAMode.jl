@@ -13,42 +13,39 @@ mutable struct Lsrates{T}
     fElse::T # Recycling fraction for non-D2 species.
     internalize::T # Non-pY species internalization rate.
     pYinternalize::T # pY species internalization rate.
-    internalFrac::T # Ratio of endosomal to surface membrane
-    internalV::T # Endosomal volume
     expression::T # Receptor expression rate.
     autocrine::MVector{2, T}
     curL::MVector{2, T}
     xFwd::T
 end
 
-function Lsparam(lsParam &params) #arguments as they appear in C code
-    mutable struct Lsrates out
-        
-    @assert min(params[1:7] < 0) "Parameter outside the physical range."
 
-    const fwdDef::T = 0.06
+function Lsparam(params::Vector)
+    out::Lsrates{eltype(params)}
         
+    @assert all(params .>= 0)
+
+    const fwdDef = 0.06
+
     out.internalize = 0.03
     out.pYinternalize = 0.3
     out.fElse = 0.2
-    out.kRec = 5.8E-2
-    out.kDeg = 2.2E-3
-        
+    out.kRec = 5.8e-2
+    out.kDeg = 2.2e-3
+
     out.xFwd = params[1]
     out.autocrine = params[2:3]
-    out.internalFrac = 0.5
-    out.internalV = 623
-    out.curL = [0,0]
-    
-    size_t TAMsel = Tyro #original C code
-        
+    out.curL = (0, 0)
+
+    size_t TAMsel = Tyro
+
     out.expression = params[4]
-        
-    out.GBinding = (fwdDef, fwdDef * IgKds[TAMsel][1:2]) #TAMsel original C code
-    out.PBinding = (fwdDef, params[5:6])
-        
-    out.xRev[1] = params[7]
-        
+
+    out.GBinding = (fwdDef, params[5], fwdDef, params[6])
+    out.PBinding = (fwdDef, params[7], fwdDef, params[8])
+
+    out.xRev[1] = params[9]
+
     out.xRev[3] = out.xRev[1] * out.GBinding[2] / out.GBinding[4] * out.GBinding[2] / out.GBinding[4]
     out.xRev[8] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[4] * out.PBinding[4]
     out.xRev[9] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[2] * out.PBinding[4]
@@ -59,7 +56,7 @@ function Lsparam(lsParam &params) #arguments as they appear in C code
     out.xRev[13] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[4] * out.GBinding[4]
     out.xRev[14] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[2] * out.GBinding[2]
     out.xFwd27 = max(out.PBinding[1], out.PBinding[3])
-    out.xFwd29 = 
+    out.xFwd29 = max(out.GBinding[1], out.GBinding[3])
     out.xRev[4] = out.GBinding[4]
     out.xRev[5] = out.GBinding[2]
     out.xRev[6] = out.PBinding[2]
@@ -135,12 +132,12 @@ end
 # @return Always returns 0 for success
 function TAM_react(R::Vector, dR::Vector)
     react_module(R, dR, tr.curL) # We give the same internal ligand address as below because it will be overwritten
-    react_module(view(R, 14:30), view(dR, 14:30), view(R, 29:30) / tr.internalV)
+    react_module(view(R, 14:30), view(dR, 14:30), view(R, 29:30) / internalV)
 
     dR[1] += tr.expression
 
-    trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
-    trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse, tr.internalFrac)
+    trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse)
+    trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse)
 
     return 0
 end
