@@ -5,10 +5,13 @@ using StaticArrays
 using SteadyStateDiffEq
 using LinearAlgebra
 using LabelledArrays
+using Turing
+using CSV
 
 include("reactCode.jl")
 include("compModel.jl")
 include("bothLigands.jl")
+include("BLI.jl")
 
 
 const solTol = 1.0e-9
