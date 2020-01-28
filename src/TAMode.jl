@@ -28,6 +28,14 @@ function getAutocrine(params::Union{Vector{T}, TAMode.Rates{T}})::Vector{T} wher
 end
 
 
+function getAutocrineLS(params::Union{Vector{T}, Lsrates{T}})::Vector{T} where {T}
+    probInit = SteadyStateProblem(TAMreactLS, zeros(T, 30), params)
+
+    sol = Rodas5(autodiff = (T == Float64))
+    return solve(probInit, DynamicSS(sol); options...).u
+end
+
+
 function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, TAMode.Rates{T}}, solInit::Vector) where {T}
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAM_reacti, solInit, maximum(tps), params)
