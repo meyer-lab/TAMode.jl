@@ -23,12 +23,6 @@ function importData(cond)
     return conc, parse.(Float64, tps), measVal
 end
 
-function plotBLI(cond)
-    conc, tps, bindData = TAMode.importData(cond)
-    bindData = Matrix(bindData)
-    plot(parse.(tps), parse.(bindData), title=cond, 
-         label=[conc[1] conc[2] conc[3] conc[4] conc[5] conc[6] conc[7] conc[8]], lw=3)
-end
 
 @model BLI(cond) = begin
     Tshift = 822.2
