@@ -36,7 +36,6 @@ function react_module(R, dR, curL, r)
         r.PBinding[1] * curL[2] * R[5] - r.PBinding[2] * R[8],
         r.GBinding[1] * curL[1] * R[5] - r.GBinding[2] * R[9],
         r.PBinding[3] * curL[2] * R[2] - r.PBinding[4] * R[9],
-
         r.xFwd * R[2] * R[2] - r.xRev[1] * R[10],
         r.xFwd * R[1] * R[6] - r.xRev[2] * R[10],
         r.xFwd * R[3] * R[3] - r.xRev[3] * R[10],
