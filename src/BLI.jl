@@ -26,30 +26,26 @@ end
 
 @model BLI(tps, conc, bindData) = begin
     Tshift = 822.2
-    Kon ~ Normal(6., 0.5)
-    Kdis ~ Normal(2., 1.)
+    Kon ~ LogNormal(6., 0.5)
+    Kdis ~ LogNormal(1., 1.)
+    Rmax ~ LogNormal(-1.0, 0.1)
     Tshift = tps[1] + 599.9
-    theor_save = []
-    exp_save = []
+    tBind = tps[tps .< Tshift] .- tps[1]
+    tUnbind = tps[tps .> Tshift] .- Tshift
+
+    resid_save = []
 
     for i in 1:length(conc)
-        tBind = tps[tps.<Tshift].-tps[1]
-            
         bind_step = R1Calc(conc[i], Kon, Kdis, tBind)
-        unbind_step = R2Calc(bind_step[end], Kdis, tps[tps .> Tshift] .- Tshift)
+        unbind_step = R2Calc(bind_step[end], Kdis, tUnbind)
         theor_bind = vcat(bind_step[:], unbind_step)
 
         if i == 1
-            theor_save = theor_bind
-            exp_save = bindData[:,i]
+            resid_save = bindData[:, i] .- theor_bind*Rmax
         else
-            theor_save = vcat(theor_save, theor_bind)
-            exp_save = vcat(exp_save, bindData[:,i])
+            resid_save = vcat(resid_save, bindData[:, i] .- theor_bind*Rmax)
         end
     end
 
-    Rmax = mean(theor_save)/mean(exp_save)
-    residuals = exp_save .- (theor_save*Rmax)
-
-    residuals ~ MvNormal(zeros(length(residuals)), ones(length(residuals)) * std(residuals))
+    resid_save ~ MvNormal(zeros(length(resid_save)), ones(length(resid_save)) * std(resid_save))
 end
