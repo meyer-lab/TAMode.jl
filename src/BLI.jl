@@ -52,7 +52,8 @@ end
 
     residuals = exp_save .- (theor_save*Rmax)
     N = length(residuals)
-    residual = mean(residuals)
-    residual ~ Normal(0., 1.)
-    #residuals ~ MvNormal(zeros(N), 2*ones(N))
+    #resMean = mean(residuals)
+    #resStd = stdm(residuals, resMean)
+    #residual ~ Normal(resMean, abs(resStd))
+    residuals ~ MvNormal(zeros(N), 2*ones(N))
 end
