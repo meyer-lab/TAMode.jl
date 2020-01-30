@@ -13,12 +13,56 @@ mutable struct Lsrates{T}
     fElse::T # Recycling fraction for non-D2 species.
     internalize::T # Non-pY species internalization rate.
     pYinternalize::T # pY species internalization rate.
-    internalFrac::T # Ratio of endosomal to surface membrane
-    internalV::T # Endosomal volume
     expression::T # Receptor expression rate.
     autocrine::MVector{2, T}
     curL::MVector{2, T}
     xFwd::T
+end
+
+
+function Lsparam(params::Vector)
+    out::Lsrates{eltype(params)}
+
+    @assert all(params .>= 0)
+
+    fwdDef = 0.06
+
+    out.internalize = 0.03
+    out.pYinternalize = 0.3
+    out.fElse = 0.2
+    out.kRec = 5.8e-2
+    out.kDeg = 2.2e-3
+
+    out.xFwd = params[1]
+    out.autocrine = params[2:3]
+    out.curL = (0, 0)
+
+    out.expression = params[4]
+
+    out.GBinding = (fwdDef, params[5], fwdDef, params[6])
+    out.PBinding = (fwdDef, params[7], fwdDef, params[8])
+
+    out.xRev[1] = params[9]
+
+    out.xRev[3] = out.xRev[1] * out.GBinding[2] / out.GBinding[4] * out.GBinding[2] / out.GBinding[4]
+    out.xRev[8] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[4] * out.PBinding[4]
+    out.xRev[9] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[2] * out.PBinding[4]
+    out.xRev[2] = out.xRev[1] * out.GBinding[2] / out.GBinding[4]
+    out.xRev[10] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[2] * out.PBinding[2]
+    out.xRev[11] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[4] * out.GBinding[2]
+    out.xRev[12] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[2] * out.GBinding[4]
+    out.xRev[13] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[4] * out.GBinding[4]
+    out.xRev[14] = out.xRev[1] / out.GBinding[4] / out.GBinding[4] * out.PBinding[2] * out.GBinding[2]
+    out.xFwd27 = max(out.PBinding[1], out.PBinding[3])
+    out.xFwd29 = max(out.GBinding[1], out.GBinding[3])
+    out.xRev[4] = out.GBinding[4]
+    out.xRev[5] = out.GBinding[2]
+    out.xRev[6] = out.PBinding[2]
+    out.xRev[7] = out.PBinding[4]
+    out.xRev[15] = out.xFwd27 * out.xRev[8] / out.xRev[7] * out.PBinding[2] / out.PBinding[1]
+    out.xRev[16] = out.xFwd29 * out.xRev[1] / out.xRev[4] * out.GBinding[2] / out.GBinding[1]
+
+    return out
 end
 
 
@@ -36,7 +80,6 @@ function react_module(R, dR, curL, r)
         r.PBinding[1] * curL[2] * R[5] - r.PBinding[2] * R[8],
         r.GBinding[1] * curL[1] * R[5] - r.GBinding[2] * R[9],
         r.PBinding[3] * curL[2] * R[2] - r.PBinding[4] * R[9],
-
         r.xFwd * R[2] * R[2] - r.xRev[1] * R[10],
         r.xFwd * R[1] * R[6] - r.xRev[2] * R[10],
         r.xFwd * R[3] * R[3] - r.xRev[3] * R[10],
@@ -77,4 +120,15 @@ function react_module(R, dR, curL, r)
     dR[15] = -sum(dRr[SVector(3, 4, 7, 9, 10, 12, 27, 28)]) - r.kDeg * R[16] # PROSi
 
     return norm(dRr)
+end
+
+
+function TAMreactLS(dR, R, tr, t)
+    react_module(R, dR, tr.curL, tr)
+    react_module(view(R, 14:30), view(dR, 14:30), view(R, 29:30) / internalV, tr)
+
+    dR[1] += tr.expression
+
+    trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse)
+    trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse)
 end
