@@ -20,23 +20,21 @@ function importData(cond)
     conc = df[1,2:end]
     tps = df[5:end,1]
     measVal = df[5:end,2:end]
-    return conc, parse.(Float64, tps), measVal
+    return parse.(Float64,Array(conc)), parse.(Float64, tps), parse.(Float64,Matrix(measVal))
 end
 
 
-@model BLI(cond) = begin
+@model BLI(tps,conc,bindData) = begin
     Tshift = 822.2
     Kon ~ Normal(6., 0.5)
     Kdis ~ Normal(2., 1.)
-    
-    conc, tps, bindData = importData(cond)
-    Tshift = tps[1] + 600.01
+    Tshift = tps[1] + 599.9
     theor_save = 0
     exp_save = 0
     for i in 1:length(conc)
         tBind = tps[tps.<Tshift].-tps[1]
-        L0 = parse(Float64, conc[i])
-        exp_bind = parse.(Float64, bindData[:,i])
+        L0 = conc[i]
+        exp_bind = bindData[:,i]
             
         bind_step = R1Calc(L0, Kon, Kdis, tBind)
         unbind_step = R2Calc(bind_step[end], Kdis, tps[tps .> Tshift] .- Tshift)
@@ -53,7 +51,8 @@ end
     Rmax = mean(theor_save)/mean(exp_save)
 
     residuals = exp_save .- (theor_save*Rmax)
-    for n in 1:length(residuals)
-         residuals[n] ~ Normal(0., 1.)#this may be right but as is it takes too long to run
-    end
+    N = length(residuals)
+    residual = mean(residuals)
+    residual ~ Normal(0., 1.)
+    #residuals ~ MvNormal(zeros(N), 2*ones(N))
 end
