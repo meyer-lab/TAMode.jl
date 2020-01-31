@@ -7,6 +7,7 @@ using LinearAlgebra
 using LabelledArrays
 using Turing
 using CSV
+using Statistics
 
 include("reactCode.jl")
 include("compModel.jl")
