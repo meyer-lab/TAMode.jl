@@ -11,6 +11,7 @@ using Statistics
 
 include("reactCode.jl")
 include("bothLigands.jl")
+include("compModel.jl")
 include("BLI.jl")
 
 
@@ -53,7 +54,6 @@ function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, Rates{T}, com
 end
 
 
-
 function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
@@ -69,7 +69,28 @@ function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
 end
 
 
-include("compModel.jl")
+function calcStim(tps::Vector{Float64}, params, gasStim::Float64)
+    @assert all(tps .>= 0.0)
+
+    solInit = getAutocrine(params, TAMreactComp, 110)
+
+    if params isa comprates
+        params.gasCur = gasStim
+    else
+        params[7] = gasStim
+    end
+
+    return runTAMinit(tps, params, TAMreactComp, solInit)
+end
+
+
+function calcStimPtdser(tps::Vector{Float64}, params)
+    @assert all(tps .>= 0.0)
+
+    solInit = getAutocrine(params, TAM_reacti, 55)
+
+    return runTAMinit(tps, params, TAMreactComp, [solInit solInit])
+end
 
 
 end # module

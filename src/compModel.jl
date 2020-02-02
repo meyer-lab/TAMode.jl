@@ -31,29 +31,3 @@ function TAMreactComp(dxxdt_d, xx_d, p, t)
     dxxdt_d[1:Nspecies] += (transIn*xx_d[Nspecies + 1 : 2*Nspecies] - xx_d[Nspecies + 1 : 2*Nspecies] .* boundLig) / p.fraction
     dxxdt_d[Nspecies + 1 : 2*Nspecies] -= transIn*(xx_d[Nspecies + 1 : 2*Nspecies] - xx_d[1:Nspecies] .* boundLig) / (1 - p.fraction)
 end
-
-
-function calcStim(tps::Vector{Float64}, params, gasStim::Float64)
-    @assert all(tps .>= 0.0)
-
-    solInit = getAutocrine(params, TAMreactComp, 110)
-
-    if params isa Rates
-        params.gasCur = gasStim
-    else
-        params[7] = gasStim
-    end
-
-    return runTAMinit(tps, params, TAMreactComp, solInit)
-end
-
-
-function calcStimPtdser(tps::Vector{Float64}, params)
-    @assert all(tps .>= 0.0)
-
-    solInit = getAutocrine(params, TAM_reacti, 55)
-    solInit = [solInit solInit]
-
-    return runTAMinit(tps, params, TAMreactComp, solInit)
-end
-
