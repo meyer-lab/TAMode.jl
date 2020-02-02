@@ -5,9 +5,13 @@ using StaticArrays
 using SteadyStateDiffEq
 using LinearAlgebra
 using LabelledArrays
+using Turing
+using CSV
+using Statistics
 
 include("reactCode.jl")
 include("bothLigands.jl")
+include("BLI.jl")
 
 
 const solTol = 1.0e-9
@@ -21,6 +25,14 @@ const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => do
 
 function getAutocrine(params::Union{Vector{T}, TAMode.Rates{T}})::Vector{T} where {T}
     probInit = SteadyStateProblem(TAM_reacti, zeros(T, 55), params)
+
+    sol = Rodas5(autodiff = (T == Float64))
+    return solve(probInit, DynamicSS(sol); options...).u
+end
+
+
+function getAutocrineLS(params::Union{Vector{T}, Lsrates{T}})::Vector{T} where {T}
+    probInit = SteadyStateProblem(TAMreactLS, zeros(T, 30), params)
 
     sol = Rodas5(autodiff = (T == Float64))
     return solve(probInit, DynamicSS(sol); options...).u
