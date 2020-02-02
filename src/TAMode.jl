@@ -7,7 +7,6 @@ using LinearAlgebra
 using LabelledArrays
 
 include("reactCode.jl")
-include("compModel.jl")
 include("bothLigands.jl")
 
 
@@ -59,6 +58,9 @@ function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
 
     return runTAMinit(tps, params, solInit)
 end
+
+
+include("compModel.jl")
 
 
 end # module
