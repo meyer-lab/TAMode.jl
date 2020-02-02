@@ -1,22 +1,14 @@
 
 mutable struct comprates{T}
     rr::Rates{T}
-    fraction::T #Fraction of cell surface covered with PtdSer
-    partIn::T #Partitioning rate into PtdSer regions
-    gasPart::T #Partitioning of ligand into PtdSer region
+    fraction::T # Fraction of cell surface covered with PtdSer
+    partIn::T # Partitioning rate into PtdSer regions
+    gasPart::T # Partitioning of ligand into PtdSer region
 end
 
 
 function compParamm(compIn::Vector)
     return comprates{eltype(compIn)}(param(compIn[4:end]), compIn[1], compIn[2], compIn[3])
-end
-
-
-function getAutocrineComp(params::Union{Vector{T}, comprates{T}})::Vector{T} where {T}
-    probInit = SteadyStateProblem(TAMreactComp, zeros(T, 110), params)
-
-    sol = Rodas5(autodiff = (T == Float64))
-    return solve(probInit, DynamicSS(sol); options...).u
 end
 
 
@@ -41,10 +33,10 @@ function TAMreactComp(dxxdt_d, xx_d, p, t)
 end
 
 
-function calcStim(tps::Array{Float64,1}, params, gasStim::Float64)
+function calcStim(tps::Vector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
-    solInit = getAutocrineComp(params)
+    solInit = getAutocrine(params, TAMreactComp, 110)
 
     if params isa Rates
         params.gasCur = gasStim
@@ -52,34 +44,16 @@ function calcStim(tps::Array{Float64,1}, params, gasStim::Float64)
         params[7] = gasStim
     end
 
-    prob = ODEProblem(TAMreactComp, solInit, maximum(tps), params)
-    solut = solve(prob, Rodas5(); saveat = tps, options...).u
-
-    if length(tps) > 1
-        solut = vcat(transpose.(solut)...)
-    else
-        solut = reshape(solut[1], (1, length(solInit)))
-    end
-
-    return solut
+    return runTAMinit(tps, params, TAMreactComp, solInit)
 end
 
 
-function calcStimPtdser(tps::Array{Float64,1}, params)
+function calcStimPtdser(tps::Vector{Float64}, params)
     @assert all(tps .>= 0.0)
 
     solInit = getAutocrine(params, TAM_reacti, 55)
     solInit = [solInit solInit]
 
-    prob = ODEProblem(TAMreactComp, solInit, maximum(tps), params)
-    solut = solve(prob, Rodas5(); saveat = tps, options...).u
-
-    if length(tps) > 1
-        solut = vcat(transpose.(solut)...)
-    else
-        solut = reshape(solut[1], (1, length(solInit)))
-    end
-
-    return solut
+    return runTAMinit(tps, params, TAMreactComp, solInit)
 end
 
