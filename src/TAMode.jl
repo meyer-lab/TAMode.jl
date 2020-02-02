@@ -10,7 +10,6 @@ using CSV
 using Statistics
 
 include("reactCode.jl")
-include("compModel.jl")
 include("bothLigands.jl")
 include("BLI.jl")
 
@@ -71,6 +70,9 @@ function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
 
     return runTAMinit(tps, params, solInit)
 end
+
+
+include("compModel.jl")
 
 
 end # module

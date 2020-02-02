@@ -171,3 +171,6 @@ end
     TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
     @test all(dnorm .< 0.05)
 end
+
+
+include("testCompModel.jl")
