@@ -24,6 +24,21 @@ function importData(cond)
 end
 
 
+function plotBLI(cond, Kon, Kdis, Rmax, idx)
+    conc, tps, bindData = TAMode.importData(cond)
+    Tshift = tps[1] + 599.9
+    tBind = tps[tps .< Tshift] .- tps[1]
+    tUnbind = tps[tps .> Tshift] .- Tshift
+
+    bind_step = R1Calc(conc[idx], Kon, Kdis, tBind)
+    unbind_step = R2Calc(bind_step[end], Kdis, tUnbind)
+    theor_bind = vcat(bind_step[:], unbind_step)
+    theor_bind = theor_bind*Rmax
+    values = hcat(bindData[:,idx], theor_bind)
+    plot(tps, values, title=cond, label=["Actual" "Predicted"], lw=3)
+end
+
+
 @model BLI(tps, conc, bindData) = begin
     Tshift = 822.2
     Kon ~ LogNormal(6.0, 0.5)
