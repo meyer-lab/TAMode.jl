@@ -26,7 +26,7 @@ end
 
 @testset "Make sure code upholds mass conservation." begin
     tt = TAMode.param(params)
-    firstV = TAMode.getAutocrine(tt)
+    firstV = TAMode.getAutocrine(tt, TAMode.TAM_reacti, 55)
 
     tt.kDeg = 0
     tt.TAMs[1].expression = 0
@@ -34,7 +34,7 @@ end
     tt.TAMs[3].expression = 0
     tt.gasCur *= 1000
 
-    secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
+    secondV = TAMode.runTAMinit([1000000.0], tt, TAMode.TAM_reacti, firstV)
 
     @test dot(firstV, TAMode.total) - dot(secondV, TAMode.total) < 0.0001
 end
@@ -51,7 +51,7 @@ end
     tt.kRec = 0.0
     tt.internalize = 10.0
 
-    outt = TAMode.getAutocrine(tt)
+    outt = TAMode.getAutocrine(tt, TAMode.TAM_reacti, 55)
 
     # Expect no ligand
     @test outt[13] ≈ 0.0
@@ -70,7 +70,7 @@ end
     rr.TAMs[3].expression = 0.0
     rr.kDeg = 0.0
 
-    uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.getAutocrine(params))
+    uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.TAM_reacti, TAMode.getAutocrine(params, TAMode.TAM_reacti, 55))
 
     dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, rr, 0.0)
 
@@ -95,7 +95,7 @@ end
     rr = TAMode.param(params)
     rrSwap = TAMode.swapIgs(rr)
 
-    dataDiff = TAMode.runTAMinit(tps, rr, zeros(55)) .- TAMode.runTAMinit(tps, rrSwap, zeros(55))
+    dataDiff = TAMode.runTAMinit(tps, rr, TAMode.TAM_reacti, zeros(55)) .- TAMode.runTAMinit(tps, rrSwap, TAMode.TAM_reacti, zeros(55))
     @test all(aboutZero.(dataDiff * TAMode.pY))
     @test all(aboutZero.(dataDiff * TAMode.total))
     @test all(aboutZero.(dataDiff * TAMode.surface))
@@ -104,7 +104,7 @@ end
         @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
     end
 
-    autoDiff = TAMode.getAutocrine(rr) .- TAMode.getAutocrine(rrSwap)
+    autoDiff = TAMode.getAutocrine(rr, TAMode.TAM_reacti, 55) .- TAMode.getAutocrine(rrSwap, TAMode.TAM_reacti, 55)
     @test aboutZero(dot(autoDiff, TAMode.pY))
     @test aboutZero(dot(autoDiff, TAMode.total))
     @test aboutZero(dot(autoDiff, TAMode.surface))
@@ -149,7 +149,7 @@ end
 
 @testset "Make sure that TAM surface don't explode at long time in reaction code." begin
     tt = TAMode.param(params)
-    firstSurf = TAMode.getAutocrine(tt)
+    firstSurf = TAMode.getAutocrine(tt, TAMode.TAM_reacti, 55)
 
     tt.TAMs[1].expression = 0.0
     tt.TAMs[2].expression = 0.0
@@ -159,21 +159,25 @@ end
     tt.pYinternalize = 0.0
     tt.gasCur *= 10.0
 
-    secondSurf = TAMode.runTAMinit([100.0], tt, firstSurf)
+    secondSurf = TAMode.runTAMinit([100.0], tt, TAMode.TAM_reacti, firstSurf)
 
     @test_broken isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol = 1.0e-5)
 end
 
 
 @testset "Ensure that system reaches equilibrium." begin
-    uLong = TAMode.getAutocrine(params)
+    uLong = TAMode.getAutocrine(params, TAMode.TAM_reacti, 55)
     dnorm = zeros(55)
     TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
     @test all(dnorm .< 0.05)
 end
 
 
+<<<<<<< HEAD
 params7 = fill(0.2, 7)
 @testset "Test if bothLigands function works." begin
     ss = TAMode.getAutocrineLS(params7)
 end
+=======
+include("testCompModel.jl")
+>>>>>>> 1a03c76490eab6408bdc2cf2a54dfb77cc637958
