@@ -56,7 +56,7 @@ function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, TAMode.Rates{
 end
 
 
-function runTAMinitLS(tps::Vector{Float64}, params::Union{Vector{T}, TAMode.Rates{T}}, solInit::Vector) where {T}
+function runTAMinitLS(tps::Vector{Float64}, params::Union{Vector{T}, Lsrates{T}}, solInit::Vector) where {T}
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAM_reactLS, solInit, maximum(tps), params)
 
@@ -87,16 +87,13 @@ function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
     return runTAMinit(tps, params, solInit)
 end
 
-function runTAMLS(tps::Vector{Float64}, params, gasStim::Float64)
+
+function runTAMLS(tps::Vector{Float64}, pIn, ligStim::Tuple{Real, Real})
+    params = Lsparam(pIn)
     @assert all(tps .>= 0.0)
 
     solInit = getAutocrineLS(params)
-
-    if params isa Rates
-        params.gasCur = gasStim
-    else
-        params[7] = gasStim
-    end
+    params.curL = ligStim
 
     return runTAMinitLS(tps, params, solInit)
 end
