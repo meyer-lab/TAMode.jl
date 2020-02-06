@@ -171,3 +171,9 @@ end
     TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
     @test all(dnorm .< 0.05)
 end
+
+
+params7 = fill(0.2, 7)
+@testset "Test if bothLigands function works." begin
+    ss = TAMode.getAutocrineLS(params7)
+end
