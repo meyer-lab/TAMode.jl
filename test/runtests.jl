@@ -173,11 +173,10 @@ end
 end
 
 
-<<<<<<< HEAD
-params7 = fill(0.2, 7)
 @testset "Test if bothLigands function works." begin
-    ss = TAMode.getAutocrineLS(params7)
+    pp = TAMode.Lsparam(fill(0.2, 9))
+    ss = TAMode.getAutocrineLS(pp)
 end
-=======
+
+
 include("testCompModel.jl")
->>>>>>> 1a03c76490eab6408bdc2cf2a54dfb77cc637958
