@@ -21,26 +21,23 @@ end
 
 
 function Lsparam(params::Vector)
-    out::Lsrates{eltype(params)}
-
-    @assert all(params .>= 0)
-
     fwdDef = 0.06
+    @assert all(params .>= 0.0)
 
-    out.internalize = 0.03
-    out.pYinternalize = 0.3
-    out.fElse = 0.2
-    out.kRec = 5.8e-2
-    out.kDeg = 2.2e-3
-
-    out.xFwd = params[1]
-    out.autocrine = params[2:3]
-    out.curL = (0, 0)
-
-    out.expression = params[4]
-
-    out.GBinding = (fwdDef, params[5], fwdDef, params[6])
-    out.PBinding = (fwdDef, params[7], fwdDef, params[8])
+    out = Lsrates{eltype(params)}((fwdDef, params[5], fwdDef, params[6]),
+                                  (fwdDef, params[7], fwdDef, params[8]),
+                                  zeros(16),
+                                  0.0,
+                                  0.0,
+                                  5.8e-2, # kRec
+                                  2.2e-3, #kDeg
+                                  0.2, # fElse
+                                  0.03, # internalize
+                                  0.3, # pYinternalize
+                                  params[4], # expression
+                                  params[2:3],
+                                  (0.0, 0.0),
+                                  params[1])
 
     out.xRev[1] = params[9]
 
