@@ -356,11 +356,11 @@ version = "0.5.1"
 
 [[LabelledArrays]]
 deps = ["LinearAlgebra", "MacroTools", "StaticArrays"]
-git-tree-sha1 = "ec8e597783c087cb3f27076c90dd853ac0a7a2cf"
+git-tree-sha1 = "6d982bb1a482a64ebb832c1ed971579efd3fda2e"
 repo-rev = "master"
 repo-url = "https://github.com/JuliaDiffEq/LabelledArrays.jl"
 uuid = "2ee39098-c373-598a-b85f-a56591580800"
-version = "1.0.1"
+version = "1.0.2"
 
 [[LazyArrays]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "MacroTools", "StaticArrays"]
