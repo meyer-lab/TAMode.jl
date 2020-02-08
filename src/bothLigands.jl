@@ -24,20 +24,22 @@ function Lsparam(params::Vector)
     fwdDef = 0.06
     @assert all(params .>= 0.0)
 
-    out = Lsrates{eltype(params)}((fwdDef, params[5], fwdDef, params[6]),
-                                  (fwdDef, params[7], fwdDef, params[8]),
-                                  zeros(16),
-                                  0.0,
-                                  0.0,
-                                  5.8e-2, # kRec
-                                  2.2e-3, #kDeg
-                                  0.2, # fElse
-                                  0.03, # internalize
-                                  0.3, # pYinternalize
-                                  params[4], # expression
-                                  params[2:3],
-                                  (0.0, 0.0),
-                                  params[1])
+    out = Lsrates{eltype(params)}(
+        (fwdDef, params[5], fwdDef, params[6]),
+        (fwdDef, params[7], fwdDef, params[8]),
+        zeros(16),
+        0.0,
+        0.0,
+        5.8e-2, # kRec
+        2.2e-3, #kDeg
+        0.2, # fElse
+        0.03, # internalize
+        0.3, # pYinternalize
+        params[4], # expression
+        params[2:3],
+        (0.0, 0.0),
+        params[1],
+    )
 
     out.xRev[1] = params[9]
 
