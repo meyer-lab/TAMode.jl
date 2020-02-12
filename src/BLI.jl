@@ -40,7 +40,6 @@ end
 
 
 @model BLI(tps, conc, bindData) = begin
-    Tshift = 822.2
     Kon ~ LogNormal(6.0, 0.5)
     Kdis ~ LogNormal(1.0, 1.0)
     Rmax ~ LogNormal(-1.0, 0.1)
@@ -56,9 +55,9 @@ end
         theor_bind = vcat(bind_step[:], unbind_step)
 
         if i == 1
-            resid_save = bindData[:, i] .- theor_bind * Rmax
+            resid_save = bindData[:, i] .- (theor_bind * Rmax)
         else
-            resid_save = vcat(resid_save, bindData[:, i] .- theor_bind * Rmax)
+            resid_save = vcat(resid_save, bindData[:, i] .- (theor_bind * Rmax))
         end
     end
 
