@@ -54,6 +54,23 @@ function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, Rates{T}, com
 end
 
 
+function runTAMinitLS(tps::Vector{Float64}, params::Union{Vector{T}, Lsrates{T}}, solInit::Vector) where {T}
+    solInit = convert(Vector{T}, solInit)
+    prob = ODEProblem(TAM_reactLS, solInit, maximum(tps), params)
+
+    sol = Rodas5(autodiff = (T == Float64))
+    solut = solve(prob, sol; saveat = tps, options...).u
+
+    if length(tps) > 1
+        solut = vcat(transpose.(solut)...)
+    else
+        solut = reshape(solut[1], (1, length(solInit)))
+    end
+
+    return solut
+end
+
+
 function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
@@ -92,5 +109,15 @@ function calcStimPtdser(tps::Vector{Float64}, params)
     return runTAMinit(tps, params, TAMreactComp, [solInit solInit])
 end
 
+
+function runTAMLS(tps::Vector{Float64}, pIn, ligStim::Tuple{Real, Real})
+    params = Lsparam(pIn)
+    @assert all(tps .>= 0.0)
+
+    solInit = getAutocrineLS(params)
+    params.curL = ligStim
+
+    return runTAMinitLS(tps, params, solInit)
+end
 
 end # module
