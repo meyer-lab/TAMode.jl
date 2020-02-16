@@ -160,9 +160,9 @@ uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[DiffEqBase]]
 deps = ["ArrayInterface", "ChainRulesCore", "Compat", "DataStructures", "Distributed", "DocStringExtensions", "FunctionWrappers", "IterativeSolvers", "IteratorInterfaceExtensions", "LinearAlgebra", "MuladdMacro", "Parameters", "Printf", "RecipesBase", "RecursiveArrayTools", "RecursiveFactorization", "Requires", "Roots", "SparseArrays", "StaticArrays", "Statistics", "SuiteSparse", "TableTraits", "TreeViews", "ZygoteRules"]
-git-tree-sha1 = "953ae69948c57805f31e0a5b85c4ba0c5ee3ae1f"
+git-tree-sha1 = "be485e7124202c6ffac2cb2d5cd3e67c425835ef"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.15.0"
+version = "6.15.2"
 
 [[DiffEqCallbacks]]
 deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
