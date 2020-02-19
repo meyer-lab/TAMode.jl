@@ -5,7 +5,8 @@ gas6_TFL = "../data/TFL-010820.csv"
 
 """ Calculation for binding step. """
 function R1Calc(conc::Real, Kon::Real, Kdis::Real, tps)
-    return conc / (Kdis / Kon + conc) * (1 .- (1 / (exp.((Kon * conc + Kdis) * tps))))
+    KD = Kdis/Kon
+    return conc / (KD + conc) * (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) * tps[:]))))
 end
 
 
@@ -35,7 +36,8 @@ function plotBLI(cond, Kon, Kdis, Rmax, idx)
     theor_bind = vcat(bind_step[:], unbind_step)
     theor_bind = theor_bind*Rmax
     values = hcat(bindData[:,idx], theor_bind)
-    plot(tps, values, title=cond, label=["Actual" "Predicted"], lw=3)
+    p = plot(tps, values, title=cond, label=["Actual" "Predicted"], lw=3)
+    return p
 end
 
 
@@ -49,7 +51,7 @@ end
 
     resid_save = []
 
-    for i = 1:length(conc)
+    for i = 1:(length(conc) - 1)
         bind_step = R1Calc(conc[i], Kon, Kdis, tBind)
         unbind_step = R2Calc(bind_step[end], Kdis, tUnbind)
         theor_bind = vcat(bind_step[:], unbind_step)

@@ -8,6 +8,7 @@ using LabelledArrays
 using Turing
 using CSV
 using Statistics
+using Plots
 
 include("reactCode.jl")
 include("bothLigands.jl")
