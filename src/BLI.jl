@@ -5,8 +5,7 @@ gas6_TFL = "../data/TFL-010820.csv"
 
 """ Calculation for binding step. """
 function R1Calc(conc::Real, Kon::Real, Kdis::Real, tps)
-    KD = Kdis/Kon
-    return conc / (KD + conc) * (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) * tps[:]))))
+    return conc / (Kdis / Kon + conc) * (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) * tps))))
 end
 
 
