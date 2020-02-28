@@ -56,7 +56,7 @@ end
 
 function runTAMinitLS(tps::Vector{Float64}, params::Union{Vector{T}, Lsrates{T}}, solInit::Vector) where {T}
     solInit = convert(Vector{T}, solInit)
-    prob = ODEProblem(TAM_reactLS, solInit, maximum(tps), params)
+    prob = ODEProblem(TAMreactLS, solInit, maximum(tps), params)
 
     sol = Rodas5(autodiff = (T == Float64))
     solut = solve(prob, sol; saveat = tps, options...).u
