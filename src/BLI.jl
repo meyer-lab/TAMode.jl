@@ -37,15 +37,6 @@ function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, Rmax::Real)
 end
 
 
-function plotBLI(cond, Kon, Kdis, Rmax, idx)
-    conc, tps, bindData = TAMode.importData(cond)
-    theor_bind = bindingCalc(tps, Kon, Kdis, Rmax)
-    values = hcat(bindData[:,idx], theor_bind)
-    p = plot(tps, values, title=cond, label=["Actual" "Predicted"], lw=3)
-    return p
-end
-
-
 @model BLI(tps, conc, bindData) = begin
     Kon ~ LogNormal(6.0, 0.5)
     Kdis ~ LogNormal(1.0, 1.0)
