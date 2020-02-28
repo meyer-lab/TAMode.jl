@@ -13,7 +13,7 @@ end
     tt.expression = 0
     tt.curL = (100, 100)
 
-    secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
+    secondV = TAMode.runTAMinit([1000000.0], tt, TAMode.TAMreactLS, firstV)
 
-    @test dot(firstV - secondV, TAMode.totalLS) < 0.0001
+    @test dot(firstV, TAMode.totalLS) - dot(secondV, TAMode.totalLS) < 0.0001
 end
