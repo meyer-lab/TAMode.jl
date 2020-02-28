@@ -24,16 +24,22 @@ function importData(cond)
 end
 
 
-function plotBLI(cond, Kon, Kdis, Rmax, idx)
-    conc, tps, bindData = TAMode.importData(cond)
+function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, Rmax::Real)
     Tshift = tps[1] + 599.9
     tBind = tps[tps .< Tshift] .- tps[1]
     tUnbind = tps[tps .> Tshift] .- Tshift
 
-    bind_step = R1Calc(conc[idx], Kon, Kdis, tBind)
+    bind_step = R1Calc(conc[i], Kon, Kdis, tBind)
     unbind_step = R2Calc(bind_step[end], Kdis, tUnbind)
-    theor_bind = vcat(bind_step[:], unbind_step)
-    theor_bind = theor_bind*Rmax
+    theor_bind = vcat(bind_step[:], unbind_step) * Rmax
+
+    return theor_bind
+end
+
+
+function plotBLI(cond, Kon, Kdis, Rmax, idx)
+    conc, tps, bindData = TAMode.importData(cond)
+    theor_bind = bindingCalc(tps, Kon, Kdis, Rmax)
     values = hcat(bindData[:,idx], theor_bind)
     p = plot(tps, values, title=cond, label=["Actual" "Predicted"], lw=3)
     return p
@@ -44,21 +50,16 @@ end
     Kon ~ LogNormal(6.0, 0.5)
     Kdis ~ LogNormal(1.0, 1.0)
     Rmax ~ LogNormal(-1.0, 0.1)
-    Tshift = tps[1] + 599.9
-    tBind = tps[tps .< Tshift] .- tps[1]
-    tUnbind = tps[tps .> Tshift] .- Tshift
 
     resid_save = []
 
     for i = 1:(length(conc) - 1)
-        bind_step = R1Calc(conc[i], Kon, Kdis, tBind)
-        unbind_step = R2Calc(bind_step[end], Kdis, tUnbind)
-        theor_bind = vcat(bind_step[:], unbind_step)
+        theor_bind = bindingCalc(tps, Kon, Kdis, Rmax)
 
         if i == 1
-            resid_save = bindData[:, i] .- theor_bind * Rmax
+            resid_save = bindData[:, i] .- theor_bind
         else
-            resid_save = vcat(resid_save, bindData[:, i] .- theor_bind * Rmax)
+            resid_save = vcat(resid_save, bindData[:, i] .- theor_bind)
         end
     end
 
