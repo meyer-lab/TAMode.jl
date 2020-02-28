@@ -1,7 +1,7 @@
 
 @testset "Test if bothLigands function works." begin
     pp = TAMode.Lsparam(fill(0.2, 9))
-    ss = TAMode.getAutocrine(pp, TAMreactLS, 30)
+    ss = TAMode.getAutocrine(pp, TAMode.TAMreactLS, 30)
 end
 
 
@@ -13,7 +13,7 @@ end
     tt.expression = 0
     tt.curL = (100, 100)
 
-    secondV = TAMode.runTAMinitLS([1000000.0], tt, firstV)
+    secondV = TAMode.runTAMinit([1000000.0], tt, firstV)
 
     @test dot(firstV - secondV, TAMode.totalLS) < 0.0001
 end
