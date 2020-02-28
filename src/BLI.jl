@@ -56,9 +56,9 @@ end
         theor_bind = vcat(bind_step[:], unbind_step)
 
         if i == 1
-            resid_save = bindData[:, i] .- (theor_bind * Rmax)
+            resid_save = bindData[:, i] .- theor_bind * Rmax
         else
-            resid_save = vcat(resid_save, bindData[:, i] .- (theor_bind * Rmax))
+            resid_save = vcat(resid_save, bindData[:, i] .- theor_bind * Rmax)
         end
     end
 
