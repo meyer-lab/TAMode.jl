@@ -122,6 +122,9 @@ function react_module(R, dR, curL, r)
 end
 
 
+totalLS = vcat(ones(8), 2 * ones(5), ones(8) * internalFrac, 2 * ones(5) * internalFrac, zeros(4))
+
+
 function TAMreactLS(dR, R, tr, t)
     react_module(R, dR, tr.curL, tr)
     react_module(view(R, 14:30), view(dR, 14:30), view(R, 29:30) / internalV, tr)
