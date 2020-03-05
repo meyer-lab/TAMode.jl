@@ -123,14 +123,17 @@ end
 
 
 totalLS = vcat(ones(8), 2 * ones(5), ones(8) * internalFrac, 2 * ones(5) * internalFrac, zeros(4))
+surfaceLS = vcat(ones(13), zeros(17))
 
 
 function TAMreactLS(dR, R, tr, t)
-    react_module(R, dR, tr.curL, tr)
-    react_module(view(R, 14:30), view(dR, 14:30), view(R, 29:30) / internalV, tr)
+    norm = react_module(R, dR, tr.curL, tr)
+    norm += react_module(view(R, 14:30), view(dR, 14:30), view(R, 29:30) / internalV, tr)
 
     dR[1] += tr.expression
 
     trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse)
     trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse)
+
+    return norm
 end
