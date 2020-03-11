@@ -55,9 +55,9 @@ version = "3.5.0+2"
 
 [[ArrayInterface]]
 deps = ["LinearAlgebra", "Requires", "SparseArrays"]
-git-tree-sha1 = "81e5dd1f5374aba2badfe967fc6a132c02ab471a"
+git-tree-sha1 = "6cfb637b174abc32587298361e42489b44db89a2"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "2.5.0"
+version = "2.5.1"
 
 [[ArrayLayouts]]
 deps = ["FillArrays", "LinearAlgebra"]
@@ -124,9 +124,9 @@ version = "0.2.0"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "c437ba8bb82f5ec9a5d8cb881031ffa2dbe1038c"
+git-tree-sha1 = "2e23d71ad695ec28ca58ddd44869f07afa33cc76"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.6.0"
+version = "3.7.0"
 
 [[CompilerSupportLibraries_jll]]
 deps = ["Libdl", "Pkg"]
@@ -172,9 +172,9 @@ version = "6.19.0"
 
 [[DiffEqCallbacks]]
 deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "OrdinaryDiffEq", "RecipesBase", "RecursiveArrayTools", "StaticArrays"]
-git-tree-sha1 = "885820a4e36f3022962e78f6cf656f82a092a775"
+git-tree-sha1 = "3aadf5d6b987aaec2bb7421aba522df744609960"
 uuid = "459566f4-90b8-5000-8ac3-15dfb0a30def"
-version = "2.12.0"
+version = "2.12.1"
 
 [[DiffResults]]
 deps = ["StaticArrays"]
@@ -374,9 +374,9 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 
 [[Libtask]]
 deps = ["BinaryProvider", "Libdl", "Pkg"]
-git-tree-sha1 = "4f39d56bf87bf17f5a04370bd036baf0d1fe8cc9"
+git-tree-sha1 = "6c49c7bdcc3d6c9c2f51739533c8302a9ba86937"
 uuid = "6f1fad26-d15e-5dc8-ae53-837a1d7b8c9f"
-version = "0.3.1"
+version = "0.3.2"
 
 [[LightGraphs]]
 deps = ["ArnoldiMethod", "DataStructures", "Distributed", "Inflate", "LinearAlgebra", "Random", "SharedArrays", "SimpleTraits", "SparseArrays", "Statistics"]
@@ -475,9 +475,9 @@ version = "0.3.7+7"
 
 [[OpenSpecFun_jll]]
 deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg"]
-git-tree-sha1 = "d110040968b9afe95c6bd9c6233570b0fe8abd22"
+git-tree-sha1 = "d51c416559217d974a1113522d5919235ae67a87"
 uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
-version = "0.5.3+2"
+version = "0.5.3+3"
 
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
