@@ -98,4 +98,7 @@ function runTAMLS(tps::Vector{Float64}, pIn, ligStim::Tuple{Real, Real})
     return runTAMinit(tps, params, TAMreactLS, solInit)
 end
 
+
+include("fitting.jl")
+
 end # module
