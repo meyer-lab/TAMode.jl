@@ -558,9 +558,9 @@ uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 
 [[ProgressLogging]]
 deps = ["Logging", "SHA", "UUIDs"]
-git-tree-sha1 = "6b36b871d7779f56b3355fb08c3a2d160adaf20b"
+git-tree-sha1 = "e47914361d124d8760f5e356403daeb7f3b81633"
 uuid = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
-version = "0.1.1"
+version = "0.1.2"
 
 [[ProgressMeter]]
 deps = ["Distributed", "Printf"]
