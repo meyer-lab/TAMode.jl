@@ -1,11 +1,11 @@
 
-@testset "Test if bothLigands function works." begin
+@testset "LS: Test if bothLigands function works." begin
     pp = TAMode.Lsparam(fill(0.2, 9))
     ss = TAMode.getAutocrine(pp, TAMode.TAMreactLS, 30)
 end
 
 
-@testset "Make sure code LS upholds mass conservation." begin
+@testset "LS: Make sure code upholds mass conservation." begin
     tt = TAMode.Lsparam(fill(0.2, 9))
     firstV = TAMode.getAutocrine(tt, TAMode.TAMreactLS, 30)
 
@@ -18,7 +18,7 @@ end
     @test dot(firstV, TAMode.totalLS) - dot(secondV, TAMode.totalLS) < 0.0001
 end
 
-@testset "Ensure that system reaches equilibrium(LS)." begin
+@testset "LS: Ensure that system reaches detailed balance." begin
     pp = TAMode.Lsparam(LSparams)
 
     uLong = TAMode.getAutocrine(pp, TAMode.TAMreactLS, 30)
@@ -28,7 +28,7 @@ end
     @test dnorm .< 0.05
 end
 
-@testset "Make sure that TAM surface don't explode at long time in reaction code (LS)." begin
+@testset "LS: Make sure that surface total is preserved without trafficking." begin
     tt = TAMode.Lsparam(LSparams)
     firstSurf = TAMode.getAutocrine(tt, TAMode.TAMreactLS, 30)
 
