@@ -19,7 +19,7 @@ end
 end
 
 @testset "LS: Ensure that system reaches detailed balance." begin
-    pp = TAMode.Lsparam(LSparams)
+    pp = TAMode.Lsparam(fill(0.2, 9))
 
     uLong = TAMode.getAutocrine(pp, TAMode.TAMreactLS, 30)
 
@@ -29,7 +29,7 @@ end
 end
 
 @testset "LS: Make sure that surface total is preserved without trafficking." begin
-    tt = TAMode.Lsparam(LSparams)
+    tt = TAMode.Lsparam(fill(0.2, 9))
     firstSurf = TAMode.getAutocrine(tt, TAMode.TAMreactLS, 30)
 
     tt.expression = 0.0
