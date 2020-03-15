@@ -119,6 +119,7 @@ end
 
 
 totalLS = vcat(ones(9), 2 * ones(5), ones(9) * internalFrac, 2 * ones(5) * internalFrac, zeros(2))
+surfaceLS = vcat(ones(14), zeros(16))
 
 
 function TAMreactLS(dR, R, tr, t)

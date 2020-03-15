@@ -20,10 +20,12 @@ end
 
 @testset "Ensure that system reaches equilibrium(LS)." begin
     pp = TAMode.Lsparam(LSparams)
+
     uLong = TAMode.getAutocrine(pp, TAMode.TAMreactLS, 30)
-    dnorm = zeros(30)
-    TAMode.TAMreactLS(dnorm, uLong, pp, 0.0)
-    @test all(dnorm .< 0.05)
+
+    dnorm = TAMode.TAMreactLS(dnorm, uLong, pp, 0.0)
+
+    @test dnorm .< 0.05
 end
 
 @testset "Make sure that TAM surface don't explode at long time in reaction code (LS)." begin
@@ -38,5 +40,6 @@ end
 
     secondSurf = TAMode.runTAMinit([100.0], tt, TAMode.TAMreactLS, firstSurf)
 
-    @test_broken isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol = 1.0e-5)
+    reduce = TAMode.surfaceLS .* TAMode.totalLS
+    @test isapprox(dot(firstSurf, reduce), dot(secondSurf, reduce), rtol = 1.0e-5)
 end
