@@ -23,9 +23,9 @@ end
 
     uLong = TAMode.getAutocrine(pp, TAMode.TAMreactLS, 30)
 
-    dnorm = TAMode.TAMreactLS(dnorm, uLong, pp, 0.0)
+    dnorm = TAMode.TAMreactLS(ones(30), uLong, pp, 0.0)
 
-    @test dnorm .< 0.05
+    @test dnorm < 0.05
 end
 
 @testset "LS: Make sure that surface total is preserved without trafficking." begin
