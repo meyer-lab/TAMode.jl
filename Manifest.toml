@@ -217,10 +217,10 @@ uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
 version = "0.22.5"
 
 [[DistributionsAD]]
-deps = ["Combinatorics", "Compat", "DiffRules", "Distributions", "FillArrays", "ForwardDiff", "LinearAlgebra", "PDMats", "Random", "SpecialFunctions", "StatsBase", "StatsFuns", "Tracker", "Zygote", "ZygoteRules"]
-git-tree-sha1 = "0aeb4213c3da5973eeb3fddfedb06b506781ddf1"
+deps = ["Combinatorics", "Compat", "DiffRules", "Distributions", "FillArrays", "ForwardDiff", "LinearAlgebra", "PDMats", "Random", "ReverseDiff", "SpecialFunctions", "StatsBase", "StatsFuns", "Tracker", "Zygote", "ZygoteRules"]
+git-tree-sha1 = "f80bf8b1f5f46bb2293fbd2c85d88465901a32ff"
 uuid = "ced4e74d-a319-5a8a-b0ac-84af2272839c"
-version = "0.4.3"
+version = "0.4.5"
 
 [[DocStringExtensions]]
 deps = ["LibGit2", "Markdown", "Pkg", "Test"]
@@ -510,9 +510,9 @@ version = "1.1.0"
 
 [[OrdinaryDiffEq]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "ExponentialUtilities", "FiniteDiff", "ForwardDiff", "GenericSVD", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "NLsolve", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays", "UnPack"]
-git-tree-sha1 = "5123c493c29ce6a3dbc420b344b7987c9c59cce8"
+git-tree-sha1 = "586c962ad54d355f195ef4e2e370d420362820d2"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "5.30.0"
+version = "5.31.0"
 
 [[PDMats]]
 deps = ["Arpack", "LinearAlgebra", "SparseArrays", "SuiteSparse", "Test"]
@@ -588,9 +588,9 @@ uuid = "b3c3ace0-ae52-54e7-9d0b-2c1406fd6b9d"
 version = "0.3.2"
 
 [[RecipesBase]]
-git-tree-sha1 = "7bdce29bc9b2f5660a6e5e64d64d91ec941f6aa2"
+git-tree-sha1 = "b4ed4a7f988ea2340017916f7c9e5d7560b52cae"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-version = "0.7.0"
+version = "0.8.0"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
@@ -615,6 +615,12 @@ deps = ["UUIDs"]
 git-tree-sha1 = "d37400976e98018ee840e0ca4f9d20baa231dc6b"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.0.1"
+
+[[ReverseDiff]]
+deps = ["DiffResults", "DiffRules", "ForwardDiff", "FunctionWrappers", "LinearAlgebra", "NaNMath", "Random", "SpecialFunctions", "StaticArrays", "Statistics"]
+git-tree-sha1 = "5f7dafd314ff2ada3076797b1edfb71e52151cb9"
+uuid = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+version = "1.1.0"
 
 [[Rmath]]
 deps = ["Random", "Rmath_jll"]
