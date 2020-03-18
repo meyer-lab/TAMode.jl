@@ -12,9 +12,9 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
     scale ~ LogNormal(-1.0, 0.1)
 
     params = vcat(paramsA, paramsB, paramsC)
-    pYresids = Matrix{Float64}(typeof(scale), length(tps), length(g6conc))
-    totalresids = Matrix{Float64}(typeof(scale), length(tps), length(g6conc))
-    surfresids = Matrix{Float64}(typeof(scale), length(tps), length(g6conc))
+    pYresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
+    totalresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
+    surfresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
 
     # Setup reductions
     pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
