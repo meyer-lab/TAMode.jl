@@ -26,9 +26,14 @@ function Lsparam(params::Vector)
     out = Lsrates{eltype(params)}(
         (fwdDef, params[5], fwdDef, params[6]),
         (fwdDef, params[7], fwdDef, params[8]),
-        zeros(16), 0.0, 0.0,
-        5.8e-2, 2.2e-3, # kRec, kDeg
-        0.2, 0.03, 0.3, # fElse, internalize, pYinternalize
+        zeros(16),
+        0.0,
+        0.0,
+        5.8e-2,
+        2.2e-3, # kRec, kDeg
+        0.2,
+        0.03,
+        0.3, # fElse, internalize, pYinternalize
         params[4], # expression
         params[2:3],
         (0.0, 0.0),
@@ -119,14 +124,17 @@ end
 
 
 totalLS = vcat(ones(9), 2 * ones(5), ones(9) * internalFrac, 2 * ones(5) * internalFrac, zeros(2))
+surfaceLS = vcat(ones(14), zeros(16))
 
 
 function TAMreactLS(dR, R, tr, t)
-    react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr)
-    react_module(view(R, 15:28), view(dR, 15:30), view(R, 29:30) / internalV, tr)
+    dnorm = react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr)
+    dnorm += react_module(view(R, 15:28), view(dR, 15:30), view(R, 29:30) / internalV, tr)
 
     dR[1] += tr.expression
 
     trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse)
     trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse)
+
+    return dnorm
 end
