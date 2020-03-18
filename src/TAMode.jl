@@ -4,10 +4,10 @@ using OrdinaryDiffEq
 using StaticArrays
 using SteadyStateDiffEq
 using LinearAlgebra
-using LabelledArrays
+import LabelledArrays
 using Turing
-using CSV
-using Statistics
+import CSV
+import Statistics
 
 include("reactCode.jl")
 include("bothLigands.jl")
