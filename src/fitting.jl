@@ -1,3 +1,9 @@
+tpsA549 = @SVector Float64[60, 240]
+gasA549 = @SVector Float64[64, 16, 4, 1, 0.25, 0]
+pYA549 = @SMatrix [10.8 8.3; 7.4 7.1; 7.1 7.7; 4.6 8.2; 6.1 7.2; 7.5 7.5]
+totA549 = @SMatrix [3443.11 3219.69; 3143.41 3353.82; 3018.88 3611.82; 2608.88 3448.21; 2690.24 3168.14; 2672.00 2672.00]
+surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0.281; 0.257 0.337]
+
 
 @model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV}=Vector{Float64}) where {TV} = begin    
     paramsA ~ MvLogNormal(fill(-6.0, 2), 0.01)
