@@ -3,6 +3,7 @@ using Profile
 using TAMode
 using LinearAlgebra
 using ForwardDiff
+using Turing
 
 tps = 10.0 .^ range(-6.0, stop = 4.0, length = 25)
 params = ones(15) * 0.5
@@ -27,3 +28,4 @@ end
 include("testCompModel.jl")
 include("testreactCode.jl")
 include("testLS.jl")
+include("testSample.jl")

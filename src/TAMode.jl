@@ -4,10 +4,10 @@ using OrdinaryDiffEq
 using StaticArrays
 using SteadyStateDiffEq
 using LinearAlgebra
-using LabelledArrays
+import LabelledArrays
 using Turing
-using CSV
-using Statistics
+import CSV
+import Statistics
 
 include("reactCode.jl")
 include("bothLigands.jl")
@@ -15,7 +15,7 @@ include("compModel.jl")
 include("BLI.jl")
 
 
-const solTol = 1.0e-9
+const solTol = 1.0e-5
 
 function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
@@ -32,7 +32,7 @@ function getAutocrine(params::Union{Vector{T}, Rates{T}, comprates{T}, Lsrates{T
 end
 
 
-function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector) where {T}
+function runTAMinit(tps::AbstractVector{Float64}, params::Union{Vector{T}, Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector) where {T}
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(func, solInit, maximum(tps), params)
 
@@ -49,7 +49,7 @@ function runTAMinit(tps::Vector{Float64}, params::Union{Vector{T}, Rates{T}, com
 end
 
 
-function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
+function runTAM(tps::AbstractVector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
     solInit = getAutocrine(params, TAM_reacti, 55)
@@ -64,7 +64,7 @@ function runTAM(tps::Vector{Float64}, params, gasStim::Float64)
 end
 
 
-function calcStim(tps::Vector{Float64}, params, gasStim::Float64)
+function calcStim(tps::AbstractVector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
     solInit = getAutocrine(params, TAMreactComp, 110)
@@ -79,7 +79,7 @@ function calcStim(tps::Vector{Float64}, params, gasStim::Float64)
 end
 
 
-function calcStimPtdser(tps::Vector{Float64}, params)
+function calcStimPtdser(tps::AbstractVector{Float64}, params)
     @assert all(tps .>= 0.0)
 
     solInit = getAutocrine(params, TAM_reacti, 55)
@@ -88,7 +88,7 @@ function calcStimPtdser(tps::Vector{Float64}, params)
 end
 
 
-function runTAMLS(tps::Vector{Float64}, pIn, ligStim::Tuple{Real, Real})
+function runTAMLS(tps::AbstractVector{Float64}, pIn, ligStim::Tuple{Real, Real})
     params = Lsparam(pIn)
     @assert all(tps .>= 0.0)
 
@@ -97,5 +97,8 @@ function runTAMLS(tps::Vector{Float64}, pIn, ligStim::Tuple{Real, Real})
 
     return runTAMinit(tps, params, TAMreactLS, solInit)
 end
+
+
+include("fitting.jl")
 
 end # module

@@ -1,4 +1,3 @@
-
 const internalFrac = 0.5
 const internalV = 623.0
 const fgMgConv = 135.2
@@ -20,8 +19,8 @@ mutable struct hetRates{T}
 end
 
 
-TAMsType{T} = @SLVector TAMrates{T} (:Axl, :MerTK, :Tyro3)
-hetRType{T} = @SLVector hetRates{T} (:AM, :MT, :AT)
+TAMsType{T} = @LabelledArrays.SLVector TAMrates{T} (:Axl, :MerTK, :Tyro3)
+hetRType{T} = @LabelledArrays.SLVector hetRates{T} (:AM, :MT, :AT)
 
 
 mutable struct Rates{T}
