@@ -1,4 +1,3 @@
-
 mutable struct comprates{T}
     rr::Rates{T}
     fraction::T # Fraction of cell surface covered with PtdSer

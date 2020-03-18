@@ -1,4 +1,3 @@
-
 mutable struct Lsrates{T}
     GBinding::MVector{4, T} # Gas6 fwd/rev rate for Ig1, then Ig2
     PBinding::MVector{4, T} # ProS fwd/rev rate for Ig1, then Ig2
