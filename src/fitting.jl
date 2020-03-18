@@ -10,29 +10,32 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
     paramsB ~ Truncated(LogNormal(-1.0, 0.01), 0.0, 1.0)
     paramsC ~ MvLogNormal(fill(-6.0, 12), 0.01)
     scale ~ LogNormal(-1.0, 0.1)
-    
+
     params = vcat(paramsA, paramsB, paramsC)
-    resids = fill(Any[], 3, size(g6conc)[1])
+    pYresids = Matrix{Float64}(typeof(scale), length(tps), length(g6conc))
+    totalresids = Matrix{Float64}(typeof(scale), length(tps), length(g6conc))
+    surfresids = Matrix{Float64}(typeof(scale), length(tps), length(g6conc))
 
-    for index=1:size(g6conc)[1]
-        data = TAMode.runTAM(tps, params, g6conc[index]) #gas6 concentration
+    # Setup reductions
+    pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
+    surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
+    totAXL = TAMode.total .* TAMode.recpSpecific[1]
 
-        # pY
-        pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
-        pYData = data * pYAXL
-        resids[1, index] = pYDataExp .- pYData*scale #scale?
-        resids[1, index] ~ MvNormal(zeros(length(resids[1, index])), ones(length(resids[1, index]))*std(resids[1, index]))
+    for ii = 1:length(g6conc)
+        data = TAMode.runTAM(tps, params, g6conc[ii])
 
-        # surface
-        surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
-        surfData = data * surfAXL
-        resids[2, index] = surfDataExp .- surfData*scale
-        resids[2, index] ~ MvNormal(zeros(length(resids[2, index])), ones(length(resids[2, index]))*std(resids[2, index]))
-
-        # total
-        totAXL = TAMode.total .* TAMode.recpSpecific[1]
-        totData = data * totAXL
-        resids[3, index] = totDataExp .- totData*scale
-        resids[3, index] ~ MvNormal(zeros(length(resids[3, index])), ones(length(resids[3, index]))*std(resids[3, index]))
+        pYresids[:, ii] = (data * pYAXL)*scale
+        surfresids[:, ii] = (data * surfAXL)*scale
+        totalresids[:, ii] = (data * totAXL)*scale
     end
+
+    pYresids = vec(pYresids .- transpose(pYDataExp))
+    totalresids = vec(totalresids .- transpose(totDataExp))
+    surfresids = vec(surfresids .- transpose(surfDataExp))
+
+    muu = zeros(length(pYresids))
+    stdd = ones(length(pYresids))
+    pYresids ~ MvNormal(muu, stdd*std(pYresids))
+    surfresids ~ MvNormal(muu, stdd*std(surfresids))
+    totalresids ~ MvNormal(muu, stdd*std(totalresids))
 end
