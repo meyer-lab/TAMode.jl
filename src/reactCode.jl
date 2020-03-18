@@ -194,7 +194,7 @@ function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates)
     return dnorm
 end
 
-function TAM_reacti_dnorm(dxdt_d, x_d, params, t)
+function TAM_reacti(dxdt_d, x_d, params, t)
     fill!(dxdt_d, 0.0)
 
     if params isa Rates
@@ -320,9 +320,6 @@ function detailedBalance(out::Rates)
     return out
 end
 
-function TAM_reacti(dxdt_d, x_d, params, t)
-    TAM_reacti_dnorm(dxdt_d, x_d, params, t)
-end
 
 function swapIgs(out::Rates)
     out = deepcopy(out)

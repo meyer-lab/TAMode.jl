@@ -53,7 +53,7 @@ end
 
     uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.TAM_reacti, TAMode.getAutocrine(params, TAMode.TAM_reacti, 55))
 
-    dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, rr, 0.0)
+    dnorm = TAMode.TAM_reacti(zeros(55), uLong, rr, 0.0)
 
     @test dnorm < 0.05
 end
