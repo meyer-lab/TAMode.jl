@@ -88,19 +88,17 @@ end
 
 
 " Tracks the hetero-receptor interactions between two receptors. "
-function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr::Rates, Gas, dLi)
-    dRr = SVector{10}([
-        tr.xFwd * Rone[3] * Rtwo[3] - hetR.xRev[1] * hetDim[3],
-        tr.xFwd * Rone[1] * Rtwo[4] - hetR.xRev[2] * hetDim[3],
-        tr.xFwd * Rone[2] * Rtwo[2] - hetR.xRev[3] * hetDim[3],
-        tr.xFwd * Rone[4] * Rtwo[1] - hetR.xRev[4] * hetDim[3],
-        tr.xFwd * Rone[3] * Rtwo[1] - hetR.xRev[5] * hetDim[2],
-        tr.xFwd * Rone[1] * Rtwo[2] - hetR.xRev[6] * hetDim[2],
-        tr.xFwd * Rone[2] * Rtwo[1] - hetR.xRev[7] * hetDim[1],
-        tr.xFwd * Rone[1] * Rtwo[3] - hetR.xRev[8] * hetDim[1],
-        hetR.xFwd15 * Gas * hetDim[1] - hetR.xRev[9] * hetDim[3],
-        hetR.xFwd16 * Gas * hetDim[2] - hetR.xRev[10] * hetDim[3],
-    ])
+function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr::Rates, Gas, dLi, dRr)
+    dRr[1] = tr.xFwd * Rone[3] * Rtwo[3] - hetR.xRev[1] * hetDim[3]
+    dRr[2] = tr.xFwd * Rone[1] * Rtwo[4] - hetR.xRev[2] * hetDim[3]
+    dRr[3] = tr.xFwd * Rone[2] * Rtwo[2] - hetR.xRev[3] * hetDim[3]
+    dRr[4] = tr.xFwd * Rone[4] * Rtwo[1] - hetR.xRev[4] * hetDim[3]
+    dRr[5] = tr.xFwd * Rone[3] * Rtwo[1] - hetR.xRev[5] * hetDim[2]
+    dRr[6] = tr.xFwd * Rone[1] * Rtwo[2] - hetR.xRev[6] * hetDim[2]
+    dRr[7] = tr.xFwd * Rone[2] * Rtwo[1] - hetR.xRev[7] * hetDim[1]
+    dRr[8] = tr.xFwd * Rone[1] * Rtwo[3] - hetR.xRev[8] * hetDim[1]
+    dRr[9] = hetR.xFwd15 * Gas * hetDim[1] - hetR.xRev[9] * hetDim[3]
+    dRr[10] = hetR.xFwd16 * Gas * hetDim[2] - hetR.xRev[10] * hetDim[3]
 
     dRone[1] += -dRr[2] - dRr[6] - dRr[8]
     dRone[2] += -dRr[3] - dRr[7]
@@ -125,19 +123,17 @@ end
 
 
 " Tracks the individual receptor-ligand interactions within a given receptor. "
-function react_module(R, dR, dLi, Gas, r::TAMrates, tr::Rates)
-    dRr = SVector{10}([
-        r.binding[1] * R[1] * Gas - r.binding[2] * R[2],
-        r.binding[3] * R[1] * Gas - r.binding[4] * R[3],
-        r.binding[3] * R[2] * Gas - r.binding[4] * R[4],
-        r.binding[1] * R[3] * Gas - r.binding[2] * R[4],
-        tr.xFwd * R[1] * R[2] - r.xRev[1] * R[5],
-        tr.xFwd * R[1] * R[3] - r.xRev[2] * R[5],
-        tr.xFwd * R[1] * R[4] - r.xRev[3] * R[6],
-        tr.xFwd * R[2] * R[2] - r.xRev[4] * R[6],
-        tr.xFwd * R[3] * R[3] - r.xRev[5] * R[6],
-        r.xFwd6 * Gas * R[5] - r.xRev[6] * R[6],
-    ])
+function react_module(R, dR, dLi, Gas, r::TAMrates, tr::Rates, dRr)
+    dRr[1] = r.binding[1] * R[1] * Gas - r.binding[2] * R[2]
+    dRr[2] = r.binding[3] * R[1] * Gas - r.binding[4] * R[3]
+    dRr[3] = r.binding[3] * R[2] * Gas - r.binding[4] * R[4]
+    dRr[4] = r.binding[1] * R[3] * Gas - r.binding[2] * R[4]
+    dRr[5] = tr.xFwd * R[1] * R[2] - r.xRev[1] * R[5]
+    dRr[6] = tr.xFwd * R[1] * R[3] - r.xRev[2] * R[5]
+    dRr[7] = tr.xFwd * R[1] * R[4] - r.xRev[3] * R[6]
+    dRr[8] = tr.xFwd * R[2] * R[2] - r.xRev[4] * R[6]
+    dRr[9] = tr.xFwd * R[3] * R[3] - r.xRev[5] * R[6]
+    dRr[10] = r.xFwd6 * Gas * R[5] - r.xRev[6] * R[6]
 
     dR[1] += -dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2] # AXL
     dR[2] += -2 * (dRr[8]) - dRr[5] + dRr[1] - dRr[3] # AXLgas1
@@ -162,8 +158,8 @@ end
 
 
 " Handles hetero-receptor interactions. "
-function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi)
-    dnorm = het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, tr.gasCur, nothing)
+function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi, cache)
+    dnorm = het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, tr.gasCur, nothing, cache)
     dnorm += het_module(
         view(Rone, 7:10),
         view(Rtwo, 7:10),
@@ -175,6 +171,7 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi)
         tr,
         Li / internalV,
         dLi,
+        cache,
     )
 
     trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, hetDim[1:3], hetDim[4:6], tr.kRec, tr.kDeg, 1.0)
@@ -182,9 +179,9 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi)
     return dnorm
 end
 
-function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates)
-    dnorm = react_module(R, dR, nothing, tr.gasCur, r, tr)
-    dnorm += react_module(view(R, 7:12), view(dR, 7:12), dLi, Li / internalV, r, tr)
+function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates, cache)
+    dnorm = react_module(R, dR, nothing, tr.gasCur, r, tr, cache)
+    dnorm += react_module(view(R, 7:12), view(dR, 7:12), dLi, Li / internalV, r, tr, cache)
 
     dR[1] += r.expression
 
@@ -196,6 +193,7 @@ end
 
 function TAM_reacti(dxdt_d, x_d, params, t)
     fill!(dxdt_d, 0.0)
+    cache = @MVector zeros(10)
 
     if params isa Rates
         r = params
@@ -203,9 +201,9 @@ function TAM_reacti(dxdt_d, x_d, params, t)
         r = param(params)
     end
 
-    dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.TAMs.Axl, r)
-    dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.TAMs.MerTK, r)
-    dnorm += TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.TAMs.Tyro3, r)
+    dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.TAMs.Axl, r, cache)
+    dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.TAMs.MerTK, r, cache)
+    dnorm += TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.TAMs.Tyro3, r, cache)
 
     dnorm += heteroTAM(
         x_d[1:12],
@@ -218,6 +216,7 @@ function TAM_reacti(dxdt_d, x_d, params, t)
         r,
         x_d[13],
         view(dxdt_d, 13),
+        cache,
     )
     dnorm += heteroTAM(
         x_d[14:25],
@@ -230,6 +229,7 @@ function TAM_reacti(dxdt_d, x_d, params, t)
         r,
         x_d[13],
         view(dxdt_d, 13),
+        cache,
     )
     dnorm += heteroTAM(
         x_d[1:12],
@@ -242,6 +242,7 @@ function TAM_reacti(dxdt_d, x_d, params, t)
         r,
         x_d[13],
         view(dxdt_d, 13),
+        cache,
     )
 
     dxdt_d[13] = -r.kDeg * x_d[13] # Gas6 degradation
