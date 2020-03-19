@@ -193,7 +193,7 @@ end
 
 function TAM_reacti(dxdt_d, x_d, params, t)
     fill!(dxdt_d, 0.0)
-    cache = @MVector zeros(10)
+    cache = MVector{10, promote_type(eltype(dxdt_d), eltype(params))}(undef)
 
     if params isa Rates
         r = params
