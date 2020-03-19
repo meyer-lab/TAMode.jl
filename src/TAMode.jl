@@ -52,6 +52,10 @@ end
 function runTAM(tps::AbstractVector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
+    if !(params isa Rates)
+        params = param(params)
+    end
+
     solInit = getAutocrine(params, TAM_reacti, 55)
 
     if params isa Rates

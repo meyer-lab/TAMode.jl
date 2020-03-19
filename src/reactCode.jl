@@ -191,15 +191,9 @@ function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates, cache)
     return dnorm
 end
 
-function TAM_reacti(dxdt_d, x_d, params, t)
+function TAM_reacti(dxdt_d, x_d, r, t)
     fill!(dxdt_d, 0.0)
-    cache = MVector{10, promote_type(eltype(dxdt_d), eltype(params))}(undef)
-
-    if params isa Rates
-        r = params
-    else
-        r = param(params)
-    end
+    cache = Vector{promote_type(eltype(dxdt_d), typeof(r.xFwd))}(undef, 10)
 
     dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.TAMs.Axl, r, cache)
     dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.TAMs.MerTK, r, cache)
@@ -251,7 +245,6 @@ function TAM_reacti(dxdt_d, x_d, params, t)
 end
 
 function detailedBalance(out::Rates)
-
     for T in out.TAMs
         KD1 = T.binding[2] / T.binding[1]
         KD2 = T.binding[4] / T.binding[3]
