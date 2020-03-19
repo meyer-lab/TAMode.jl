@@ -45,15 +45,16 @@ end
 
 @testset "Check for detailed balance at steady-state." begin
     rr = TAMode.param(params)
+    rrTwo = deepcopy(rr)
 
     rr.TAMs[1].expression = 0.0
     rr.TAMs[2].expression = 0.0
     rr.TAMs[3].expression = 0.0
     rr.kDeg = 0.0
 
-    uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.TAM_reacti, TAMode.getAutocrine(params, TAMode.TAM_reacti, 55))
+    uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.TAM_reacti, TAMode.getAutocrine(rrTwo, TAMode.TAM_reacti, 55))
 
-    dnorm = TAMode.TAM_reacti_dnorm(zeros(55), uLong, rr, 0.0)
+    dnorm = TAMode.TAM_reacti(zeros(55), uLong, rr, 0.0)
 
     @test dnorm < 0.05
 end
@@ -147,8 +148,9 @@ end
 
 
 @testset "Ensure that system reaches equilibrium." begin
-    uLong = TAMode.getAutocrine(params, TAMode.TAM_reacti, 55)
+    rr = TAMode.param(params)
+    uLong = TAMode.getAutocrine(rr, TAMode.TAM_reacti, 55)
     dnorm = zeros(55)
-    TAMode.TAM_reacti(dnorm, uLong, params, 0.0)
+    TAMode.TAM_reacti(dnorm, uLong, rr, 0.0)
     @test all(dnorm .< 0.05)
 end
