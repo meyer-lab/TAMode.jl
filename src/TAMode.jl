@@ -24,7 +24,7 @@ end
 const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => domainDef])
 
 
-function getAutocrine(params::Union{Vector{T}, Rates{T}, comprates{T}, Lsrates{T}}, func, N::Int)::Vector{T} where {T}
+function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, N::Int)::Vector{T} where {T}
     probInit = SteadyStateProblem(func, zeros(T, N), params)
 
     sol = Rodas5(autodiff = (T == Float64))
@@ -32,7 +32,7 @@ function getAutocrine(params::Union{Vector{T}, Rates{T}, comprates{T}, Lsrates{T
 end
 
 
-function runTAMinit(tps::AbstractVector{Float64}, params::Union{Vector{T}, Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector) where {T}
+function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector) where {T}
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(func, solInit, maximum(tps), params)
 
