@@ -5,7 +5,7 @@ totA549 = @SMatrix [3443.11 3219.69; 3143.41 3353.82; 3018.88 3611.82; 2608.88 3
 surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0.281; 0.257 0.337]
 
 
-@model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV}=Vector{Float64}) where {TV} = begin    
+@model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
     paramsA ~ MvLogNormal(fill(-6.0, 2), 0.01)
     paramsB ~ Truncated(LogNormal(-1.0, 0.01), 0.0, 1.0)
     paramsC ~ MvLogNormal(fill(-6.0, 12), 0.01)
@@ -24,9 +24,9 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
     for ii = 1:length(g6conc)
         data = TAMode.runTAM(tps, params, g6conc[ii])
 
-        pYresids[:, ii] = (data * pYAXL)*scale
-        surfresids[:, ii] = (data * surfAXL)*scale
-        totalresids[:, ii] = (data * totAXL)*scale
+        pYresids[:, ii] = (data * pYAXL) * scale
+        surfresids[:, ii] = (data * surfAXL) * scale
+        totalresids[:, ii] = (data * totAXL) * scale
     end
 
     pYresids = vec(pYresids .- transpose(pYDataExp))
@@ -35,7 +35,7 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
 
     muu = zeros(length(pYresids))
     stdd = ones(length(pYresids))
-    pYresids ~ MvNormal(muu, stdd*std(pYresids))
-    surfresids ~ MvNormal(muu, stdd*std(surfresids))
-    totalresids ~ MvNormal(muu, stdd*std(totalresids))
+    pYresids ~ MvNormal(muu, stdd * std(pYresids))
+    surfresids ~ MvNormal(muu, stdd * std(surfresids))
+    totalresids ~ MvNormal(muu, stdd * std(totalresids))
 end
