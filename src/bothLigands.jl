@@ -63,39 +63,37 @@ function Lsparam(params::Vector)
 end
 
 
-function react_module(R, dR, curL, r)
-    dRr = SVector{30}([
-        r.GBinding[1] * curL[1] * R[1] - r.GBinding[2] * R[2],
-        r.GBinding[3] * curL[1] * R[1] - r.GBinding[4] * R[3],
-        r.PBinding[1] * curL[2] * R[1] - r.PBinding[2] * R[4],
-        r.PBinding[3] * curL[2] * R[1] - r.PBinding[4] * R[5],
-        r.GBinding[3] * curL[1] * R[2] - r.GBinding[4] * R[6],
-        r.GBinding[1] * curL[1] * R[3] - r.GBinding[2] * R[6],
-        r.PBinding[1] * curL[2] * R[3] - r.PBinding[2] * R[7],
-        r.GBinding[3] * curL[1] * R[4] - r.GBinding[4] * R[7],
-        r.PBinding[3] * curL[2] * R[4] - r.PBinding[4] * R[8],
-        r.PBinding[1] * curL[2] * R[5] - r.PBinding[2] * R[8],
-        r.GBinding[1] * curL[1] * R[5] - r.GBinding[2] * R[9],
-        r.PBinding[3] * curL[2] * R[2] - r.PBinding[4] * R[9],
-        r.xFwd * R[2] * R[2] - r.xRev[1] * R[10],
-        r.xFwd * R[1] * R[6] - r.xRev[2] * R[10],
-        r.xFwd * R[3] * R[3] - r.xRev[3] * R[10],
-        r.xFwd * R[2] * R[1] - r.xRev[4] * R[11],
-        r.xFwd * R[3] * R[1] - r.xRev[5] * R[11],
-        r.xFwd * R[1] * R[5] - r.xRev[6] * R[12],
-        r.xFwd * R[1] * R[4] - r.xRev[7] * R[12],
-        r.xFwd * R[4] * R[4] - r.xRev[8] * R[13],
-        r.xFwd * R[1] * R[8] - r.xRev[9] * R[13],
-        r.xFwd * R[5] * R[5] - r.xRev[10] * R[13],
-        r.xFwd * R[7] * R[1] - r.xRev[11] * R[14],
-        r.xFwd * R[9] * R[1] - r.xRev[12] * R[14],
-        r.xFwd * R[2] * R[4] - r.xRev[13] * R[14],
-        r.xFwd * R[3] * R[5] - r.xRev[14] * R[14],
-        r.xFwd27 * R[12] * curL[2] - r.xRev[15] * R[13],
-        r.xFwd27 * R[11] * curL[2] - r.xRev[15] * R[14],
-        r.xFwd29 * R[12] * curL[1] - r.xRev[16] * R[14],
-        r.xFwd29 * R[11] * curL[1] - r.xRev[16] * R[10],
-    ])
+function react_module(R, dR, curL, r, dRr)
+    dRr[1] = r.GBinding[1] * curL[1] * R[1] - r.GBinding[2] * R[2]
+    dRr[2] = r.GBinding[3] * curL[1] * R[1] - r.GBinding[4] * R[3]
+    dRr[3] = r.PBinding[1] * curL[2] * R[1] - r.PBinding[2] * R[4]
+    dRr[4] = r.PBinding[3] * curL[2] * R[1] - r.PBinding[4] * R[5]
+    dRr[5] = r.GBinding[3] * curL[1] * R[2] - r.GBinding[4] * R[6]
+    dRr[6] = r.GBinding[1] * curL[1] * R[3] - r.GBinding[2] * R[6]
+    dRr[7] = r.PBinding[1] * curL[2] * R[3] - r.PBinding[2] * R[7]
+    dRr[8] = r.GBinding[3] * curL[1] * R[4] - r.GBinding[4] * R[7]
+    dRr[9] = r.PBinding[3] * curL[2] * R[4] - r.PBinding[4] * R[8]
+    dRr[10] = r.PBinding[1] * curL[2] * R[5] - r.PBinding[2] * R[8]
+    dRr[11] = r.GBinding[1] * curL[1] * R[5] - r.GBinding[2] * R[9]
+    dRr[12] = r.PBinding[3] * curL[2] * R[2] - r.PBinding[4] * R[9]
+    dRr[13] = r.xFwd * R[2] * R[2] - r.xRev[1] * R[10]
+    dRr[14] = r.xFwd * R[1] * R[6] - r.xRev[2] * R[10]
+    dRr[15] = r.xFwd * R[3] * R[3] - r.xRev[3] * R[10]
+    dRr[16] = r.xFwd * R[2] * R[1] - r.xRev[4] * R[11]
+    dRr[17] = r.xFwd * R[3] * R[1] - r.xRev[5] * R[11]
+    dRr[18] = r.xFwd * R[1] * R[5] - r.xRev[6] * R[12]
+    dRr[19] = r.xFwd * R[1] * R[4] - r.xRev[7] * R[12]
+    dRr[20] = r.xFwd * R[4] * R[4] - r.xRev[8] * R[13]
+    dRr[21] = r.xFwd * R[1] * R[8] - r.xRev[9] * R[13]
+    dRr[22] = r.xFwd * R[5] * R[5] - r.xRev[10] * R[13]
+    dRr[23] = r.xFwd * R[7] * R[1] - r.xRev[11] * R[14]
+    dRr[24] = r.xFwd * R[9] * R[1] - r.xRev[12] * R[14]
+    dRr[25] = r.xFwd * R[2] * R[4] - r.xRev[13] * R[14]
+    dRr[26] = r.xFwd * R[3] * R[5] - r.xRev[14] * R[14]
+    dRr[27] = r.xFwd27 * R[12] * curL[2] - r.xRev[15] * R[13]
+    dRr[28] = r.xFwd27 * R[11] * curL[2] - r.xRev[15] * R[14]
+    dRr[29] = r.xFwd29 * R[12] * curL[1] - r.xRev[16] * R[14]
+    dRr[30] = r.xFwd29 * R[11] * curL[1] - r.xRev[16] * R[10]
 
     dR[1] = -sum(dRr[SVector(1, 2, 3, 4, 14, 16, 17, 18, 19, 21, 23, 24)]) # A
     dR[2] = dRr[1] - sum(dRr[SVector(5, 12, 13, 13, 16, 25)]) # AG (first site)
@@ -127,8 +125,10 @@ surfaceLS = vcat(ones(14), zeros(16))
 
 
 function TAMreactLS(dR, R, tr, t)
-    dnorm = react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr)
-    dnorm += react_module(view(R, 15:28), view(dR, 15:30), view(R, 29:30) / internalV, tr)
+    cache = Vector{promote_type(eltype(dR), typeof(tr.xFwd))}(undef, 30)
+
+    dnorm = react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr, cache)
+    dnorm += react_module(view(R, 15:28), view(dR, 15:30), view(R, 29:30) / internalV, tr, cache)
 
     dR[1] += tr.expression
 

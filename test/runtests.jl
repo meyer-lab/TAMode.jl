@@ -25,7 +25,7 @@ end
 end
 
 
-include("testCompModel.jl")
 include("testreactCode.jl")
+#include("testCompModel.jl")
 include("testLS.jl")
 include("testSample.jl")

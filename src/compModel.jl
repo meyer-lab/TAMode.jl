@@ -11,11 +11,7 @@ function compParamm(compIn::Vector)
 end
 
 
-function TAMreactComp(dxxdt_d, xx_d, p, t)
-    if p isa Vector
-        p = compParamm(p)
-    end
-
+function TAMreactComp(dxxdt_d::Vector, xx_d::Vector, p::comprates, t)
     # Note that TAM_reacti will set ydot to zero first
     # Reaction for the rich phase
     p.rr.gasCur *= p.gasPart
