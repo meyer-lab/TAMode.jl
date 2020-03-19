@@ -12,10 +12,6 @@ end
 
 
 function TAMreactComp(dxxdt_d, xx_d, p, t)
-    if p isa Vector
-        p = compParamm(p)
-    end
-
     # Note that TAM_reacti will set ydot to zero first
     # Reaction for the rich phase
     p.rr.gasCur *= p.gasPart

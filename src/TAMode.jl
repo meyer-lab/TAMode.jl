@@ -58,11 +58,7 @@ function runTAM(tps::AbstractVector{Float64}, params, gasStim::Float64)
 
     solInit = getAutocrine(params, TAM_reacti, 55)
 
-    if params isa Rates
-        params.gasCur = gasStim
-    else
-        params[7] = gasStim
-    end
+    params.gasCur = gasStim
 
     return runTAMinit(tps, params, TAM_reacti, solInit)
 end
@@ -71,13 +67,13 @@ end
 function calcStim(tps::AbstractVector{Float64}, params, gasStim::Float64)
     @assert all(tps .>= 0.0)
 
+    if params isa Vector
+        params = compParamm(params)
+    end
+
     solInit = getAutocrine(params, TAMreactComp, 110)
 
-    if params isa comprates
-        params.gasCur = gasStim
-    else
-        params[7] = gasStim
-    end
+    params.rr.gasCur = gasStim
 
     return runTAMinit(tps, params, TAMreactComp, solInit)
 end
