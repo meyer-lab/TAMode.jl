@@ -73,7 +73,6 @@ end
 
 
 @testset "Swapping Ig1 with Ig2 doesn't change anything." begin
-    # TODO: boundLig doesn't work here...
     rr = TAMode.param(params)
     rrSwap = TAMode.swapIgs(rr)
 
@@ -99,6 +98,7 @@ end
     @test all(aboutZero.(dataDiff * TAMode.pY))
     @test all(aboutZero.(dataDiff * TAMode.total))
     @test all(aboutZero.(dataDiff * TAMode.surface))
+    @test_broken all(aboutZero.(dataDiff * TAMode.boundLig))
 
     for ii = 1:3
         @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
