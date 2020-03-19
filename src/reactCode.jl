@@ -191,55 +191,19 @@ function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates, cache)
     return dnorm
 end
 
-function TAM_reacti(dxdt_d, x_d, r, t)
-    fill!(dxdt_d, 0.0)
-    cache = Vector{promote_type(eltype(dxdt_d), typeof(r.xFwd))}(undef, 10)
+function TAM_reacti(du, u, r, t)
+    fill!(du, 0.0)
+    cache = Vector{promote_type(eltype(du), typeof(r.xFwd))}(undef, 10)
 
-    dnorm = TAM_reactii(view(x_d, 1:12), x_d[13], view(dxdt_d, 1:12), view(dxdt_d, 13), r.TAMs.Axl, r, cache)
-    dnorm += TAM_reactii(view(x_d, 14:25), x_d[13], view(dxdt_d, 14:25), view(dxdt_d, 13), r.TAMs.MerTK, r, cache)
-    dnorm += TAM_reactii(view(x_d, 26:37), x_d[13], view(dxdt_d, 26:37), view(dxdt_d, 13), r.TAMs.Tyro3, r, cache)
+    dnorm = TAM_reactii(view(u, 1:12), u[13], view(du, 1:12), view(du, 13), r.TAMs.Axl, r, cache)
+    dnorm += TAM_reactii(view(u, 14:25), u[13], view(du, 14:25), view(du, 13), r.TAMs.MerTK, r, cache)
+    dnorm += TAM_reactii(view(u, 26:37), u[13], view(du, 26:37), view(du, 13), r.TAMs.Tyro3, r, cache)
 
-    dnorm += heteroTAM(
-        x_d[1:12],
-        x_d[14:25],
-        view(dxdt_d, 1:12),
-        view(dxdt_d, 14:25),
-        r.hetR.AM,
-        x_d[38:43],
-        view(dxdt_d, 38:43),
-        r,
-        x_d[13],
-        view(dxdt_d, 13),
-        cache,
-    )
-    dnorm += heteroTAM(
-        x_d[14:25],
-        x_d[26:37],
-        view(dxdt_d, 14:25),
-        view(dxdt_d, 26:37),
-        r.hetR.MT,
-        x_d[44:49],
-        view(dxdt_d, 44:49),
-        r,
-        x_d[13],
-        view(dxdt_d, 13),
-        cache,
-    )
-    dnorm += heteroTAM(
-        x_d[1:12],
-        x_d[26:37],
-        view(dxdt_d, 1:12),
-        view(dxdt_d, 26:37),
-        r.hetR.AT,
-        x_d[50:55],
-        view(dxdt_d, 50:55),
-        r,
-        x_d[13],
-        view(dxdt_d, 13),
-        cache,
-    )
+    dnorm += heteroTAM(u[1:12], u[14:25], view(du, 1:12), view(du, 14:25), r.hetR.AM, u[38:43], view(du, 38:43), r, u[13], view(du, 13), cache)
+    dnorm += heteroTAM(u[14:25], u[26:37], view(du, 14:25), view(du, 26:37), r.hetR.MT, u[44:49], view(du, 44:49), r, u[13], view(du, 13), cache)
+    dnorm += heteroTAM(u[1:12], u[26:37], view(du, 1:12), view(du, 26:37), r.hetR.AT, u[50:55], view(du, 50:55), r, u[13], view(du, 13), cache)
 
-    dxdt_d[13] = -r.kDeg * x_d[13] # Gas6 degradation
+    du[13] = -r.kDeg * u[13] # Gas6 degradation
 
     return dnorm
 end
