@@ -39,8 +39,9 @@ end
 # Mark surface species
 surface = vcat(ones(6), zeros(6), 0, ones(6), zeros(6), ones(6), zeros(6), ones(3), zeros(3), ones(3), zeros(3), ones(3), zeros(3))
 pY = vcat(zeros(4), ones(2), zeros(4), ones(2), 0, zeros(4), ones(2), zeros(4), ones(2), zeros(4), ones(2), zeros(4), ones(2), ones(18))
-ligPiece = [0, 1, 0, 0, 0, 1]
-boundLig = vcat(ligPiece, ligPiece, 0, ligPiece, ligPiece, ligPiece, ligPiece, ones(18))
+ligPiece = [0, 1, 1, 2, 1, 2]
+hetPiece = [1, 1, 2]
+boundLig = vcat(ligPiece, ligPiece, 0, ligPiece, ligPiece, ligPiece, ligPiece, hetPiece, hetPiece, hetPiece, hetPiece, hetPiece, hetPiece)
 totalPiece = [1, 1, 1, 1, 2, 2]
 total = vcat(
     totalPiece,
@@ -152,8 +153,8 @@ end
 
 " Handles trafficking of receptor and ligand. "
 function trafFunc(dextR, dintR, intRate, extR, intR, kRec, kDeg, fElse)
-    dextR[:] .+= -extR * intRate + kRec * (1 - fElse) * intR * internalFrac # Endocytosis, recycling
-    dintR[:] .+= extR * intRate / internalFrac - kRec * (1 - fElse) * intR - kDeg * fElse * intR # Endocytosis, recycling, degradation
+    dextR .+= -extR * intRate + kRec * (1 - fElse) * intR * internalFrac # Endocytosis, recycling
+    dintR .+= extR * intRate / internalFrac - kRec * (1 - fElse) * intR - kDeg * fElse * intR # Endocytosis, recycling, degradation
 end
 
 
@@ -174,7 +175,7 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi,
         cache,
     )
 
-    trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, hetDim[1:3], hetDim[4:6], tr.kRec, tr.kDeg, 1.0)
+    trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, view(hetDim, 1:3), view(hetDim, 4:6), tr.kRec, tr.kDeg, 1.0)
 
     return dnorm
 end
@@ -185,8 +186,8 @@ function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates, cache)
 
     dR[1] += r.expression
 
-    trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, R[1:4], R[7:10], tr.kRec, tr.kDeg, tr.fElse)
-    trafFunc(view(dR, 5:6), view(dR, 11:12), tr.pYinternalize, R[5:6], R[11:12], tr.kRec, tr.kDeg, 1.0)
+    trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, view(R, 1:4), view(R, 7:10), tr.kRec, tr.kDeg, tr.fElse)
+    trafFunc(view(dR, 5:6), view(dR, 11:12), tr.pYinternalize, view(R, 5:6), view(R, 11:12), tr.kRec, tr.kDeg, 1.0)
 
     return dnorm
 end
@@ -199,9 +200,9 @@ function TAM_reacti(du, u, r, t)
     dnorm += TAM_reactii(view(u, 14:25), u[13], view(du, 14:25), view(du, 13), r.TAMs.MerTK, r, cache)
     dnorm += TAM_reactii(view(u, 26:37), u[13], view(du, 26:37), view(du, 13), r.TAMs.Tyro3, r, cache)
 
-    dnorm += heteroTAM(u[1:12], u[14:25], view(du, 1:12), view(du, 14:25), r.hetR.AM, u[38:43], view(du, 38:43), r, u[13], view(du, 13), cache)
-    dnorm += heteroTAM(u[14:25], u[26:37], view(du, 14:25), view(du, 26:37), r.hetR.MT, u[44:49], view(du, 44:49), r, u[13], view(du, 13), cache)
-    dnorm += heteroTAM(u[1:12], u[26:37], view(du, 1:12), view(du, 26:37), r.hetR.AT, u[50:55], view(du, 50:55), r, u[13], view(du, 13), cache)
+    dnorm += heteroTAM(view(u, 1:12), view(u, 14:25), view(du, 1:12), view(du, 14:25), r.hetR.AM, view(u, 38:43), view(du, 38:43), r, u[13], view(du, 13), cache)
+    dnorm += heteroTAM(view(u, 14:25), view(u, 26:37), view(du, 14:25), view(du, 26:37), r.hetR.MT, view(u, 44:49), view(du, 44:49), r, u[13], view(du, 13), cache)
+    dnorm += heteroTAM(view(u, 1:12), view(u, 26:37), view(du, 1:12), view(du, 26:37), r.hetR.AT, view(u, 50:55), view(du, 50:55), r, u[13], view(du, 13), cache)
 
     du[13] = -r.kDeg * u[13] # Gas6 degradation
 

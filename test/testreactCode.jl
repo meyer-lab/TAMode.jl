@@ -98,7 +98,7 @@ end
     @test all(aboutZero.(dataDiff * TAMode.pY))
     @test all(aboutZero.(dataDiff * TAMode.total))
     @test all(aboutZero.(dataDiff * TAMode.surface))
-    @test_broken all(aboutZero.(dataDiff * TAMode.boundLig))
+    @test all(aboutZero.(dataDiff * TAMode.boundLig))
 
     for ii = 1:3
         @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
@@ -116,7 +116,7 @@ end
     @test all(data * TAMode.boundLig .≈ 0)
 end
 
-#reactCode
+
 @testset "Check if there's no receptor that we don't see any." begin
     for i = 1:3
         rr = TAMode.param(params)
@@ -142,8 +142,9 @@ end
     tt.gasCur *= 10.0
 
     secondSurf = TAMode.runTAMinit([100.0], tt, TAMode.TAM_reacti, firstSurf)
+    reduce = TAMode.surface .* TAMode.total
 
-    @test_broken isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol = 1.0e-5)
+    @test aboutZero(dot(vec(firstSurf) - vec(secondSurf), reduce))
 end
 
 
