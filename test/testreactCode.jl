@@ -98,7 +98,7 @@ end
     @test all(aboutZero.(dataDiff * TAMode.pY))
     @test all(aboutZero.(dataDiff * TAMode.total))
     @test all(aboutZero.(dataDiff * TAMode.surface))
-    @test_broken all(aboutZero.(dataDiff * TAMode.boundLig))
+    @test all(aboutZero.(dataDiff * TAMode.boundLig))
 
     for ii = 1:3
         @test all(aboutZero.(dataDiff * TAMode.recpSpecific[ii]))
@@ -116,7 +116,7 @@ end
     @test all(data * TAMode.boundLig .≈ 0)
 end
 
-#reactCode
+
 @testset "Check if there's no receptor that we don't see any." begin
     for i = 1:3
         rr = TAMode.param(params)

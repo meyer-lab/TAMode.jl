@@ -39,8 +39,9 @@ end
 # Mark surface species
 surface = vcat(ones(6), zeros(6), 0, ones(6), zeros(6), ones(6), zeros(6), ones(3), zeros(3), ones(3), zeros(3), ones(3), zeros(3))
 pY = vcat(zeros(4), ones(2), zeros(4), ones(2), 0, zeros(4), ones(2), zeros(4), ones(2), zeros(4), ones(2), zeros(4), ones(2), ones(18))
-ligPiece = [0, 1, 0, 0, 0, 1]
-boundLig = vcat(ligPiece, ligPiece, 0, ligPiece, ligPiece, ligPiece, ligPiece, ones(18))
+ligPiece = [0, 1, 1, 2, 1, 2]
+hetPiece = [1, 1, 2]
+boundLig = vcat(ligPiece, ligPiece, 0, ligPiece, ligPiece, ligPiece, ligPiece, hetPiece, hetPiece, hetPiece, hetPiece, hetPiece, hetPiece)
 totalPiece = [1, 1, 1, 1, 2, 2]
 total = vcat(
     totalPiece,
