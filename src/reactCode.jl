@@ -174,7 +174,7 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi,
         cache,
     )
 
-    trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, hetDim[1:3], hetDim[4:6], tr.kRec, tr.kDeg, 1.0)
+    trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, view(hetDim, 1:3), view(hetDim, 4:6), tr.kRec, tr.kDeg, 1.0)
 
     return dnorm
 end
@@ -185,8 +185,8 @@ function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates, cache)
 
     dR[1] += r.expression
 
-    trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, R[1:4], R[7:10], tr.kRec, tr.kDeg, tr.fElse)
-    trafFunc(view(dR, 5:6), view(dR, 11:12), tr.pYinternalize, R[5:6], R[11:12], tr.kRec, tr.kDeg, 1.0)
+    trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, view(R, 1:4), view(R, 7:10), tr.kRec, tr.kDeg, tr.fElse)
+    trafFunc(view(dR, 5:6), view(dR, 11:12), tr.pYinternalize, view(R, 5:6), view(R, 11:12), tr.kRec, tr.kDeg, 1.0)
 
     return dnorm
 end
