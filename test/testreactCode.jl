@@ -142,8 +142,9 @@ end
     tt.gasCur *= 10.0
 
     secondSurf = TAMode.runTAMinit([100.0], tt, TAMode.TAM_reacti, firstSurf)
+    reduce = TAMode.surface .* TAMode.total
 
-    @test_broken isapprox(dot(firstSurf, TAMode.surface), dot(secondSurf, TAMode.surface), rtol = 1.0e-5)
+    @test aboutZero(dot(vec(firstSurf) - vec(secondSurf), reduce))
 end
 
 
