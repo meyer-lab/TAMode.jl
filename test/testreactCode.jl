@@ -43,20 +43,24 @@ end
 end
 
 
-@testset "Check for detailed balance at steady-state." begin
+@testset "Check for detailed balance." begin
+    # PMID: 16698778
     rr = TAMode.param(params)
-    rrTwo = deepcopy(rr)
+    autoC = TAMode.getAutocrine(rr)
 
     rr.TAMs[1].expression = 0.0
     rr.TAMs[2].expression = 0.0
     rr.TAMs[3].expression = 0.0
     rr.kDeg = 0.0
 
-    uLong = TAMode.runTAMinit([1000000.0], rr, TAMode.getAutocrine(rrTwo))
+    uLong = TAMode.runTAMinit([1000000.0], rr, autoC)
 
-    dnorm = TAMode.TAMreact(zeros(55), uLong, rr, 0.0)
+    # Get the Jacobian matrix
+    du = zero(uLong)
+    J = ForwardDiff.jacobian((y, x) -> TAMode.TAMreact(y, x, rr, 0.0), du, uLong)
+    GK = J * diagm(vec(uLong))
 
-    @test dnorm < 0.01
+    @test norm(GK - transpose(GK)) < 1.0e-5
 end
 
 
@@ -152,6 +156,5 @@ end
     rr = TAMode.param(params)
     du = zeros(55)
     ddnorm = TAMode.TAMreact(du, TAMode.getAutocrine(rr), rr, 0.0)
-    @test norm(du) < 0.01
-    @test norm(ddnorm) < 1.0
+    @test norm(du) < TAMode.solTol*10.0
 end
