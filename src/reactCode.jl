@@ -180,25 +180,24 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi,
     return dnorm
 end
 
-function TAM_reactii(R, Li, dR, dLi, r::TAMrates, tr::Rates, cache)
-    dnorm = react_module(R, dR, nothing, tr.gasCur, r, tr, cache)
-    dnorm += react_module(view(R, 7:12), view(dR, 7:12), dLi, Li / internalV, r, tr, cache)
 
-    dR[1] += r.expression
-
-    trafFunc(view(dR, 1:4), view(dR, 7:10), tr.internalize, view(R, 1:4), view(R, 7:10), tr.kRec, tr.kDeg, tr.fElse)
-    trafFunc(view(dR, 5:6), view(dR, 11:12), tr.pYinternalize, view(R, 5:6), view(R, 11:12), tr.kRec, tr.kDeg, 1.0)
-
-    return dnorm
-end
-
-function TAM_reacti(du, u, r, t)
+function TAMreact(du, u, r::Rates, t)
     fill!(du, 0.0)
+    dnorm = 0.0
     cache = Vector{promote_type(eltype(du), typeof(r.xFwd))}(undef, 10)
 
-    dnorm = TAM_reactii(view(u, 1:12), u[13], view(du, 1:12), view(du, 13), r.TAMs.Axl, r, cache)
-    dnorm += TAM_reactii(view(u, 14:25), u[13], view(du, 14:25), view(du, 13), r.TAMs.MerTK, r, cache)
-    dnorm += TAM_reactii(view(u, 26:37), u[13], view(du, 26:37), view(du, 13), r.TAMs.Tyro3, r, cache)
+    for (ii, aa) in enumerate((1, 14, 26))
+        R = view(u, aa:(aa + 11))
+        dR = view(du, aa:(aa + 11))
+
+        dnorm += react_module(R, dR, nothing, r.gasCur, r.TAMs[ii], r, cache)
+        dnorm += react_module(view(R, 7:12), view(dR, 7:12), view(du, 13), u[13] / internalV, r.TAMs[ii], r, cache)
+
+        dR[1] += r.TAMs[ii].expression
+
+        trafFunc(view(dR, 1:4), view(dR, 7:10), r.internalize, view(R, 1:4), view(R, 7:10), r.kRec, r.kDeg, r.fElse)
+        trafFunc(view(dR, 5:6), view(dR, 11:12), r.pYinternalize, view(R, 5:6), view(R, 11:12), r.kRec, r.kDeg, 1.0)
+    end
 
     dnorm += heteroTAM(
         view(u, 1:12),
@@ -244,6 +243,7 @@ function TAM_reacti(du, u, r, t)
 
     return dnorm
 end
+
 
 function detailedBalance(out::Rates{TT})::Rates{TT} where {TT <: Real}
     for T in out.TAMs
@@ -316,7 +316,7 @@ function detailedBalance(out::Rates{TT})::Rates{TT} where {TT <: Real}
 end
 
 
-function swapIgs(out::Rates)
+function swapIgs(out::Rates{TT})::Rates{TT} where {TT <: Real}
     out = deepcopy(out)
     detailedBalance(out)
 
