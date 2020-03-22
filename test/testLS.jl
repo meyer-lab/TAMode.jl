@@ -25,15 +25,14 @@
         rr.expression = 0.0
         rr.kDeg = 0.0
 
-        uLong = TAMode.runTAMinit([1000000.0], rr, autoC)
+        uLong = TAMode.runTAMinit([1.0e6], rr, autoC)
 
         # Get the Jacobian matrix
         du = zero(uLong)
         J = ForwardDiff.jacobian((y, x) -> TAMode.TAMreact(y, x, rr, 0.0), du, uLong)
         GK = J * diagm(vec(uLong))
 
-        # TODO: This seems quite high.
-        @test norm(GK - transpose(GK)) < 100.0
+        @test_broken norm(GK - transpose(GK)) < 1.0e-5
     end
 
     @testset "LS: Make sure that surface total is preserved without trafficking." begin

@@ -63,7 +63,7 @@ function Lsparam(params::Vector)
 end
 
 
-function react_module(R, dR, curL, r, dRr)
+function react_module(R, dR, curL, r::Lsrates, dRr)
     dRr[1] = r.GBinding[1] * curL[1] * R[1] - r.GBinding[2] * R[2]
     dRr[2] = r.GBinding[3] * curL[1] * R[1] - r.GBinding[4] * R[3]
     dRr[3] = r.PBinding[1] * curL[2] * R[1] - r.PBinding[2] * R[4]
@@ -125,6 +125,7 @@ surfaceLS = vcat(ones(14), zeros(16))
 
 
 function TAMreact(dR, R, tr::Lsrates, t)
+    fill!(dR, 0.0)
     cache = Vector{promote_type(eltype(dR), typeof(tr.xFwd))}(undef, 30)
 
     react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr, cache)
