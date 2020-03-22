@@ -153,5 +153,5 @@ end
     du = zeros(55)
     ddnorm = TAMode.TAMreact(du, TAMode.getAutocrine(rr), rr, 0.0)
     @test norm(du) < 0.01
-    @test norm(ddnorm) < 0.01
+    @test norm(ddnorm) < 1.0
 end
