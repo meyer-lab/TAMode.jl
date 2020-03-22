@@ -63,7 +63,7 @@ function Lsparam(params::Vector)
 end
 
 
-function react_module(R, dR, curL, r, dRr)
+function react_module(R, dR, curL, r::Lsrates, dRr)
     dRr[1] = r.GBinding[1] * curL[1] * R[1] - r.GBinding[2] * R[2]
     dRr[2] = r.GBinding[3] * curL[1] * R[1] - r.GBinding[4] * R[3]
     dRr[3] = r.PBinding[1] * curL[2] * R[1] - r.PBinding[2] * R[4]
@@ -116,7 +116,7 @@ function react_module(R, dR, curL, r, dRr)
         dR[16] = -sum(dRr[SVector(3, 4, 7, 9, 10, 12, 27, 28)]) - r.kDeg * curL[2] # PROSi
     end
 
-    return norm(dRr)
+    nothing
 end
 
 
@@ -125,15 +125,16 @@ surfaceLS = vcat(ones(14), zeros(16))
 
 
 function TAMreact(dR, R, tr::Lsrates, t)
+    fill!(dR, 0.0)
     cache = Vector{promote_type(eltype(dR), typeof(tr.xFwd))}(undef, 30)
 
-    dnorm = react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr, cache)
-    dnorm += react_module(view(R, 15:28), view(dR, 15:30), view(R, 29:30) / internalV, tr, cache)
+    react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr, cache)
+    react_module(view(R, 15:28), view(dR, 15:30), view(R, 29:30) / internalV, tr, cache)
 
     dR[1] += tr.expression
 
     trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse)
     trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse)
 
-    return dnorm
+    nothing
 end

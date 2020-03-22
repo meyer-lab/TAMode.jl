@@ -18,13 +18,21 @@
     end
 
     @testset "LS: Ensure that system reaches detailed balance." begin
-        pp = TAMode.Lsparam(fill(0.2, 9))
+        rr = TAMode.Lsparam(fill(0.2, 9))
 
-        uLong = TAMode.getAutocrine(pp)
+        autoC = TAMode.getAutocrine(rr)
 
-        dnorm = TAMode.TAMreact(ones(30), uLong, pp, 0.0)
+        rr.expression = 0.0
+        rr.kDeg = 0.0
 
-        @test dnorm < 0.05
+        uLong = TAMode.runTAMinit([1.0e6], rr, autoC)
+
+        # Get the Jacobian matrix
+        du = zero(uLong)
+        J = ForwardDiff.jacobian((y, x) -> TAMode.TAMreact(y, x, rr, 0.0), du, uLong)
+        GK = J * diagm(vec(uLong))
+
+        @test_broken norm(GK - transpose(GK)) < 1.0e-5
     end
 
     @testset "LS: Make sure that surface total is preserved without trafficking." begin

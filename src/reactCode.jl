@@ -119,7 +119,7 @@ function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr::Rates, 
         dLi[1] += -dRr[9] - dRr[10]
     end
 
-    return norm(dRr)
+    nothing
 end
 
 
@@ -147,7 +147,7 @@ function react_module(R, dR, dLi, Gas, r::TAMrates, tr::Rates, dRr)
         dLi[1] += -dRr[10] - dRr[1] - dRr[2] - dRr[3] - dRr[4]
     end
 
-    return norm(dRr)
+    nothing
 end
 
 
@@ -160,8 +160,8 @@ end
 
 " Handles hetero-receptor interactions. "
 function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi, cache)
-    dnorm = het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, tr.gasCur, nothing, cache)
-    dnorm += het_module(
+    het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, tr.gasCur, nothing, cache)
+    het_module(
         view(Rone, 7:10),
         view(Rtwo, 7:10),
         view(dRone, 7:10),
@@ -177,21 +177,20 @@ function heteroTAM(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Li, dLi,
 
     trafFunc(view(dhetDim, 1:3), view(dhetDim, 4:6), tr.pYinternalize, view(hetDim, 1:3), view(hetDim, 4:6), tr.kRec, tr.kDeg, 1.0)
 
-    return dnorm
+    nothing
 end
 
 
 function TAMreact(du, u, r::Rates, t)
     fill!(du, 0.0)
-    dnorm = 0.0
     cache = Vector{promote_type(eltype(du), typeof(r.xFwd))}(undef, 10)
 
     for (ii, aa) in enumerate((1, 14, 26))
         R = view(u, aa:(aa + 11))
         dR = view(du, aa:(aa + 11))
 
-        dnorm += react_module(R, dR, nothing, r.gasCur, r.TAMs[ii], r, cache)
-        dnorm += react_module(view(R, 7:12), view(dR, 7:12), view(du, 13), u[13] / internalV, r.TAMs[ii], r, cache)
+        react_module(R, dR, nothing, r.gasCur, r.TAMs[ii], r, cache)
+        react_module(view(R, 7:12), view(dR, 7:12), view(du, 13), u[13] / internalV, r.TAMs[ii], r, cache)
 
         dR[1] += r.TAMs[ii].expression
 
@@ -199,7 +198,7 @@ function TAMreact(du, u, r::Rates, t)
         trafFunc(view(dR, 5:6), view(dR, 11:12), r.pYinternalize, view(R, 5:6), view(R, 11:12), r.kRec, r.kDeg, 1.0)
     end
 
-    dnorm += heteroTAM(
+    heteroTAM(
         view(u, 1:12),
         view(u, 14:25),
         view(du, 1:12),
@@ -212,7 +211,7 @@ function TAMreact(du, u, r::Rates, t)
         view(du, 13),
         cache,
     )
-    dnorm += heteroTAM(
+    heteroTAM(
         view(u, 14:25),
         view(u, 26:37),
         view(du, 14:25),
@@ -225,7 +224,7 @@ function TAMreact(du, u, r::Rates, t)
         view(du, 13),
         cache,
     )
-    dnorm += heteroTAM(
+    heteroTAM(
         view(u, 1:12),
         view(u, 26:37),
         view(du, 1:12),
@@ -241,7 +240,7 @@ function TAMreact(du, u, r::Rates, t)
 
     du[13] = -r.kDeg * u[13] # Gas6 degradation
 
-    return dnorm
+    nothing
 end
 
 

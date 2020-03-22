@@ -15,7 +15,7 @@ include("compModel.jl")
 include("BLI.jl")
 
 
-const solTol = 1.0e-7
+const solTol = 1.0e-5
 
 function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
@@ -59,44 +59,28 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
 end
 
 
-function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Vector{T}}, gasStim::Float64)::Matrix{T} where {T <: Real}
+function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}, Vector{T}}, ligStim)::Matrix{T} where {T <: Real}
     if params isa Vector
-        params = param(params)
+        if length(params) == 15
+            params = param(params)
+        elseif length(params) == 9
+            params = Lsparam(params)
+        else
+            @assert false
+        end
     end
 
     solInit = getAutocrine(params)
 
-    params.gasCur = gasStim
-
-    return runTAMinit(tps, params, solInit)
-end
-
-
-function calcStim(tps::AbstractVector{Float64}, params, gasStim::Float64)
-    if params isa Vector
-        params = compParamm(params)
+    if params isa Rates
+        params.gasCur = ligStim
+    elseif params isa comprates
+        params.rr.gasCur = ligStim
+    elseif params isa Lsrates
+        params.curL = ligStim
+    else
+        @assert false
     end
-
-    solInit = getAutocrine(params)
-
-    params.rr.gasCur = gasStim
-
-    return runTAMinit(tps, params, solInit)
-end
-
-
-function calcStimPtdser(tps::AbstractVector{Float64}, params)
-    solInit = getAutocrine(params)
-
-    return runTAMinit(tps, params, [solInit solInit])
-end
-
-
-function runTAMLS(tps::AbstractVector{Float64}, pIn, ligStim::Tuple{Real, Real})
-    params = Lsparam(pIn)
-
-    solInit = getAutocrine(params)
-    params.curL = ligStim
 
     return runTAMinit(tps, params, solInit)
 end
