@@ -32,7 +32,7 @@ function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, N
 end
 
 
-function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector) where {T}
+function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector)::Matrix{T} where {T}
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(func, solInit, maximum(tps), params)
 
@@ -49,7 +49,7 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
 end
 
 
-function runTAM(tps::AbstractVector{Float64}, params, gasStim::Float64)
+function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Vector{T}}, gasStim::Float64)::Matrix{T} where {T}
     @assert all(tps .>= 0.0)
 
     if !(params isa Rates)

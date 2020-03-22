@@ -66,7 +66,7 @@ recpSpecific = [
 
 
 " Setup the parameters for the full TAM receptor model. "
-function param(params::Vector)
+function param(params::Vector{T})::Rates{T} where {T}
     @assert all(params .>= 0.0)
     @assert params[3] < 1.0
     fBnd = 0.06
@@ -209,7 +209,7 @@ function TAM_reacti(du, u, r, t)
     return dnorm
 end
 
-function detailedBalance(out::Rates)
+function detailedBalance(out::Rates{TT})::Rates{TT} where {TT}
     for T in out.TAMs
         KD1 = T.binding[2] / T.binding[1]
         KD2 = T.binding[4] / T.binding[3]
