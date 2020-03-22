@@ -124,7 +124,7 @@ totalLS = vcat(ones(9), 2 * ones(5), ones(9) * internalFrac, 2 * ones(5) * inter
 surfaceLS = vcat(ones(14), zeros(16))
 
 
-function TAMreactLS(dR, R, tr, t)
+function TAMreact(dR, R, tr::Lsrates, t)
     cache = Vector{promote_type(eltype(dR), typeof(tr.xFwd))}(undef, 30)
 
     dnorm = react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr, cache)

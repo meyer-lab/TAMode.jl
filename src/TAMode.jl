@@ -15,7 +15,7 @@ include("compModel.jl")
 include("BLI.jl")
 
 
-const solTol = 1.0e-6
+const solTol = 1.0e-7
 
 function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
@@ -24,17 +24,27 @@ end
 const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => domainDef])
 
 
-function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, N::Int)::Vector{T} where {T}
-    probInit = SteadyStateProblem(func, zeros(T, N), params)
+function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector{T} where {T <: Real}
+    if params isa Rates
+        N = 55
+    elseif params isa comprates
+        N = 110
+    elseif params isa Lsrates
+        N = 30
+    end
+
+    probInit = SteadyStateProblem(TAMreact, zeros(T, N), params)
 
     sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
     return solve(probInit, DynamicSS(sol); options...).u
 end
 
 
-function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector) where {T}
+function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, solInit::Vector)::Matrix{T} where {T <: Real}
+    @assert all(x -> x >= 0.0, tps)
+
     solInit = convert(Vector{T}, solInit)
-    prob = ODEProblem(func, solInit, maximum(tps), params)
+    prob = ODEProblem(TAMreact, solInit, maximum(tps), params)
 
     sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
     solut = solve(prob, sol; saveat = tps, options...).u
@@ -49,53 +59,46 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
 end
 
 
-function runTAM(tps::AbstractVector{Float64}, params, gasStim::Float64)
-    @assert all(tps .>= 0.0)
-
-    if !(params isa Rates)
+function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Vector{T}}, gasStim::Float64)::Matrix{T} where {T <: Real}
+    if params isa Vector
         params = param(params)
     end
 
-    solInit = getAutocrine(params, TAM_reacti, 55)
+    solInit = getAutocrine(params)
 
     params.gasCur = gasStim
 
-    return runTAMinit(tps, params, TAM_reacti, solInit)
+    return runTAMinit(tps, params, solInit)
 end
 
 
 function calcStim(tps::AbstractVector{Float64}, params, gasStim::Float64)
-    @assert all(tps .>= 0.0)
-
     if params isa Vector
         params = compParamm(params)
     end
 
-    solInit = getAutocrine(params, TAMreactComp, 110)
+    solInit = getAutocrine(params)
 
     params.rr.gasCur = gasStim
 
-    return runTAMinit(tps, params, TAMreactComp, solInit)
+    return runTAMinit(tps, params, solInit)
 end
 
 
 function calcStimPtdser(tps::AbstractVector{Float64}, params)
-    @assert all(tps .>= 0.0)
+    solInit = getAutocrine(params)
 
-    solInit = getAutocrine(params, TAM_reacti, 55)
-
-    return runTAMinit(tps, params, TAMreactComp, [solInit solInit])
+    return runTAMinit(tps, params, [solInit solInit])
 end
 
 
 function runTAMLS(tps::AbstractVector{Float64}, pIn, ligStim::Tuple{Real, Real})
     params = Lsparam(pIn)
-    @assert all(tps .>= 0.0)
 
-    solInit = getAutocrine(params, TAMreactLS, 30)
+    solInit = getAutocrine(params)
     params.curL = ligStim
 
-    return runTAMinit(tps, params, TAMreactLS, solInit)
+    return runTAMinit(tps, params, solInit)
 end
 
 
