@@ -209,7 +209,7 @@ function TAM_reacti(du, u, r, t)
     return dnorm
 end
 
-function detailedBalance(out::Rates{TT})::Rates{TT} where {TT}
+function detailedBalance(out::Rates{TT})::Rates{TT} where {TT <: Real}
     for T in out.TAMs
         KD1 = T.binding[2] / T.binding[1]
         KD2 = T.binding[4] / T.binding[3]

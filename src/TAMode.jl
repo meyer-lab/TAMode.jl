@@ -24,7 +24,7 @@ end
 const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => domainDef])
 
 
-function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, N::Int)::Vector{T} where {T}
+function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, N::Int)::Vector{T} where {T <: Real}
     probInit = SteadyStateProblem(func, zeros(T, N), params)
 
     sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
@@ -32,7 +32,7 @@ function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, N
 end
 
 
-function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector)::Matrix{T} where {T}
+function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, func, solInit::Vector)::Matrix{T} where {T <: Real}
     solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(func, solInit, maximum(tps), params)
 
@@ -49,10 +49,10 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
 end
 
 
-function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Vector{T}}, gasStim::Float64)::Matrix{T} where {T}
+function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Vector{T}}, gasStim::Float64)::Matrix{T} where {T <: Real}
     @assert all(tps .>= 0.0)
 
-    if !(params isa Rates)
+    if params isa Vector
         params = param(params)
     end
 
