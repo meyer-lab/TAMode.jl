@@ -156,5 +156,5 @@ end
     rr = TAMode.param(params)
     du = zeros(55)
     ddnorm = TAMode.TAMreact(du, TAMode.getAutocrine(rr), rr, 0.0)
-    @test norm(du) < TAMode.solTol*10.0
+    @test norm(du) < TAMode.solTol * 10.0
 end
