@@ -69,7 +69,7 @@ recpSpecific = [
 function param(params::Vector{T})::Rates{T} where {T}
     @assert all(params .>= 0.0)
     @assert params[3] < 1.0
-    fBnd = 0.06
+    fBnd = 0.6
 
     AXL = TAMrates{eltype(params)}([1.2, 0.042, fBnd, fBnd * params[11]], zeros(6), params[8], 1.50) # From Kariolis et al
     MerTK = TAMrates{eltype(params)}([fBnd, fBnd * params[12], fBnd, fBnd * params[13]], zeros(6), params[9], 0.0)
