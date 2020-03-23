@@ -19,7 +19,7 @@ end
 
 
 function Lsparam(params::Vector)
-    fwdDef = 0.06
+    fwdDef = 0.6
     @assert all(params .>= 0.0)
 
     out = Lsrates{eltype(params)}(
