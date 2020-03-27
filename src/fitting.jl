@@ -23,8 +23,12 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
     surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
     totAXL = TAMode.total .* TAMode.recpSpecific[1]
 
+    params = param(params)
+    solInit = getAutocrine(params)
+
     Threads.@threads for ii = 1:length(g6conc)
-        data = TAMode.runTAM(tps, params, g6conc[ii])
+        params.gasCur = g6conc[ii]
+        data = runTAMinit(tps, params, solInit)
 
         pYresids[:, ii] = (data * pYAXL) * scale
         surfresids[:, ii] = (data * surfAXL) * scaleSurf
