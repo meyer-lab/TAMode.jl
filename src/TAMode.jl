@@ -9,6 +9,7 @@ using Turing
 import CSV
 import Statistics
 
+include("types.jl")
 include("reactCode.jl")
 include("bothLigands.jl")
 include("compModel.jl")

@@ -1,13 +1,15 @@
-mutable struct comprates{T}
-    rr::Rates{T}
-    fraction::T # Fraction of cell surface covered with PtdSer
-    partIn::T # Partitioning rate into PtdSer regions
-    gasPart::T # Partitioning of ligand into PtdSer region
-end
+const fraction = 0.1 # Fraction of the cell surface with PS
 
 
-function compParamm(compIn::Vector)
-    return comprates{eltype(compIn)}(param(compIn[4:end]), compIn[1], compIn[2], compIn[3])
+" Setup the parameters for the full TAM receptor model. "
+function compParamm(params::Vector{T})::comprates{T} where {T}
+    @assert all(params .>= 0.0)
+
+    TAM, hetRs = paramTAMrate(view(params, 4:11))
+
+    out = comprates{T}(TAM, params[1], params[2], params[3], hetRs)
+
+    return detailedBalance(out)
 end
 
 
