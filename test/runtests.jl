@@ -35,6 +35,6 @@ end
 
 
 include("testreactCode.jl")
-# include("testCompModel.jl")
+include("testCompModel.jl")
 include("testLS.jl")
 include("testSample.jl")

@@ -8,6 +8,7 @@ import LabelledArrays
 using Turing
 import CSV
 import Statistics
+using DiffEqOperators
 
 include("types.jl")
 include("reactCode.jl")

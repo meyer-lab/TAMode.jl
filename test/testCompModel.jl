@@ -1,8 +1,8 @@
 
-CompParams = ones(18) * 0.5
+CompParams = ones(12) * 0.5
 
 @testset "Can successfully assemble the comp model parameters." begin
-    TAMode.calcStim(tps, CompParams, 10.0)
+    TAMode.compTAM(tps, CompParams)
 
-    @time TAMode.calcStim(tps, CompParams, 10.0)
+    @time TAMode.compTAM(tps, CompParams)
 end

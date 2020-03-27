@@ -34,6 +34,7 @@ mutable struct comprates{T}
     diff::T # Receptor diffusivity
     gasPart::T # Partitioning of ligand into PtdSer region
     gasCur::T
+    xFwd::T
     hetR::hetRType{T}
 end
 
