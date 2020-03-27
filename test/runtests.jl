@@ -19,8 +19,17 @@ aboutZero = x -> isapprox(x, 0.0, rtol = 1.0e-5, atol = 1.0e-5)
 end
 
 
+function gradFunc(x)
+	return dot(TAMode.runTAM([10.0], x, 1.0), TAMode.pY)
+end
+
+
 @testset "Check that we can diff though the solver." begin
-    g = ForwardDiff.gradient(x -> dot(TAMode.runTAM([10.0], x, 1.0), TAMode.pY), params)
+	g = similar(params)
+
+    ForwardDiff.gradient!(g, gradFunc, params)
+    @time ForwardDiff.gradient!(g, gradFunc, params)
+
     @test(length(g) == length(params))
 end
 

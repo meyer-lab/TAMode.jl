@@ -154,11 +154,14 @@ function TAMreact(du, u, r::Rates, t)
     for ii in 1:27
         if pYc[ii] == 1
             fElse = 1.0
+            intRate = r.pYinternalize
         else
             fElse = r.fElse
+            intRate = r.internalize
         end
 
-        trafFunc(view(du, ii), view(du, ii + 27), r.internalize, view(u, ii), view(u, ii + 27), r.kRec, r.kDeg, fElse)
+        du[ii] += -u[ii] * intRate + r.kRec * (1.0 - fElse) * u[ii + 27] * internalFrac # Endocytosis, recycling
+        du[ii + 27] += u[ii] * intRate / internalFrac - r.kRec * (1.0 - fElse) * u[ii + 27] - r.kDeg * fElse * u[ii + 27] # ", degradation
     end
 
     du[end] = -r.kDeg * u[end] # Gas6 degradation
