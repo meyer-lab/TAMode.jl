@@ -60,7 +60,7 @@ end
 
 
 " Tracks the hetero-receptor interactions between two receptors. "
-function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr::Rates, Gas, dLi, dRr)
+function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Gas, dLi, dRr)
     dRr[1] = tr.xFwd * Rone[3] * Rtwo[3] - hetR.xRev[1] * hetDim[3]
     dRr[2] = tr.xFwd * Rone[1] * Rtwo[4] - hetR.xRev[2] * hetDim[3]
     dRr[3] = tr.xFwd * Rone[2] * Rtwo[2] - hetR.xRev[3] * hetDim[3]
@@ -95,7 +95,7 @@ end
 
 
 " Tracks the individual receptor-ligand interactions within a given receptor. "
-function react_module(R, dR, Gas, dLi, r::TAMrates, tr::Rates, dRr)
+function react_module(R, dR, Gas, dLi, r::TAMrates, tr, dRr)
     dRr[1] = r.binding[1] * R[1] * Gas - r.binding[2] * R[2]
     dRr[2] = r.binding[3] * R[1] * Gas - r.binding[4] * R[3]
     dRr[3] = r.binding[3] * R[2] * Gas - r.binding[4] * R[4]
@@ -170,7 +170,7 @@ function TAMreact(du, u, r::Rates, t)
 end
 
 
-function detailedBalance(out::Union{Rates{TT}, comprates{TT}})::Rates{TT} where {TT <: Real}
+function detailedBalance(out)
     for T in out.TAMs
         KD1 = T.binding[2] / T.binding[1]
         KD2 = T.binding[4] / T.binding[3]

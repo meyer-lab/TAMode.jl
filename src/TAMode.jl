@@ -8,6 +8,7 @@ import LabelledArrays
 using Turing
 import CSV
 import Statistics
+using DiffEqOperators
 
 include("types.jl")
 include("reactCode.jl")
@@ -29,7 +30,7 @@ function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector
     if params isa Rates
         N = 55
     elseif params isa comprates
-        N = 110
+        N = 27
     elseif params isa Lsrates
         N = 30
     end
@@ -60,7 +61,19 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
 end
 
 
-function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}, Vector{T}}, ligStim)::Matrix{T} where {T <: Real}
+function compTAM(tps::AbstractVector{Float64}, params::Union{comprates{T}, Vector{T}}) where {T <: Real}
+    if params isa Vector
+        params = compParamm(params)
+    end
+
+    solInit = getAutocrine(params)
+    u0 = repeat(solInit; outer=[100])
+
+    return runTAMinit(tps, params, u0)
+end
+
+
+function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Lsrates{T}, Vector{T}}, ligStim)::Matrix{T} where {T <: Real}
     if params isa Vector
         if length(params) == 15
             params = param(params)
@@ -75,8 +88,6 @@ function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{
 
     if params isa Rates
         params.gasCur = ligStim
-    elseif params isa comprates
-        params.rr.gasCur = ligStim
     elseif params isa Lsrates
         params.curL = ligStim
     else

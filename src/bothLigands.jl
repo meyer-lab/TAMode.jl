@@ -115,7 +115,7 @@ function TAMreact(dR, R, tr::Lsrates, t)
     dR[1] += tr.expression
 
     trafFunc(view(dR, 1:9), view(dR, 15:23), tr.internalize, R[1:9], R[15:23], tr.kRec, tr.kDeg, tr.fElse)
-    trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, tr.fElse)
+    trafFunc(view(dR, 10:14), view(dR, 24:28), tr.pYinternalize, R[10:14], R[24:28], tr.kRec, tr.kDeg, 1.0)
 
     nothing
 end
