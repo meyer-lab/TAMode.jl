@@ -16,10 +16,15 @@ boundLig = vcat(boundLigC, boundLigC * internalFrac, 0)
 totalPiece = [1, 1, 1, 1, 2, 2]
 totalC = vcat(totalPiece, totalPiece, totalPiece, 2 * ones(9))
 total = vcat(totalC, totalC * internalFrac, 0)
+recpSpecificC = [
+    vcat(ones(6), zeros(12), ones(3), zeros(3), ones(3)),  # AXL
+    vcat(zeros(6), ones(6), zeros(6), ones(6), zeros(3)),  # MerTK
+    vcat(zeros(6), zeros(6), ones(6), zeros(3), ones(6)),
+] # Tyro3
 recpSpecific = [
-    vcat(ones(12), 0, zeros(24), 0.5 * ones(6), zeros(6), 0.5 * ones(6)),  # AXL
-    vcat(zeros(12), 0, ones(12), zeros(12), 0.5 * ones(12), zeros(6)),  # MerTK
-    vcat(zeros(12), 0, zeros(12), ones(12), zeros(6), 0.5 * ones(12)),
+    vcat(recpSpecificC[1], recpSpecificC[1] * internalFrac, 0),  # AXL
+    vcat(recpSpecificC[2], recpSpecificC[2] * internalFrac, 0),  # MerTK
+    vcat(recpSpecificC[3], recpSpecificC[3] * internalFrac, 0),
 ] # Tyro3
 
 
@@ -135,7 +140,7 @@ function compartmentReact(u, du, Gas, dLi, r, cache)
 
     het_module(view(u, 1:6), view(u, 7:12), view(du, 1:6), view(du, 7:12), r.hetR.AM, view(u, 19:21), view(du, 19:21), r, Gas, dLi, cache)
     het_module(view(u, 7:12), view(u, 13:18), view(du, 7:12), view(du, 13:18), r.hetR.MT, view(u, 22:24), view(du, 22:24), r, Gas, dLi, cache)
-    het_module(view(u, 1:12), view(u, 13:18), view(du, 1:12), view(du, 13:18), r.hetR.AT, view(u, 25:27), view(du, 25:27), r, Gas, dLi, cache)
+    het_module(view(u, 1:6), view(u, 13:18), view(du, 1:6), view(du, 13:18), r.hetR.AT, view(u, 25:27), view(du, 25:27), r, Gas, dLi, cache)
 end
 
 

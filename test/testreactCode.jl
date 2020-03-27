@@ -35,7 +35,7 @@ end
     outt = TAMode.getAutocrine(tt)
 
     # Expect no ligand
-    @test outt[13] ≈ 0.0
+    @test outt[end] ≈ 0.0
 
     for i = 1:3
         @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol = 1.0e-5)
