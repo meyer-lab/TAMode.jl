@@ -28,7 +28,6 @@ end
     tt.TAMs[1].expression = 10.0
     tt.TAMs[2].expression = 10.0
     tt.TAMs[3].expression = 10.0
-    tt.kDeg = 1e8
     tt.kRec = 0.0
     tt.internalize = 10.0
 
@@ -38,7 +37,7 @@ end
     @test outt[end] ≈ 0.0
 
     for i = 1:3
-        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total), 1.0, rtol = 1.0e-5)
+        @test isapprox(dot(outt, TAMode.recpSpecific[i] .* TAMode.total .* TAMode.surface), 1.0, rtol = 1.0e-5)
     end
 end
 
