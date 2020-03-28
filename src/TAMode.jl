@@ -67,7 +67,7 @@ function compTAM(tps::AbstractVector{Float64}, params::Union{comprates{T}, Vecto
     end
 
     solInit = getAutocrine(params)
-    u0 = repeat(solInit; outer=[100])
+    u0 = repeat(solInit; outer = [100])
 
     return runTAMinit(tps, params, u0)
 end

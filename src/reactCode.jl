@@ -151,7 +151,7 @@ function TAMreact(du, u, r::Rates, t)
     compartmentReact(view(u, 1:27), view(du, 1:27), r.gasCur, nothing, r, cache)
     compartmentReact(view(u, 28:54), view(du, 28:54), u[end] / internalV, view(du, Nspecies), r, cache)
 
-    for ii in 1:27
+    for ii = 1:27
         if pYc[ii] == 1
             fElse = 1.0
             intRate = r.pYinternalize
