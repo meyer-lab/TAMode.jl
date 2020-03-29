@@ -38,13 +38,26 @@ function TAMreactComp(du::Vector, u::Vector, r::comprates, t)
 
     dx = collect(1:sizze)
     Δ = CenteredDifference(2, 2, dx, sizze, coeff_func = r.diff)
+    Δin = CenteredDifference(2, 2, dx[1:boundary], boundary, coeff_func = r.diff)
+    Δout = CenteredDifference(2, 2, dx[boundary+1:sizze], sizze - boundary, coeff_func = r.diff)
+    bc = Neumann0BC(dx, approximation_order)
+    bcin = Neumann0BC(dx[1:boundary], approximation_order)
+    bcout = Neumann0BC(dx[boundary+1:sizze], approximation_order)
 
-    # TODO: Handle boundary conditions
+    # TODO: Handle boundary flux
     for ii = 1:27
+        duu = @view du[ii:27:end]
+        uu = u[ii:27:end]
+
         if boundLigC[ii] == 0
-            du[ii:27:end] += Δ * u[ii:27:end]
+            duu += (Δ*bc) * uu
         else
-            du[ii:27:end] += Δ * u[ii:27:end]
+            duu[1:boundary] += (Δin*bcin) * uu[1:boundary]
+            duu[(boundary + 1):end] += (Δout*bcout) * uu[(boundary + 1):end]
+
+            fluxx = (uu[boundary + 1] - uu[boundary]) / sizze / sizze * r.diff
+            du[boundary] += fluxx
+            du[boundary + 1] -= fluxx
         end
     end
 end
