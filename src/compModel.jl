@@ -15,25 +15,23 @@ end
 
 function TAMreact(du::Vector, u::Vector, r::comprates, t)
     fill!(du, 0.0)
-    cache = Vector{promote_type(eltype(du), typeof(r.gasCur))}(undef, 10)
 
-    compartmentReact(u, du, r.gasCur, nothing, r, cache)
+    compartmentReact(u, du, r.gasCur, nothing, r)
 end
 
 
 function TAMreactComp(du::Vector, u::Vector, r::comprates, t)
     fill!(du, 0.0)
-    cache = Vector{promote_type(eltype(du), typeof(r.xFwd))}(undef, 10)
 
     sizze = Int(length(u) / 27)
     boundary = Int(floor(sizze / 10))
 
     for ii = 0:boundary
-        compartmentReact(view(u, (27 * ii + 1):(27 * ii + 27)), view(du, (27 * ii + 1):(27 * ii + 27)), r.gasCur * r.gasPart, nothing, r, cache)
+        compartmentReact(view(u, (27 * ii + 1):(27 * ii + 27)), view(du, (27 * ii + 1):(27 * ii + 27)), r.gasCur * r.gasPart, nothing, r)
     end
 
     for ii = boundary:(sizze + 1)
-        compartmentReact(view(u, (27 * ii + 1):(27 * ii + 27)), view(du, (27 * ii + 1):(27 * ii + 27)), r.gasCur, nothing, r, cache)
+        compartmentReact(view(u, (27 * ii + 1):(27 * ii + 27)), view(du, (27 * ii + 1):(27 * ii + 27)), r.gasCur, nothing, r)
     end
 
     dx = collect(1:sizze)
