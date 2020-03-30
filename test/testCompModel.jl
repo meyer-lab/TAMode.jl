@@ -31,7 +31,7 @@ end
 
 	solOut = TAMode.compTAM(tps, pp)
 
-	vv = var(solOut, dims=1)
+	solOut ./= mean(solOut, dims=1) .+ eps()
 
-	@test all(aboutZero.(vv))
+	@test all(aboutZero.(var(solOut, dims=1)))
 end
