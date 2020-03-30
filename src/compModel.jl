@@ -23,7 +23,6 @@ end
 
 function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction=true)
     fill!(du, 0.0)
-    cache = Vector{promote_type(eltype(du), typeof(r.xFwd))}(undef, 10)
 
     sizze = Int(length(u) / 27)
     boundary = Int(floor(sizze / 10))
@@ -37,7 +36,7 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction=true)
             end
 
             idx = (27 * ii + 1):(27 * ii + 27)
-            compartmentReact(view(u, idx), view(du, idx), gass, nothing, r, cache)
+            compartmentReact(view(u, idx), view(du, idx), gass, nothing, r)
         end
     end
 
