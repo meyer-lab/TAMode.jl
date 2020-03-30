@@ -60,34 +60,34 @@ end
 
 
 " Tracks the hetero-receptor interactions between two receptors. "
-function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Gas, dLi, dRr)
-    dRr[1] = tr.xFwd * Rone[3] * Rtwo[3] - hetR.xRev[1] * hetDim[3]
-    dRr[2] = tr.xFwd * Rone[1] * Rtwo[4] - hetR.xRev[2] * hetDim[3]
-    dRr[3] = tr.xFwd * Rone[2] * Rtwo[2] - hetR.xRev[3] * hetDim[3]
-    dRr[4] = tr.xFwd * Rone[4] * Rtwo[1] - hetR.xRev[4] * hetDim[3]
-    dRr[5] = tr.xFwd * Rone[3] * Rtwo[1] - hetR.xRev[5] * hetDim[2]
-    dRr[6] = tr.xFwd * Rone[1] * Rtwo[2] - hetR.xRev[6] * hetDim[2]
-    dRr[7] = tr.xFwd * Rone[2] * Rtwo[1] - hetR.xRev[7] * hetDim[1]
-    dRr[8] = tr.xFwd * Rone[1] * Rtwo[3] - hetR.xRev[8] * hetDim[1]
-    dRr[9] = hetR.xFwd15 * Gas * hetDim[1] - hetR.xRev[9] * hetDim[3]
-    dRr[10] = hetR.xFwd16 * Gas * hetDim[2] - hetR.xRev[10] * hetDim[3]
+function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Gas, dLi)
+    dRr1 = tr.xFwd * Rone[3] * Rtwo[3] - hetR.xRev[1] * hetDim[3]
+    dRr2 = tr.xFwd * Rone[1] * Rtwo[4] - hetR.xRev[2] * hetDim[3]
+    dRr3 = tr.xFwd * Rone[2] * Rtwo[2] - hetR.xRev[3] * hetDim[3]
+    dRr4 = tr.xFwd * Rone[4] * Rtwo[1] - hetR.xRev[4] * hetDim[3]
+    dRr5 = tr.xFwd * Rone[3] * Rtwo[1] - hetR.xRev[5] * hetDim[2]
+    dRr6 = tr.xFwd * Rone[1] * Rtwo[2] - hetR.xRev[6] * hetDim[2]
+    dRr7 = tr.xFwd * Rone[2] * Rtwo[1] - hetR.xRev[7] * hetDim[1]
+    dRr8 = tr.xFwd * Rone[1] * Rtwo[3] - hetR.xRev[8] * hetDim[1]
+    dRr9 = hetR.xFwd15 * Gas * hetDim[1] - hetR.xRev[9] * hetDim[3]
+    dRr10 = hetR.xFwd16 * Gas * hetDim[2] - hetR.xRev[10] * hetDim[3]
 
-    dRone[1] += -dRr[2] - dRr[6] - dRr[8]
-    dRone[2] += -dRr[3] - dRr[7]
-    dRone[3] += -dRr[1] - dRr[5]
-    dRone[4] += -dRr[4]
+    dRone[1] += -dRr2 - dRr6 - dRr8
+    dRone[2] += -dRr3 - dRr7
+    dRone[3] += -dRr1 - dRr5
+    dRone[4] += -dRr4
 
-    dRtwo[1] += -dRr[4] - dRr[5] - dRr[7]
-    dRtwo[2] += -dRr[3] - dRr[6]
-    dRtwo[3] += -dRr[1] - dRr[8]
-    dRtwo[4] += -dRr[2]
+    dRtwo[1] += -dRr4 - dRr5 - dRr7
+    dRtwo[2] += -dRr3 - dRr6
+    dRtwo[3] += -dRr1 - dRr8
+    dRtwo[4] += -dRr2
 
-    dhetDim[1] += dRr[7] + dRr[8] - dRr[9] # AMD1
-    dhetDim[2] += dRr[5] + dRr[6] - dRr[10] # MAD1
-    dhetDim[3] += dRr[1] + dRr[2] + dRr[3] + dRr[4] + dRr[9] + dRr[10] # AMD2
+    dhetDim[1] += dRr7 + dRr8 - dRr9 # AMD1
+    dhetDim[2] += dRr5 + dRr6 - dRr10 # MAD1
+    dhetDim[3] += dRr1 + dRr2 + dRr3 + dRr4 + dRr9 + dRr10 # AMD2
 
     if !(dLi isa Nothing)
-        dLi[1] += -dRr[9] - dRr[10]
+        dLi[1] += -dRr9 - dRr10
     end
 
     nothing
@@ -95,27 +95,27 @@ end
 
 
 " Tracks the individual receptor-ligand interactions within a given receptor. "
-function react_module(R, dR, Gas, dLi, r::TAMrates, tr, dRr)
-    dRr[1] = r.binding[1] * R[1] * Gas - r.binding[2] * R[2]
-    dRr[2] = r.binding[3] * R[1] * Gas - r.binding[4] * R[3]
-    dRr[3] = r.binding[3] * R[2] * Gas - r.binding[4] * R[4]
-    dRr[4] = r.binding[1] * R[3] * Gas - r.binding[2] * R[4]
-    dRr[5] = tr.xFwd * R[1] * R[2] - r.xRev[1] * R[5]
-    dRr[6] = tr.xFwd * R[1] * R[3] - r.xRev[2] * R[5]
-    dRr[7] = tr.xFwd * R[1] * R[4] - r.xRev[3] * R[6]
-    dRr[8] = tr.xFwd * R[2] * R[2] - r.xRev[4] * R[6]
-    dRr[9] = tr.xFwd * R[3] * R[3] - r.xRev[5] * R[6]
-    dRr[10] = r.xFwd6 * Gas * R[5] - r.xRev[6] * R[6]
+function react_module(R, dR, Gas, dLi, r::TAMrates, tr)
+    dRr1 = r.binding[1] * R[1] * Gas - r.binding[2] * R[2]
+    dRr2 = r.binding[3] * R[1] * Gas - r.binding[4] * R[3]
+    dRr3 = r.binding[3] * R[2] * Gas - r.binding[4] * R[4]
+    dRr4 = r.binding[1] * R[3] * Gas - r.binding[2] * R[4]
+    dRr5 = tr.xFwd * R[1] * R[2] - r.xRev[1] * R[5]
+    dRr6 = tr.xFwd * R[1] * R[3] - r.xRev[2] * R[5]
+    dRr7 = tr.xFwd * R[1] * R[4] - r.xRev[3] * R[6]
+    dRr8 = tr.xFwd * R[2] * R[2] - r.xRev[4] * R[6]
+    dRr9 = tr.xFwd * R[3] * R[3] - r.xRev[5] * R[6]
+    dRr10 = r.xFwd6 * Gas * R[5] - r.xRev[6] * R[6]
 
-    dR[1] += -dRr[7] - dRr[6] - dRr[5] - dRr[1] - dRr[2] # AXL
-    dR[2] += -2 * (dRr[8]) - dRr[5] + dRr[1] - dRr[3] # AXLgas1
-    dR[3] += -2 * (dRr[9]) - dRr[6] + dRr[2] - dRr[4] # AXLgas2
-    dR[4] += -dRr[7] + dRr[3] + dRr[4] # AXLgas12
-    dR[5] += -dRr[10] + dRr[6] + dRr[5] # AXLdimer1
-    dR[6] += dRr[10] + dRr[9] + dRr[8] + dRr[7] # AXLdimer2
+    dR[1] += -dRr7 - dRr6 - dRr5 - dRr1 - dRr2 # AXL
+    dR[2] += -2 * (dRr8) - dRr5 + dRr1 - dRr3 # AXLgas1
+    dR[3] += -2 * (dRr9) - dRr6 + dRr2 - dRr4 # AXLgas2
+    dR[4] += -dRr7 + dRr3 + dRr4 # AXLgas12
+    dR[5] += -dRr10 + dRr6 + dRr5 # AXLdimer1
+    dR[6] += dRr10 + dRr9 + dRr8 + dRr7 # AXLdimer2
 
     if !(dLi isa Nothing)
-        dLi[1] += -dRr[10] - dRr[1] - dRr[2] - dRr[3] - dRr[4]
+        dLi[1] += -dRr10 - dRr1 - dRr2 - dRr3 - dRr4
     end
 
     nothing
@@ -123,36 +123,9 @@ end
 
 
 " Handles trafficking of receptor and ligand. "
-function trafFunc(dextR, dintR, intRate, extR, intR, kRec, kDeg, fElse)
-    dextR .+= -extR * intRate + kRec * (1 - fElse) * intR * internalFrac # Endocytosis, recycling
-    dintR .+= extR * intRate / internalFrac - kRec * (1 - fElse) * intR - kDeg * fElse * intR # Endocytosis, recycling, degradation
-end
-
-
-function compartmentReact(u, du, Gas, dLi, r, cache)
-    for (ii, aa) in enumerate((1, 7, 13))
-        dR = view(du, aa:(aa + 5))
-
-        react_module(view(u, aa:(aa + 5)), dR, Gas, dLi, r.TAMs[ii], r, cache)
-
-        dR[1] += r.TAMs[ii].expression
-    end
-
-    het_module(view(u, 1:6), view(u, 7:12), view(du, 1:6), view(du, 7:12), r.hetR.AM, view(u, 19:21), view(du, 19:21), r, Gas, dLi, cache)
-    het_module(view(u, 7:12), view(u, 13:18), view(du, 7:12), view(du, 13:18), r.hetR.MT, view(u, 22:24), view(du, 22:24), r, Gas, dLi, cache)
-    het_module(view(u, 1:6), view(u, 13:18), view(du, 1:6), view(du, 13:18), r.hetR.AT, view(u, 25:27), view(du, 25:27), r, Gas, dLi, cache)
-end
-
-
-function TAMreact(du, u, r::Rates, t)
-    fill!(du, 0.0)
-    cache = Vector{promote_type(eltype(du), typeof(r.xFwd))}(undef, 10)
-
-    compartmentReact(view(u, 1:27), view(du, 1:27), r.gasCur, nothing, r, cache)
-    compartmentReact(view(u, 28:54), view(du, 28:54), u[end] / internalV, view(du, Nspecies), r, cache)
-
-    for ii = 1:27
-        if pYc[ii] == 1
+function trafFunc(du, u, r, pYcIn)
+    for ii = 1:length(pYcIn)
+        if pYcIn[ii] == 1
             fElse = 1.0
             intRate = r.pYinternalize
         else
@@ -160,9 +133,34 @@ function TAMreact(du, u, r::Rates, t)
             intRate = r.internalize
         end
 
-        du[ii] += -u[ii] * intRate + r.kRec * (1.0 - fElse) * u[ii + 27] * internalFrac # Endocytosis, recycling
-        du[ii + 27] += u[ii] * intRate / internalFrac - r.kRec * (1.0 - fElse) * u[ii + 27] - r.kDeg * fElse * u[ii + 27] # ", degradation
+        du[ii] += -u[ii] * intRate + r.kRec * (1.0 - fElse) * u[ii + length(pYcIn)] * internalFrac # Endocytosis, recycling
+        du[ii + length(pYcIn)] += u[ii] * intRate / internalFrac - r.kRec * (1.0 - fElse) * u[ii + length(pYcIn)] - r.kDeg * fElse * u[ii + length(pYcIn)] # ", degradation
     end
+end
+
+
+function compartmentReact(u, du, Gas, dLi, r)
+    for (ii, aa) in enumerate((1, 7, 13))
+        dR = view(du, aa:(aa + 5))
+
+        react_module(view(u, aa:(aa + 5)), dR, Gas, dLi, r.TAMs[ii], r)
+
+        dR[1] += r.TAMs[ii].expression
+    end
+
+    het_module(view(u, 1:6), view(u, 7:12), view(du, 1:6), view(du, 7:12), r.hetR.AM, view(u, 19:21), view(du, 19:21), r, Gas, dLi)
+    het_module(view(u, 7:12), view(u, 13:18), view(du, 7:12), view(du, 13:18), r.hetR.MT, view(u, 22:24), view(du, 22:24), r, Gas, dLi)
+    het_module(view(u, 1:6), view(u, 13:18), view(du, 1:6), view(du, 13:18), r.hetR.AT, view(u, 25:27), view(du, 25:27), r, Gas, dLi)
+end
+
+
+function TAMreact(du, u, r::Rates, t)
+    fill!(du, 0.0)
+
+    compartmentReact(view(u, 1:27), view(du, 1:27), r.gasCur, nothing, r)
+    compartmentReact(view(u, 28:54), view(du, 28:54), u[end] / internalV, view(du, Nspecies), r)
+
+    trafFunc(du, u, r, pYc)
 
     du[end] = -r.kDeg * u[end] # Gas6 degradation
 
