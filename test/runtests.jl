@@ -1,6 +1,7 @@
 using Test
 using Profile
 using TAMode
+using OrdinaryDiffEq
 using LinearAlgebra
 using ForwardDiff
 using Turing
