@@ -17,7 +17,7 @@ include("compModel.jl")
 include("BLI.jl")
 
 
-const solTol = 1.0e-8
+const solTol = 1.0e-9
 
 function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
