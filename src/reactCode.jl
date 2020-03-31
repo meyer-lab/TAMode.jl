@@ -134,7 +134,8 @@ function trafFunc(du, u, r, pYcIn)
         end
 
         du[ii] += -u[ii] * intRate + r.kRec * (1.0 - fElse) * u[ii + length(pYcIn)] * internalFrac # Endocytosis, recycling
-        du[ii + length(pYcIn)] += u[ii] * intRate / internalFrac - r.kRec * (1.0 - fElse) * u[ii + length(pYcIn)] - r.kDeg * fElse * u[ii + length(pYcIn)] # ", degradation
+        du[ii + length(pYcIn)] +=
+            u[ii] * intRate / internalFrac - r.kRec * (1.0 - fElse) * u[ii + length(pYcIn)] - r.kDeg * fElse * u[ii + length(pYcIn)] # ", degradation
     end
 end
 
