@@ -9,14 +9,14 @@ end
 
 
 @testset "In the absence of a reaction we just see diffusion." begin
-	solInit = zeros(2700)
-	solInit[1] = 1000.0
+    solInit = zeros(2700)
+    solInit[1] = 1000.0
 
-	pp = TAMode.compParamm(CompParams)
+    pp = TAMode.compParamm(CompParams)
 
-	function func(du, u, r, t)
-		TAMode.TAMreact(du, u, r, t, reaction=false)
-	end
+    function func(du, u, r, t)
+        TAMode.TAMreact(du, u, r, t, reaction = false)
+    end
 
     prob = ODEProblem(func, solInit, maximum(tps), pp)
     solut = solve(prob, AutoTsit5(Rodas5()); saveat = tps).u
@@ -26,12 +26,12 @@ end
 
 
 @testset "With no ligand nothing changes." begin
-	pp = copy(CompParams)
-	pp[3] = 0.0
+    pp = copy(CompParams)
+    pp[3] = 0.0
 
-	solOut = TAMode.compTAM(tps, pp)
+    solOut = TAMode.compTAM(tps, pp)
 
-	solOut ./= mean(solOut, dims=1) .+ eps()
+    solOut ./= mean(solOut, dims = 1) .+ eps()
 
-	@test all(aboutZero.(var(solOut, dims=1)))
+    @test all(aboutZero.(var(solOut, dims = 1)))
 end

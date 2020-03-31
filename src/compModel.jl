@@ -21,7 +21,7 @@ function getDiffOp(dx, D)
 end
 
 
-function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction=true)
+function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
     fill!(du, 0.0)
 
     sizze = Int(length(u) / 27)
@@ -54,15 +54,15 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction=true)
         duu = @view du[ii:27:end]
         uu = u[ii:27:end]
 
-    #    if boundLigC[ii] == 0
-    #        duu += bc * uu
-    #    else
-    #        duu[1:boundary] += bcin * uu[1:boundary]
-    #        duu[(boundary + 1):end] += bcout * uu[(boundary + 1):end]
+        #    if boundLigC[ii] == 0
+        #        duu += bc * uu
+        #    else
+        #        duu[1:boundary] += bcin * uu[1:boundary]
+        #        duu[(boundary + 1):end] += bcout * uu[(boundary + 1):end]
 
-    #        fluxx = (uu[boundary + 1] - uu[boundary]) / sizze / sizze * r.diff
-    #        du[boundary] += fluxx
-    #        du[boundary + 1] -= fluxx
-    #    end
+        #        fluxx = (uu[boundary + 1] - uu[boundary]) / sizze / sizze * r.diff
+        #        du[boundary] += fluxx
+        #        du[boundary + 1] -= fluxx
+        #    end
     end
 end
