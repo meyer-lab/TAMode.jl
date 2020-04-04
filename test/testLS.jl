@@ -56,7 +56,7 @@
 
         uLong = TAMode.getAutocrine(tt)
         dnorm = zeros(30)
-        TAMode.TAMreactLS(dnorm, uLong, tt, 0.0)
+        TAMode.TAMreact(dnorm, uLong, tt, 0.0)
         @test norm(dnorm) .< 0.001
     end
 end
