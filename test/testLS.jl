@@ -54,9 +54,9 @@
     @testset "LS: Ensure that system reaches equilibrium." begin
         tt = TAMode.Lsparam(fill(0.2, 9))
 
-        uLong = TAMode.getAutocrine(tt, TAMode.TAMreactLS, 30)
+        uLong = TAMode.getAutocrine(tt)
         dnorm = zeros(30)
         TAMode.TAMreactLS(dnorm, uLong, tt, 0.0)
-        @test norm(dnorm) .< 0.01
+        @test norm(dnorm) .< 0.001
     end
 end
