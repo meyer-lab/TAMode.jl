@@ -4,8 +4,9 @@ function importData(cond)
     df = CSV.read(filepath)
     conc = df[1, 2:end]
     tps = df[5:end, 1]
-    measVal = df[5:end, 2:end]
-    return parse.(Float64, Array(conc)), parse.(Float64, tps), parse.(Float64, Matrix(measVal))
+    measVal = parse.(Float64, Matrix(df[5:end, 2:end]))
+    measVal .-= minimum(measVal, dims=2)
+    return parse.(Float64, Array(conc)), parse.(Float64, tps), measVal
 end
 
 
@@ -26,8 +27,8 @@ end
 
 
 @model BLI(tps, conc, bindData, ::Type{TV} = Vector{Float64}) where {TV} = begin
-    Kon ~ LogNormal(6.0, 0.5)
-    Kdis ~ LogNormal(1.0, 1.0)
+    Kon ~ LogNormal(9.0, 1.0)
+    Kdis ~ LogNormal(-1.0, 1.0)
     Rmax ~ LogNormal(-1.0, 0.1)
     stdev = 0.03
 
