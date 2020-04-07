@@ -1,13 +1,5 @@
 function importData(cond)
-    if cond == :T1
-        condPath = "T1-010820.csv"
-    elseif cond == :T2
-        condPath = "T2-010820.csv"
-    elseif cond == :TFL
-        condPath = "TFL-010820.csv"
-    end
-
-    filepath = joinpath(dirname(pathof(TAMode)), "..", "data", condPath)
+    filepath = joinpath(dirname(pathof(TAMode)), "..", "data", cond)
 
     df = CSV.read(filepath)
     conc = df[1, 2:end]
@@ -18,16 +10,18 @@ end
 
 
 " The actual binding model calculation. This assumes a single site. "
-function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, conc::Real)
+function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, conc::Vector)::Matrix
     Tshift = tps[1] + 599.9
     tBind = tps[tps .< Tshift] .- tps[1]
     tUnbind = tps[tps .> Tshift] .- Tshift
+    KD = Kdis / Kon
+    conc = reshape(conc, (1, :))
+    concOnes = ones(size(conc))
 
-    bind_step = conc ./ (Kdis ./ Kon + conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* tBind))))
-    unbind_step = bind_step[end] .* exp.(-Kdis .* tUnbind)
-    theor_bind = vcat(bind_step[:], unbind_step)
+    bind_step = conc ./ (KD .+ conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* tBind))))
+    unbind_step = concOnes .* bind_step[end] .* exp.(-Kdis .* tUnbind) # one(conc) is to broadcast shape
 
-    return theor_bind
+    return vcat(bind_step, unbind_step)
 end
 
 
@@ -37,25 +31,16 @@ end
     Rmax ~ LogNormal(-1.0, 0.1)
     stdev = 0.03
 
-    resid_save = Matrix{typeof(Kon)}(undef, length(tps), length(conc))
-    for i = 1:length(conc)
-        resid_save[:, i] .= bindingCalc(tps, Kon, Kdis, conc[i])
-    end
+    resid_save = bindingCalc(tps, Kon, Kdis, conc)
 
     residNorm = norm(bindData - resid_save * Rmax) / stdev
     residNorm ~ Chisq(length(bindData))
 end
 
 
-function buildModel(pathIn)
-    conc, tps, bindData = TAMode.importData(pathIn)
-
-    return BLI(tps, conc, Matrix(bindData))
-end
-
-
 function sampleModel(pathIn; testt=false)
-    model = buildModel(pathIn)
+    conc, tps, bindData = TAMode.importData(pathIn)
+    model = BLI(tps, conc, Matrix(bindData))
 
     if testt
         return sample(model, HMC(0.001, 4), 5)

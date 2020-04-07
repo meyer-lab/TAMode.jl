@@ -1,3 +1,3 @@
 @testset "Test BLI sampling." begin
-	samp = sampleModel(:T1, testt=true)
+	samp = TAMode.sampleModel("T1-010820.csv", testt=true)
 end
