@@ -1,58 +1,51 @@
-gas6_T1 = "../data/T1-010820.csv"
-gas6_T2 = "../data/T2-010820.csv"
-gas6_TFL = "../data/TFL-010820.csv"
-
-
-""" Calculation for binding step. """
-function R1Calc(conc::Real, Kon::Real, Kdis::Real, tps)
-    return conc ./ (Kdis ./ Kon + conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* tps))))
-end
-
-
-""" Calculation for unbinding step. """
-function R2Calc(R::Real, Kdis::Real, tps)
-    return R .* exp.(-Kdis .* tps)
-end
-
-
 function importData(cond)
-    df = CSV.read(cond)
+    filepath = joinpath(dirname(pathof(TAMode)), "..", "data", cond)
+
+    df = CSV.read(filepath)
     conc = df[1, 2:end]
     tps = df[5:end, 1]
-    measVal = df[5:end, 2:end]
-    return parse.(Float64, Array(conc)), parse.(Float64, tps), parse.(Float64, Matrix(measVal))
+    measVal = parse.(Float64, Matrix(df[5:end, 2:end]))
+    measVal .-= minimum(measVal, dims=2)
+    return parse.(Float64, Array(conc)), parse.(Float64, tps), measVal
 end
 
 
-function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, Rmax::Real, conc::Real)
+" The actual binding model calculation. This assumes a single site. "
+function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, conc::Vector)::Matrix
     Tshift = tps[1] + 599.9
     tBind = tps[tps .< Tshift] .- tps[1]
     tUnbind = tps[tps .> Tshift] .- Tshift
+    KD = Kdis / Kon
+    conc = reshape(conc, (1, :))
 
-    bind_step = R1Calc(conc, Kon, Kdis, tBind)
-    unbind_step = R2Calc(bind_step[end], Kdis, tUnbind)
-    theor_bind = vcat(bind_step[:], unbind_step) * Rmax
+    bind_step = conc ./ (KD .+ conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* tBind))))
+    bind_end = conc ./ (KD .+ conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* 599.9))))
+    unbind_step = bind_end .* exp.(-Kdis .* tUnbind)
 
-    return theor_bind
+    return vcat(bind_step, unbind_step)
 end
 
 
-@model BLI(tps, conc, bindData) = begin
-    Kon ~ LogNormal(6.0, 0.5)
-    Kdis ~ LogNormal(1.0, 1.0)
+@model BLI(tps, conc, bindData, ::Type{TV} = Vector{Float64}) where {TV} = begin
+    Kon ~ LogNormal(9.0, 1.0)
+    Kdis ~ LogNormal(-1.0, 1.0)
     Rmax ~ LogNormal(-1.0, 0.1)
+    stdev = 0.03
 
-    resid_save = []
+    resid_save = bindingCalc(tps, Kon, Kdis, conc)
 
-    for i = 1:(length(conc) - 1)
-        theor_bind = bindingCalc(tps, Kon, Kdis, Rmax, conc[i])
+    residNorm = norm(bindData - resid_save * Rmax) / stdev
+    residNorm ~ Chisq(length(bindData))
+end
 
-        if i == 1
-            resid_save = bindData[:, i] .- theor_bind
-        else
-            resid_save = vcat(resid_save, bindData[:, i] .- theor_bind)
-        end
+
+function sampleModel(pathIn; testt=false)
+    conc, tps, bindData = TAMode.importData(pathIn)
+    model = BLI(tps, conc, Matrix(bindData))
+
+    if testt
+        return sample(model, HMC(0.001, 4), 5)
     end
 
-    resid_save ~ MvNormal(zeros(length(resid_save)), ones(length(resid_save)) * std(resid_save))
+    return sample(model, NUTS(), 500)
 end
