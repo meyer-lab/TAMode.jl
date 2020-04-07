@@ -1,16 +1,3 @@
-
-""" Calculation for binding step. """
-function R1Calc(conc::Real, Kon::Real, Kdis::Real, tps)
-    return conc ./ (Kdis ./ Kon + conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* tps))))
-end
-
-
-""" Calculation for unbinding step. """
-function R2Calc(R::Real, Kdis::Real, tps)
-    return R .* exp.(-Kdis .* tps)
-end
-
-
 function importData(cond)
     if cond == :T1
         condPath = "T1-010820.csv"
@@ -20,9 +7,9 @@ function importData(cond)
         condPath = "TFL-010820.csv"
     end
 
-    joinpath(dirname(pathof(TAMode)), "data", condPath)
+    filepath = joinpath(dirname(pathof(TAMode)), "..", "data", condPath)
 
-    df = CSV.read(cond)
+    df = CSV.read(filepath)
     conc = df[1, 2:end]
     tps = df[5:end, 1]
     measVal = df[5:end, 2:end]
@@ -30,14 +17,15 @@ function importData(cond)
 end
 
 
-function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, Rmax::Real, conc::Real)
+" The actual binding model calculation. This assumes a single site. "
+function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, conc::Real)
     Tshift = tps[1] + 599.9
     tBind = tps[tps .< Tshift] .- tps[1]
     tUnbind = tps[tps .> Tshift] .- Tshift
 
-    bind_step = R1Calc(conc, Kon, Kdis, tBind)
-    unbind_step = R2Calc(bind_step[end], Kdis, tUnbind)
-    theor_bind = vcat(bind_step[:], unbind_step) * Rmax
+    bind_step = conc ./ (Kdis ./ Kon + conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* tBind))))
+    unbind_step = bind_step[end] .* exp.(-Kdis .* tUnbind)
+    theor_bind = vcat(bind_step[:], unbind_step)
 
     return theor_bind
 end
@@ -47,20 +35,15 @@ end
     Kon ~ LogNormal(6.0, 0.5)
     Kdis ~ LogNormal(1.0, 1.0)
     Rmax ~ LogNormal(-1.0, 0.1)
+    stdev = 0.03
 
-    resid_save = []
-
-    for i = 1:(length(conc) - 1)
-        theor_bind = bindingCalc(tps, Kon, Kdis, Rmax, conc[i])
-
-        if i == 1
-            resid_save = bindData[:, i] .- theor_bind
-        else
-            resid_save = vcat(resid_save, bindData[:, i] .- theor_bind)
-        end
+    resid_save = Matrix{typeof(Kon)}(undef, length(tps), length(conc))
+    for i = 1:length(conc)
+        resid_save[:, i] .= bindingCalc(tps, Kon, Kdis, conc[i])
     end
 
-    resid_save ~ MvNormal(zeros(length(resid_save)), ones(length(resid_save)) * std(resid_save))
+    residNorm = norm(bindData - resid_save * Rmax) / stdev
+    residNorm ~ Chisq(length(bindData))
 end
 
 
