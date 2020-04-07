@@ -50,4 +50,13 @@
         reduce = TAMode.surfaceLS .* TAMode.totalLS
         @test isapprox(dot(firstSurf, reduce), dot(secondSurf, reduce), rtol = 1.0e-5)
     end
+
+    @testset "LS: Ensure that system reaches equilibrium." begin
+        tt = TAMode.Lsparam(fill(0.2, 9))
+
+        uLong = TAMode.getAutocrine(tt)
+        dnorm = zeros(30)
+        TAMode.TAMreact(dnorm, uLong, tt, 0.0)
+        @test norm(dnorm) .< 0.001
+    end
 end
