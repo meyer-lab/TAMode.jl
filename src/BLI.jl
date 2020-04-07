@@ -18,7 +18,7 @@ function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, conc::Vector)::Matrix
     conc = reshape(conc, (1, :))
 
     bind_step = conc ./ (KD .+ conc) .* (1 .- (1 ./ (exp.((Kon .* conc .+ Kdis) .* tBind))))
-    unbind_step = bind_step[end, :] .* exp.(-Kdis .* tUnbind) # one(conc) is to broadcast shape
+    unbind_step = bind_step[:, end] .* exp.(-Kdis .* tUnbind)
 
     return vcat(bind_step, unbind_step)
 end
