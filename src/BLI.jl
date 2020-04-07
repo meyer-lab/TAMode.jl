@@ -1,7 +1,3 @@
-gas6_T1 = "../data/T1-010820.csv"
-gas6_T2 = "../data/T2-010820.csv"
-gas6_TFL = "../data/TFL-010820.csv"
-
 
 """ Calculation for binding step. """
 function R1Calc(conc::Real, Kon::Real, Kdis::Real, tps)
@@ -16,6 +12,16 @@ end
 
 
 function importData(cond)
+    if cond == :T1
+        condPath = "T1-010820.csv"
+    elseif cond == :T2
+        condPath = "T2-010820.csv"
+    elseif cond == :TFL
+        condPath = "TFL-010820.csv"
+    end
+
+    joinpath(dirname(pathof(TAMode)), "data", condPath)
+
     df = CSV.read(cond)
     conc = df[1, 2:end]
     tps = df[5:end, 1]
@@ -37,7 +43,7 @@ function bindingCalc(tps::Vector, Kon::Real, Kdis::Real, Rmax::Real, conc::Real)
 end
 
 
-@model BLI(tps, conc, bindData) = begin
+@model BLI(tps, conc, bindData, ::Type{TV} = Vector{Float64}) where {TV} = begin
     Kon ~ LogNormal(6.0, 0.5)
     Kdis ~ LogNormal(1.0, 1.0)
     Rmax ~ LogNormal(-1.0, 0.1)
@@ -55,4 +61,22 @@ end
     end
 
     resid_save ~ MvNormal(zeros(length(resid_save)), ones(length(resid_save)) * std(resid_save))
+end
+
+
+function buildModel(pathIn)
+    conc, tps, bindData = TAMode.importData(pathIn)
+
+    return BLI(tps, conc, Matrix(bindData))
+end
+
+
+function sampleModel(pathIn; testt=false)
+    model = buildModel(pathIn)
+
+    if testt
+        return sample(model, HMC(0.001, 4), 5)
+    end
+
+    return sample(model, NUTS(), 500)
 end
