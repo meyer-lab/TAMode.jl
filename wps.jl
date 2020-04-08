@@ -16,8 +16,8 @@ setups = [
     Dict(:alg => Ros4LStab()),
     Dict(:alg => Rodas5()),
     Dict(:alg => Rosenbrock23()), # slow
-    Dict(:alg => TRBDF2(autodiff=false, linsolve=LinSolveGMRES())), # slow
-    Dict(:alg => ABDF2(autodiff=false, linsolve=LinSolveGMRES())), # slow
+    Dict(:alg => TRBDF2(autodiff = false, linsolve = LinSolveGMRES())), # slow
+    Dict(:alg => ABDF2(autodiff = false, linsolve = LinSolveGMRES())), # slow
     # Dict(:alg => Exprb43()), # slow
     # Dict(:alg => Exprb32()), # slow
 ]
