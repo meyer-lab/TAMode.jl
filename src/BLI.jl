@@ -5,7 +5,7 @@ function importData(cond)
     conc = df[1, 2:end]
     tps = df[5:end, 1]
     measVal = parse.(Float64, Matrix(df[5:end, 2:end]))
-    measVal .-= minimum(measVal, dims=2)
+    measVal .-= minimum(measVal, dims = 2)
     return parse.(Float64, Array(conc)), parse.(Float64, tps), measVal
 end
 
@@ -39,7 +39,7 @@ end
 end
 
 
-function sampleModel(pathIn; testt=false)
+function sampleModel(pathIn; testt = false)
     conc, tps, bindData = TAMode.importData(pathIn)
     model = BLI(tps, conc, Matrix(bindData))
 
