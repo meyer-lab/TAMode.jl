@@ -2,7 +2,6 @@ module TAMode
 
 using OrdinaryDiffEq
 using StaticArrays
-using SteadyStateDiffEq
 using LinearAlgebra
 import LabelledArrays
 using Turing
@@ -33,10 +32,10 @@ function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector
         N = 30
     end
 
-    probInit = SteadyStateProblem(TAMreact, zeros(T, N), params)
+    probInit = ODEProblem(TAMreact, zeros(T, N), 1.0e6, params)
 
     sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
-    return solve(probInit, DynamicSS(sol); options...).u
+    return solve(probInit, sol; saveat = [1.0e6], options...).u
 end
 
 
