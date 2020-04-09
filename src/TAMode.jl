@@ -6,7 +6,6 @@ using SteadyStateDiffEq
 using LinearAlgebra
 import LabelledArrays
 using Turing
-import CSV
 import Statistics
 using DiffEqOperators
 
@@ -14,7 +13,6 @@ include("types.jl")
 include("reactCode.jl")
 include("bothLigands.jl")
 include("compModel.jl")
-include("BLI.jl")
 
 
 const solTol = 1.0e-9
