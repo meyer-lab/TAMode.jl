@@ -12,8 +12,8 @@ mutable struct hetRates{T}
 end
 
 
-TAMsType{T} = @LabelledArrays.SLVector TAMrates{T} (:Axl, :MerTK, :Tyro3)
-hetRType{T} = @LabelledArrays.SLVector hetRates{T} (:AM, :MT, :AT)
+TAMsType{T} = LabelledArrays.@SLVector TAMrates{T} (:Axl, :MerTK, :Tyro3)
+hetRType{T} = LabelledArrays.@SLVector hetRates{T} (:AM, :MT, :AT)
 
 
 mutable struct Rates{T}
