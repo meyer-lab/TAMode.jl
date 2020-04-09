@@ -32,17 +32,13 @@ function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector
         N = 30
     end
 
-    probInit = ODEProblem(TAMreact, zeros(T, N), (0.0, 1.0e6), params)
-
-    sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
-    return solve(probInit, sol; saveat = [1.0e6], options...).u
+    return vec(runTAMinit([1.0e6, ], params, zeros(T, N)))
 end
 
 
-function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, solInit::Vector)::Matrix{T} where {T <: Real}
+function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, solInit::Vector{T})::Matrix{T} where {T <: Real}
     @assert all(x -> x >= 0.0, tps)
 
-    solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAMreact, solInit, maximum(tps), params)
 
     sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
