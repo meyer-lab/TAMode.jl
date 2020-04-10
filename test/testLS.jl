@@ -59,4 +59,14 @@
         TAMode.TAMreact(dnorm, uLong, tt, 0.0)
         @test norm(dnorm) .< 0.001
     end
+    
+    @testset "LS: Test that if no ligand is present, we don’t see any." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (0, 0)
+
+        data = TAMode.runTAM(tps, rr, (0, 0))
+
+        @test all(data * TAMode.totalLS .≈ 0)
+        @test all(data * TAMode.surfaceLS .≈ 0)
+    end
 end
