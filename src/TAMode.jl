@@ -32,7 +32,7 @@ function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector
         N = 30
     end
 
-    return vec(runTAMinit([1.0e6, ], params, zeros(T, N)))
+    return vec(runTAMinit([1.0e6], params, zeros(T, N)))
 end
 
 
