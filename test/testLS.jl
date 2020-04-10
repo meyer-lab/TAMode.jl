@@ -60,13 +60,30 @@
         @test norm(dnorm) .< 0.001
     end
     
-    @testset "LS: Test that if no ligand is present, we don’t see any." begin
+    @testset "LS: Test that if no Gas6 is present, we don’t see any." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (0, 0)
+
+        data = TAMode.runTAM(tps, rr, (0, 10))
+
+        @test all(data * TAMode.GasLS .≈ 0)
+    end
+    
+    @testset "LS: Test that if no Protein S is present, we don’t see any." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (0, 0)
+
+        data = TAMode.runTAM(tps, rr, (10, 0))
+
+        @test all(data * TAMode.PROSLS .≈ 0)
+    end
+    
+    @testset "LS: Test that if no ligand is present, we don’t see any pY." begin
         rr = TAMode.Lsparam(fill(0.2, 9))
         rr.curL = (0, 0)
 
         data = TAMode.runTAM(tps, rr, (0, 0))
 
-        @test all(data * TAMode.totalLS .≈ 0)
-        @test all(data * TAMode.surfaceLS .≈ 0)
+        @test all(data * TAMode.pYLS .≈ 0)
     end
 end
