@@ -59,4 +59,14 @@
         TAMode.TAMreact(dnorm, uLong, tt, 0.0)
         @test norm(dnorm) .< 0.001
     end
+    
+    @testset "If there's no ligand, we should see no pY receptor." begin
+        rr = TAMode.Lsparam(fill(0.2,9))
+        rr.curL = (0,0)
+    
+        data = TAMode.runTAM(tps, rr, (0,0))
+    
+        @test all(data * TAMode.pYcLS.≈ 0)
+        
+    end
 end
