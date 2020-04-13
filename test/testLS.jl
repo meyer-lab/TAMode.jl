@@ -66,7 +66,7 @@
 
         data = TAMode.runTAM(tps, rr, (0.0, 10.0))
 
-        @test aboutZero.(data * TAMode.GasLS)
+        @test all(aboutZero.(data * TAMode.GasLS))
     end
     
     @testset "LS: Test that if no Protein S is present, we don’t see any." begin
@@ -75,7 +75,7 @@
 
         data = TAMode.runTAM(tps, rr, (10.0, 0.0))
 
-        @test aboutZero.(data * TAMode.PROSLS)
+        @test all(aboutZero.(data * TAMode.PROSLS))
     end
     
     @testset "LS: Test that if no ligand is present, we don’t see any pY." begin
@@ -84,6 +84,6 @@
 
         data = TAMode.runTAM(tps, rr, (0.0, 0.0))
 
-        @test aboutZero.(data * TAMode.pYLS)
+        @test all(aboutZero.(data * TAMode.pYLS))
     end
 end
