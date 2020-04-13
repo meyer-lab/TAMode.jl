@@ -66,7 +66,7 @@
     
         data = TAMode.runTAM(tps, rr, (0,0))
     
-        @test all(data * TAMode.pYcLS.≈ 0)
-        
+        @test all(data * TAMode.pYLS.≈ 0)
+        @test all(data* TAMode.boundLig.≈0)
     end
 end

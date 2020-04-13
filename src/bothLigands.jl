@@ -106,6 +106,7 @@ surfaceLS = vcat(ones(14), zeros(16))
 pYcLS = vcat(zeros(9), ones(5))
 GascLS = vcat(0, ones(2), zeros(2), 2, 1, 0, 1, 2, 1, zeros(2), 1)
 PROScLS = vcat(zeros(3), ones(2), 0, 1, 2, 1, zeros(2), 1, 2, 1)
+pYLS = vcat(pYcLS, pYcLS, zeros(2))
 
 
 function TAMreact(dR, R, tr::Lsrates, t)
