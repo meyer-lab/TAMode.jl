@@ -7,6 +7,7 @@ import LabelledArrays
 using Turing
 import Statistics
 using DiffEqOperators
+using ModelingToolkit
 
 include("types.jl")
 include("reactCode.jl")
