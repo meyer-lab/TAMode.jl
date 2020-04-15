@@ -21,8 +21,6 @@ function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
 end
 
-const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => domainDef])
-
 
 function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector{T} where {T <: Real}
     if params isa Rates
@@ -43,7 +41,7 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
     prob = ODEProblem(TAMreact, solInit, maximum(tps), params)
 
     sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
-    solut = solve(prob, sol; saveat = tps, options...).u
+    solut = solve(prob, sol; saveat = tps, reltol = solTol, isoutofdomain = domainDef).u
 
     if length(tps) > 1
         solut = vcat(transpose.(solut)...)
