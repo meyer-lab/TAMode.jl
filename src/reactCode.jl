@@ -95,30 +95,8 @@ end
 
 
 " Tracks the individual receptor-ligand interactions within a given receptor. "
-function react_module(R, dR, Gas, dLi, r::TAMrates, tr)
-    dRr1 = r.binding[1] * R[1] * Gas - r.binding[2] * R[2]
-    dRr2 = r.binding[3] * R[1] * Gas - r.binding[4] * R[3]
-    dRr3 = r.binding[3] * R[2] * Gas - r.binding[4] * R[4]
-    dRr4 = r.binding[1] * R[3] * Gas - r.binding[2] * R[4]
-    dRr5 = tr.xFwd * R[1] * R[2] - r.xRev[1] * R[5]
-    dRr6 = tr.xFwd * R[1] * R[3] - r.xRev[2] * R[5]
-    dRr7 = tr.xFwd * R[1] * R[4] - r.xRev[3] * R[6]
-    dRr8 = tr.xFwd * R[2] * R[2] - r.xRev[4] * R[6]
-    dRr9 = tr.xFwd * R[3] * R[3] - r.xRev[5] * R[6]
-    dRr10 = r.xFwd6 * Gas * R[5] - r.xRev[6] * R[6]
-
-    dR[1] += -dRr7 - dRr6 - dRr5 - dRr1 - dRr2 # AXL
-    dR[2] += -2 * (dRr8) - dRr5 + dRr1 - dRr3 # AXLgas1
-    dR[3] += -2 * (dRr9) - dRr6 + dRr2 - dRr4 # AXLgas2
-    dR[4] += -dRr7 + dRr3 + dRr4 # AXLgas12
-    dR[5] += -dRr10 + dRr6 + dRr5 # AXLdimer1
-    dR[6] += dRr10 + dRr9 + dRr8 + dRr7 # AXLdimer2
-
-    if !(dLi isa Nothing)
-        dLi[1] += -dRr10 - dRr1 - dRr2 - dRr3 - dRr4
-    end
-
-    nothing
+function react_module(R, dR, Gas, dLi, r::TAMrates, xFwd::Real)
+    return nothing
 end
 
 
@@ -143,8 +121,29 @@ end
 function compartmentReact(u, du, Gas, dLi, r)
     for (ii, aa) in enumerate((1, 7, 13))
         dR = view(du, aa:(aa + 5))
+        R = view(u, aa:(aa + 5))
 
-        react_module(view(u, aa:(aa + 5)), dR, Gas, dLi, r.TAMs[ii], r)
+        dRr1 = r.TAMs[ii].binding[1] * R[1] * Gas - r.TAMs[ii].binding[2] * R[2]
+        dRr2 = r.TAMs[ii].binding[3] * R[1] * Gas - r.TAMs[ii].binding[4] * R[3]
+        dRr3 = r.TAMs[ii].binding[3] * R[2] * Gas - r.TAMs[ii].binding[4] * R[4]
+        dRr4 = r.TAMs[ii].binding[1] * R[3] * Gas - r.TAMs[ii].binding[2] * R[4]
+        dRr5 = r.xFwd * R[1] * R[2] - r.TAMs[ii].xRev[1] * R[5]
+        dRr6 = r.xFwd * R[1] * R[3] - r.TAMs[ii].xRev[2] * R[5]
+        dRr7 = r.xFwd * R[1] * R[4] - r.TAMs[ii].xRev[3] * R[6]
+        dRr8 = r.xFwd * R[2] * R[2] - r.TAMs[ii].xRev[4] * R[6]
+        dRr9 = r.xFwd * R[3] * R[3] - r.TAMs[ii].xRev[5] * R[6]
+        dRr10 = r.TAMs[ii].xFwd6 * Gas * R[5] - r.TAMs[ii].xRev[6] * R[6]
+
+        dR[1] += -dRr7 - dRr6 - dRr5 - dRr1 - dRr2 # AXL
+        dR[2] += -2 * (dRr8) - dRr5 + dRr1 - dRr3 # AXLgas1
+        dR[3] += -2 * (dRr9) - dRr6 + dRr2 - dRr4 # AXLgas2
+        dR[4] += -dRr7 + dRr3 + dRr4 # AXLgas12
+        dR[5] += -dRr10 + dRr6 + dRr5 # AXLdimer1
+        dR[6] += dRr10 + dRr9 + dRr8 + dRr7 # AXLdimer2
+
+        if !(dLi isa Nothing)
+            dLi[1] += -dRr10 - dRr1 - dRr2 - dRr3 - dRr4
+        end
 
         dR[1] += r.TAMs[ii].expression
     end
