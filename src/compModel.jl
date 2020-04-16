@@ -1,5 +1,4 @@
 const fraction = 0.1 # Fraction of the cell surface with PS
-const apprx_ord = 2
 
 
 " Setup the parameters for the full TAM receptor model. "
@@ -15,8 +14,8 @@ end
 
 
 function getDiffOp(dx, D)
-    Δ = CenteredDifference(1, apprx_ord, dx, length(dx) - 1, D)
-    return Δ * Neumann0BC(dx, apprx_ord)
+    Δ = CenteredDifference(1, 2, dx, length(dx) - 1, D)
+    return Δ * Neumann0BC(dx, 1)
 end
 
 
@@ -44,7 +43,7 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
         return nothing
     end
 
-    dx = 1.0 ./ collect(1:(sizze + 1))
+    dx = Float64.(collect(1:(sizze + 1)))
     bc = getDiffOp(dx, r.diff)
     bcin = getDiffOp(dx[1:(boundary + 1)], r.diff)
     bcout = getDiffOp(dx[boundary:sizze], r.diff)
