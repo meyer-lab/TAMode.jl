@@ -1,4 +1,7 @@
 const fraction = 0.1 # Fraction of the cell surface with PS
+const compSize = 100
+const boundary = 10
+const compDX = compSize * Float64.(collect(1:(compSize + 1)))
 
 
 " Setup the parameters for the full TAM receptor model. "
@@ -13,41 +16,39 @@ function compParamm(params::Vector{T})::comprates{T} where {T}
 end
 
 
-function getDiffOp(dx, D)
-    Δ = CenteredDifference(1, 2, dx, length(dx) - 1, D)
-    return Δ * Neumann0BC(dx)
+function getDiffOp(dx::Vector{Float64})
+    Δ = CenteredDifference(1, 2, dx, length(dx) - 1)
+    return Δ * Neumann0BC(dx, 2)
 end
+
+const bc = getDiffOp(compDX)
+const bcin = getDiffOp(compDX[1:(boundary + 1)])
+const bcout = getDiffOp(compDX[boundary:compSize])
 
 
 function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
-    fill!(du, 0.0)
-
-    sizze = Int(length(u) / 27)
-    boundary = Int(floor(sizze / 10))
-
     # If we're dealing with the PDE form
     if length(du) > 100
-        dx = Float64.(collect(1:(sizze + 1)))
-        bc = getDiffOp(dx, r.diff)
-        bcin = getDiffOp(dx[1:(boundary + 1)], r.diff)
-        bcout = getDiffOp(dx[boundary:sizze], r.diff)
-
-        @views for ii = 1:27
-            duu = du[ii:27:end]
+        for ii = 1:27
+            duu = view(du, ii:27:length(du))
             uu = u[ii:27:end]
     
             if boundLigC[ii] == 0
                 mul!(duu, bc, uu)
             else
-                mul!(duu[1:boundary], bcin, uu[1:boundary])
-                mul!(duu[(boundary + 1):end], bcout, uu[(boundary + 1):end])
+                mul!(view(duu, 1:boundary), bcin, uu[1:boundary])
+                mul!(view(duu, (boundary + 1):length(duu)), bcout, uu[(boundary + 1):end])
                 # TODO: Implement one-way flux across boundary
             end
         end
+
+        rmul!(du, r.diff)
+    else
+        fill!(du, 0.0)
     end
 
     if reaction
-        for ii = 0:(sizze - 1)
+        for ii = 0:(Int(length(u) / 27) - 1)
             if ii < boundary
                 gass = r.gasCur * r.gasPart
             else
@@ -58,5 +59,4 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
             compartmentReact(view(u, idx), view(du, idx), gass, nothing, r)
         end
     end
-
 end
