@@ -15,7 +15,7 @@ end
 
 function getDiffOp(dx, D)
     Δ = CenteredDifference(1, 2, dx, length(dx) - 1, D)
-    return Δ * Neumann0BC(dx, 1)
+    return Δ * Neumann0BC(dx)
 end
 
 

@@ -8,6 +8,16 @@ CompParams = ones(12) * 0.5
 end
 
 
+@testset "Derivative is zero with no reaction and flat concentration." begin
+    u = ones(2700)
+    du = ones(2700)
+
+    TAMode.TAMreact(du, u, TAMode.compParamm(CompParams), 0.0, reaction = false)
+
+    @test all(aboutZero.(du))
+end
+
+
 @testset "In the absence of a reaction we just see diffusion." begin
     solInit = zeros(2700)
     solInit[1] = 1000.0
