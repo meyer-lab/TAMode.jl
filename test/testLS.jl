@@ -32,6 +32,9 @@
         J = ForwardDiff.jacobian((y, x) -> TAMode.TAMreact(y, x, rr, 0.0), du, uLong)
         GK = J * diagm(vec(uLong))
 
+        idx = findall(GK - transpose(GK) .≠ 0.0)
+        println(idx)
+
         @test_broken norm(GK - transpose(GK)) < 1.0e-5
     end
 
