@@ -1,11 +1,11 @@
 
 CompParams = ones(12) * 0.5
 
-@testset "Can successfully assemble the comp model parameters." begin
-    TAMode.compTAM(tps, CompParams)
-
-    @time TAMode.compTAM(tps, CompParams)
-end
+# @testset "Can successfully assemble the comp model parameters." begin
+#     TAMode.compTAM(tps, CompParams)
+# 
+#     @time TAMode.compTAM(tps, CompParams)
+# end
 
 
 @testset "Derivative is zero with no reaction and flat concentration." begin
@@ -29,19 +29,19 @@ end
     end
 
     prob = ODEProblem(func, solInit, maximum(tps), pp)
-    solut = solve(prob, AutoTsit5(Rodas5()); saveat = tps).u
+    solut = solve(prob, AutoTsit5(Rodas5()); saveat = tps, reltol = TAMode.solTol, isoutofdomain = TAMode.domainDef).u
 
     #TODO: Write test
 end
 
 
-@testset "With no ligand nothing changes." begin
-    pp = copy(CompParams)
-    pp[3] = 0.0
-
-    solOut = TAMode.compTAM(tps, pp)
-
-    solOut ./= mean(solOut, dims = 1) .+ eps()
-
-    @test all(aboutZero.(var(solOut, dims = 1)))
-end
+# @testset "With no ligand nothing changes." begin
+#     pp = copy(CompParams)
+#     pp[3] = 0.0
+# 
+#     solOut = TAMode.compTAM(tps, pp)
+# 
+#     solOut ./= mean(solOut, dims = 1) .+ eps()
+# 
+#     @test all(aboutZero.(var(solOut, dims = 1)))
+# end

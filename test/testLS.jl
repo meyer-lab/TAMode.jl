@@ -25,7 +25,7 @@
         rr.expression = 0.0
         rr.kDeg = 0.0
 
-        uLong = TAMode.runTAMinit([1.0e6], rr, autoC)
+        uLong = TAMode.runTAMinit([1.0e7], rr, autoC)
 
         # Get the Jacobian matrix
         du = zero(uLong)
