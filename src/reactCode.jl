@@ -94,12 +94,6 @@ function het_module(Rone, Rtwo, dRone, dRtwo, hetR, hetDim, dhetDim, tr, Gas, dL
 end
 
 
-" Tracks the individual receptor-ligand interactions within a given receptor. "
-function react_module(R, dR, Gas, dLi, r::TAMrates, xFwd::Real)
-    return nothing
-end
-
-
 " Handles trafficking of receptor and ligand. "
 function trafFunc(du, u, r, pYcIn)
     for ii = 1:length(pYcIn)
