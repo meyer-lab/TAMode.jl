@@ -25,6 +25,27 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
     sizze = Int(length(u) / 27)
     boundary = Int(floor(sizze / 10))
 
+    # If we're dealing with the PDE form
+    if length(du) > 100
+        dx = Float64.(collect(1:(sizze + 1)))
+        bc = getDiffOp(dx, r.diff)
+        bcin = getDiffOp(dx[1:(boundary + 1)], r.diff)
+        bcout = getDiffOp(dx[boundary:sizze], r.diff)
+
+        @views for ii = 1:27
+            duu = du[ii:27:end]
+            uu = u[ii:27:end]
+    
+            if boundLigC[ii] == 0
+                mul!(duu, bc, uu)
+            else
+                mul!(duu[1:boundary], bcin, uu[1:boundary])
+                mul!(duu[(boundary + 1):end], bcout, uu[(boundary + 1):end])
+                # TODO: Implement one-way flux across boundary
+            end
+        end
+    end
+
     if reaction
         for ii = 0:(sizze - 1)
             if ii < boundary
@@ -38,26 +59,4 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
         end
     end
 
-    # If we're not yet dealing with the PDE, solve for starting state
-    if length(du) == 27
-        return nothing
-    end
-
-    dx = Float64.(collect(1:(sizze + 1)))
-    bc = getDiffOp(dx, r.diff)
-    bcin = getDiffOp(dx[1:(boundary + 1)], r.diff)
-    bcout = getDiffOp(dx[boundary:sizze], r.diff)
-
-    for ii = 1:27
-        duu = @view du[ii:27:end]
-        uu = @view u[ii:27:end]
-
-        if boundLigC[ii] == 0
-            duu += bc * uu
-        else
-            duu[1:boundary] += bcin * uu[1:boundary]
-            duu[(boundary + 1):end] += bcout * uu[(boundary + 1):end]
-            # TODO: Implement one-way flux across boundary
-        end
-    end
 end
