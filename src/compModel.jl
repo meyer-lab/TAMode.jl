@@ -14,10 +14,9 @@ function compParamm(params::Vector{T})::comprates{T} where {T}
 end
 
 
-# TODO: Boundary condition not yet working
 function getDiffOp(dx, D)
-    Δ = CenteredDifference(apprx_ord, apprx_ord, dx, length(dx) - 1, D)
-    return Δ # * Neumann0BC(dx, apprx_ord)
+    Δ = CenteredDifference(1, apprx_ord, dx, length(dx) - 1, D)
+    return Δ * Neumann0BC(dx, apprx_ord)
 end
 
 
@@ -47,22 +46,19 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
 
     dx = 1.0 ./ collect(1:(sizze + 1))
     bc = getDiffOp(dx, r.diff)
-    bcin = getDiffOp(dx[1:boundary], r.diff)
-    bcout = getDiffOp(dx[(boundary + 1):sizze], r.diff)
+    bcin = getDiffOp(dx[1:(boundary + 1)], r.diff)
+    bcout = getDiffOp(dx[boundary:sizze], r.diff)
 
     for ii = 1:27
         duu = @view du[ii:27:end]
-        uu = u[ii:27:end]
+        uu = @view u[ii:27:end]
 
-        #    if boundLigC[ii] == 0
-        #        duu += bc * uu
-        #    else
-        #        duu[1:boundary] += bcin * uu[1:boundary]
-        #        duu[(boundary + 1):end] += bcout * uu[(boundary + 1):end]
-
-        #        fluxx = (uu[boundary + 1] - uu[boundary]) / sizze / sizze * r.diff
-        #        du[boundary] += fluxx
-        #        du[boundary + 1] -= fluxx
-        #    end
+        if boundLigC[ii] == 0
+            duu += bc * uu
+        else
+            duu[1:boundary] += bcin * uu[1:boundary]
+            duu[(boundary + 1):end] += bcout * uu[(boundary + 1):end]
+            # TODO: Implement one-way flux across boundary
+        end
     end
 end
