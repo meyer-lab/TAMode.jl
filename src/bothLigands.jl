@@ -92,11 +92,6 @@ function react_module(R, dR, curL, r::Lsrates, dRr)
     dR[13] = sum(dRr[SVector(20, 21, 22, 27)]) # APPA
     dR[14] = sum(dRr[SVector(23, 24, 25, 26, 28, 29)]) # APGA
 
-    if length(dR) == 16
-        dR[15] = -sum(dRr[SVector(1, 2, 5, 6, 8, 11, 29, 30)]) - r.kDeg * curL[1] # Gasi
-        dR[16] = -sum(dRr[SVector(3, 4, 7, 9, 10, 12, 27, 28)]) - r.kDeg * curL[2] # PROSi
-    end
-
     nothing
 end
 
@@ -114,9 +109,14 @@ PROSLS = vcat(PROScLS, PROScLS, 0, 1)
 function TAMreact(dR, R, tr::Lsrates, t)
     fill!(dR, 0.0)
     cache = Vector{promote_type(eltype(dR), typeof(tr.xFwd))}(undef, 30)
+    Li = view(R, 29:30) / internalV
 
     react_module(view(R, 1:14), view(dR, 1:14), tr.curL, tr, cache)
-    react_module(view(R, 15:28), view(dR, 15:30), view(R, 29:30) / internalV, tr, cache)
+    react_module(view(R, 15:28), view(dR, 15:28), Li, tr, cache)
+
+    # Handle internal ligand
+    dR[29] = -sum(cache[SVector(1, 2, 5, 6, 8, 11, 29, 30)]) - tr.kDeg * Li[1] # Gasi
+    dR[30] = -sum(cache[SVector(3, 4, 7, 9, 10, 12, 27, 28)]) - tr.kDeg * Li[2] # PROSi
 
     dR[1] += tr.expression
 
