@@ -25,12 +25,14 @@
         rr.expression = 0.0
         rr.kDeg = 0.0
 
-        uLong = TAMode.runTAMinit([1.0e6], rr, autoC)
+        uLong = TAMode.runTAMinit([1.0e7], rr, autoC)
 
         # Get the Jacobian matrix
         du = zero(uLong)
         J = ForwardDiff.jacobian((y, x) -> TAMode.TAMreact(y, x, rr, 0.0), du, uLong)
         GK = J * diagm(vec(uLong))
+
+        println(findall(GK - transpose(GK) .≠ 0.0))
 
         @test_broken norm(GK - transpose(GK)) < 1.0e-5
     end
