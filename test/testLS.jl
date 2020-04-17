@@ -87,5 +87,7 @@
         data = TAMode.runTAM(tps, rr, (0.0, 0.0))
 
         @test all(aboutZero.(data * TAMode.pYLS))
+        @test all(aboutZero.(data * TAMode.PROSLS))
+        @test all(aboutZero.(data * TAMode.GasLS))
     end
 end
