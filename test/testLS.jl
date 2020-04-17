@@ -59,14 +59,33 @@
         TAMode.TAMreact(dnorm, uLong, tt, 0.0)
         @test norm(dnorm) .< 0.001
     end
-    
-    @testset "If there's no ligand, we should see no pY receptor." begin
-        rr = TAMode.Lsparam(fill(0.2,9))
-        rr.curL = (0,0)
-    
-        data = TAMode.runTAM(tps, rr, (0,0))
-    
-        @test all(data * TAMode.pYLS.≈ 0)
-        @test all(data* TAMode.boundLig.≈0)
+
+    @testset "LS: Test that if no Gas6 is present, we don’t see any." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (0.0, 0.0)
+
+        data = TAMode.runTAM(tps, rr, (0.0, 10.0))
+
+        @test all(aboutZero.(data * TAMode.GasLS))
+    end
+
+    @testset "LS: Test that if no Protein S is present, we don’t see any." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (0.0, 0.0)
+
+        data = TAMode.runTAM(tps, rr, (10.0, 0.0))
+
+        @test all(aboutZero.(data * TAMode.PROSLS))
+    end
+
+    @testset "LS: Test that if no ligand is present, we don’t see any pY." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (0.0, 0.0)
+
+        data = TAMode.runTAM(tps, rr, (0.0, 0.0))
+
+        @test all(aboutZero.(data * TAMode.pYLS))
+        @test all(aboutZero.(data * TAMode.PROSLS))
+        @test all(aboutZero.(data * TAMode.GasLS))
     end
 end
