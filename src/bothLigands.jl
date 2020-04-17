@@ -99,7 +99,6 @@ end
 totalLS = vcat(ones(9), 2 * ones(5), ones(9) * internalFrac, 2 * ones(5) * internalFrac, zeros(2))
 surfaceLS = vcat(ones(14), zeros(16))
 pYcLS = vcat(zeros(9), ones(5))
-pYLS = vcat(pYcLS, pYcLS, zeros(2))
 GascLS = vcat(0, ones(2), zeros(2), 2, 1, 0, 1, 2, 1, zeros(2), 1)
 PROScLS = vcat(zeros(3), ones(2), 0, 1, 2, 1, zeros(2), 1, 2, 1)
 pYLS = vcat(pYcLS, pYcLS, zeros(2))
