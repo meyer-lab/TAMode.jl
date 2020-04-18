@@ -32,7 +32,7 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
         for ii = 1:27
             duu = view(du, ii:27:length(du))
             uu = u[ii:27:end]
-    
+
             if boundLigC[ii] == 0
                 mul!(duu, bc, uu)
             else
