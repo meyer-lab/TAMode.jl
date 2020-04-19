@@ -90,4 +90,18 @@
         @test all(aboutZero.(data * TAMode.PROSLS))
         @test all(aboutZero.(data * TAMode.GasLS))
     end
+    
+    @testset "LS: Test for symmetry." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (10.0, 10.0)
+        
+        Gstim = TAMode.runTAM(tps, rr, (10.0, 0.0))
+        Pstim = TAMode.runTAM(tps, rr, (0.0, 10.0))
+        dataDiff = Gstim .- Pstim
+        
+        @test all(aboutZero.(dataDiff * TAMode.pYLS))
+        @test all(aboutZero.(dataDiff * TAMode.totalLS))
+        @test all(aboutZero.(dataDiff * TAMode.surfaceLS))
+        @test all(aboutZero.(Gstim * TAMode.GasLS .- Pstim * TAMode.PROSLS))
+    end
 end
