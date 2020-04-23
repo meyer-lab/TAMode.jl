@@ -19,6 +19,7 @@
 
     @testset "LS: Ensure that system reaches detailed balance." begin
         rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (0.0, 0.0)
 
         autoC = TAMode.getAutocrine(rr)
 
@@ -32,8 +33,9 @@
         J = ForwardDiff.jacobian((y, x) -> TAMode.TAMreact(y, x, rr, 0.0), du, uLong)
         GK = J * diagm(vec(uLong))
 
-        println(findall(GK - transpose(GK) .≠ 0.0))
+        IDXmismatch = findall(GK - transpose(GK) .≠ 0.0)
 
+        @test length(IDXmismatch) == 2
         @test_broken norm(GK - transpose(GK)) < 1.0e-5
     end
 
@@ -45,7 +47,7 @@
         tt.kRec = 0.0
         tt.internalize = 0.0
         tt.pYinternalize = 0.0
-        tt.curL = (10, 10)
+        tt.curL = (10.0, 10.0)
 
         secondSurf = TAMode.runTAMinit([100.0], tt, firstSurf)
 
@@ -89,5 +91,19 @@
         @test all(aboutZero.(data * TAMode.pYLS))
         @test all(aboutZero.(data * TAMode.PROSLS))
         @test all(aboutZero.(data * TAMode.GasLS))
+    end
+    
+    @testset "LS: Test for symmetry wrt to both ligands." begin
+        rr = TAMode.Lsparam(fill(0.2, 9))
+        rr.curL = (10.0, 10.0)
+        
+        Gstim = TAMode.runTAM(tps, rr, (10.0, 0.0))
+        Pstim = TAMode.runTAM(tps, rr, (0.0, 10.0))
+        dataDiff = Gstim .- Pstim
+        
+        @test_broken all(aboutZero.(dataDiff * TAMode.pYLS))
+        @test_broken all(aboutZero.(dataDiff * TAMode.totalLS))
+        @test_broken all(aboutZero.(dataDiff * TAMode.surfaceLS))
+        @test_broken all(aboutZero.(Gstim * TAMode.GasLS .- Pstim * TAMode.PROSLS))
     end
 end

@@ -52,7 +52,6 @@ mutable struct Lsrates{T}
     internalize::T # Non-pY species internalization rate.
     pYinternalize::T # pY species internalization rate.
     expression::T # Receptor expression rate.
-    autocrine::MVector{2, T}
     curL::MVector{2, T}
     xFwd::T
 end

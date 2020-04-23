@@ -16,7 +16,6 @@ function Lsparam(params::Vector)
         0.3, # fElse, internalize, pYinternalize
         params[4], # expression
         params[2:3],
-        (0.0, 0.0),
         params[1],
     )
 
