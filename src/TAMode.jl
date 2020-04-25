@@ -65,6 +65,8 @@ end
 
 
 function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Lsrates{T}, Vector{T}}, ligStim)::Matrix{T} where {T <: Real}
+    params = deepcopy(params) # Make sure we're not mutating the input
+
     if params isa Vector
         if length(params) == 15
             params = param(params)
