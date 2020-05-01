@@ -6,14 +6,20 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
 
 
 @model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
-    paramsA ~ MvLogNormal(fill(-3.0, 2), 0.01) # internalize, pYinternalize
-    paramsB ~ Truncated(LogNormal(-1.0, 0.01), 0.0, 1.0) # sortF
-    paramsC ~ MvLogNormal(fill(-3.0, 5), 0.01) # kRec, kDeg, xFwd, gasCur, AXLexpr
+    
+    internalize ~ LogNormal(-3.0, 0.01)
+    pYinternalize ~ LogNormal(-3.0, 0.01)
+    sortF ~ Truncated(LogNormal(-1.0, 0.01), 0.0, 1.0)
+    kRec ~ LogNormal(-3.0, 0.01)
+    kDeg ~ LogNormal(-3.0, 0.01)
+    xFwd ~ LogNormal(-3.0, 0.01)
+    gasCur ~ LogNormal(-3.0, 0.01)
+    AXLexpr ~ LogNormal(-3.0, 0.01)
     Ig2rev ~ LogNormal(-3.0, 0.1)
     scale ~ LogNormal(-1.0, 0.1)
     scaleSurf ~ LogNormal(-1.0, 0.1)
 
-    params = vcat(paramsA, paramsB, paramsC, zeros(2), Ig2rev, ones(4))
+    params = vcat(internalize, pYinternalize, sortF, kRec, kDeg, xFwd, gasCur, AXLexpr, zeros(2), Ig2rev, ones(4))
     pYresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
     totalresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
     surfresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
@@ -46,5 +52,72 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
     totalresids ~ MvNormal(muu, stdd * std(totalresids))
 end
 
+function plot_overlay(chn, tps, g6conc) 
+    
+    internalize = get(chn, :internalize)[1]
+    pYinternalize = get(chn, :pYinternalize)[1]
+    sortF = get(chn, :sortF)[1]
+    kRec = get(chn, :kRec)[1]
+    kDeg = get(chn, :kDeg)[1]
+    xFwd = get(chn, :xFwd)[1]
+    gasCur = get(chn, :gasCur)[1]
+    AXLexpr = get(chn, :AXLexpr)[1]
+    Ig2rev = get(chn, :Ig2rev)[1]
+    scale = get(chn, :scale)[1]
+    scaleSurf = get(chn, :scaleSurf)[1] 
+    
+    samp_params = hcat(internalize, pYinternalize, sortF, kRec, kDeg, xFwd, gasCur, AXLexpr)
+    
+    pY = Array{Float64}(undef, length(samp_params)[1], length(tps), length(g6conc));
+    tot = Array{Float64}(undef, length(samp_params)[1], length(tps), length(g6conc));
+    surf = Array{Float64}(undef, length(samp_params)[1], length(tps), length(g6conc));
+    
+    for iter = 1:length(samp_params)[1] 
+        params = vcat(samp_params[iter,:], zeros(2), Ig2rev[iter], ones(4))
+        params = TAMode.param(params)
+        solInit = TAMode.getAutocrine(params)
 
-A549model = AXLfit(TAMode.pYA549, TAMode.surfA549, TAMode.totA549, TAMode.tpsA549, TAMode.gasA549)
+        pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
+        surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
+        totAXL = TAMode.total .* TAMode.recpSpecific[1]
+
+        Threads.@threads for ii = 1:length(g6conc)
+            params.gasCur = g6conc[ii]
+            data = TAMode.runTAMinit(tps, params, solInit)
+
+            pY[iter, :, ii] = (data * pYAXL) * scale[iter] 
+            surf[iter, :, ii] = (data * surfAXL) * scaleSurf[iter]
+            tot[iter, :, ii] = (data * totAXL)
+        end
+    end
+        
+    #calculate means
+    meanpY = fill(zeros(length(g6conc)), length(tps))
+    meantot = fill(zeros(length(g6conc)), length(tps))
+    meansurf = fill(zeros(length(g6conc)), length(tps))
+    for time in 1:length(tps)
+        for gas in 1:length(g6conc)
+            meanpY[time][gas] = mean(pY[:, time, gas])
+            meantot[time][gas] = mean(tot[:, time, gas])
+            meansurf[time][gas] = mean(surf[:, time, gas])
+        end
+    end
+    
+    pYData = [pYA549[:,1],pYA549[:,2]] 
+    surfData = [surfA549[:,1],surfA549[:,2]] 
+    totData = [totA549[:,1],totA549[:,2]] 
+        
+    plot(g6conc, [meanpY; meansurf; meantot], 
+            label=["1 hr, calc" "4 hr, calc"] , 
+            title=["Phosphorylated receptor" "Surface receptor" "Total receptor"], 
+            lw=3, 
+            layout = (1,3), 
+            size=(1200,400))
+    plot!(g6conc, [pYData;surfData;totData], 
+            label=["1 hr, exp" "4 hr, exp"], 
+            lw=3)
+    xlabel!("Gas6 Concentration (nM)")
+    
+end
+
+#A549model = AXLfit(TAMode.pYA549, TAMode.surfA549, TAMode.totA549, TAMode.tpsA549, TAMode.gasA549)
