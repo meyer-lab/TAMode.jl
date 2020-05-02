@@ -2,11 +2,9 @@ module TAMode
 
 using OrdinaryDiffEq
 using StaticArrays
-using SteadyStateDiffEq
 using LinearAlgebra
 import LabelledArrays
 using Turing
-import CSV
 import Statistics
 using DiffEqOperators
 
@@ -14,7 +12,6 @@ include("types.jl")
 include("reactCode.jl")
 include("bothLigands.jl")
 include("compModel.jl")
-include("BLI.jl")
 
 
 const solTol = 1.0e-9
@@ -22,8 +19,6 @@ const solTol = 1.0e-9
 function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
 end
-
-const options = Dict([:reltol => solTol, :abstol => solTol, :isoutofdomain => domainDef])
 
 
 function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector{T} where {T <: Real}
@@ -35,21 +30,17 @@ function getAutocrine(params::Union{Rates{T}, comprates{T}, Lsrates{T}})::Vector
         N = 30
     end
 
-    probInit = SteadyStateProblem(TAMreact, zeros(T, N), params)
-
-    sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
-    return solve(probInit, DynamicSS(sol); options...).u
+    return vec(runTAMinit([1.0e6], params, zeros(T, N)))
 end
 
 
-function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, solInit::Vector)::Matrix{T} where {T <: Real}
+function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, comprates{T}, Lsrates{T}}, solInit::Vector{T})::Matrix{T} where {T <: Real}
     @assert all(x -> x >= 0.0, tps)
 
-    solInit = convert(Vector{T}, solInit)
     prob = ODEProblem(TAMreact, solInit, maximum(tps), params)
 
     sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
-    solut = solve(prob, sol; saveat = tps, options...).u
+    solut = solve(prob, sol; saveat = tps, reltol = solTol, isoutofdomain = domainDef).u
 
     if length(tps) > 1
         solut = vcat(transpose.(solut)...)
@@ -67,13 +58,15 @@ function compTAM(tps::AbstractVector{Float64}, params::Union{comprates{T}, Vecto
     end
 
     solInit = getAutocrine(params)
-    u0 = repeat(solInit; outer = [100])
+    u0 = repeat(solInit; outer = [compSize])
 
     return runTAMinit(tps, params, u0)
 end
 
 
 function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Lsrates{T}, Vector{T}}, ligStim)::Matrix{T} where {T <: Real}
+    params = deepcopy(params) # Make sure we're not mutating the input
+
     if params isa Vector
         if length(params) == 15
             params = param(params)

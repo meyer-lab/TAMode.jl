@@ -12,8 +12,8 @@ mutable struct hetRates{T}
 end
 
 
-TAMsType{T} = @LabelledArrays.SLVector TAMrates{T} (:Axl, :MerTK, :Tyro3)
-hetRType{T} = @LabelledArrays.SLVector hetRates{T} (:AM, :MT, :AT)
+TAMsType{T} = LabelledArrays.@SLVector TAMrates{T} (:Axl, :MerTK, :Tyro3)
+hetRType{T} = LabelledArrays.@SLVector hetRates{T} (:AM, :MT, :AT)
 
 
 mutable struct Rates{T}
@@ -52,7 +52,6 @@ mutable struct Lsrates{T}
     internalize::T # Non-pY species internalization rate.
     pYinternalize::T # pY species internalization rate.
     expression::T # Receptor expression rate.
-    autocrine::MVector{2, T}
     curL::MVector{2, T}
     xFwd::T
 end
