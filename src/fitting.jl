@@ -50,9 +50,9 @@ end
 
     # The scaling is based on the average stderr, to make these proportional to the std MvNorm
     # TODO: Identify exact values
-    sqResid = norm(pYresids .- transpose(pYDataExp)) / 1.0
-    sqResid += norm(totalresids .- transpose(totDataExp)) / 1000.0
-    sqResid += norm(surfresids .- transpose(surfDataExp)) / 0.2
+    sqResid = norm(pYresids .- transpose(pYDataExp))
+    sqResid += norm(totalresids .- transpose(totDataExp)) / 100.0
+    sqResid += norm(surfresids .- transpose(surfDataExp)) / 0.038
 
     sqResid ~ Chisq(length(pYDataExp) + length(totDataExp) + length(surfDataExp))
 end
@@ -76,9 +76,9 @@ function plot_overlay(chn, tps, g6conc)
     end
 
     # Calculate means
-    meanpY = Statistics.mean(pY, dims = 1)
-    meantot = Statistics.mean(tot, dims = 1)
-    meansurf = Statistics.mean(surf, dims = 1)
+    meanpY = Statistics.median(pY, dims = 1)
+    meantot = Statistics.median(tot, dims = 1)
+    meansurf = Statistics.median(surf, dims = 1)
 
     plot(g6conc, [meanpY; meansurf; meantot], 
             label=["1 hr, calc" "4 hr, calc"] , 
