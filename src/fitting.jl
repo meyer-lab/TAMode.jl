@@ -5,21 +5,8 @@ totA549 = @SMatrix [3443.1 3219.7; 3143.4 3353.8; 3018.9 3611.8; 2608.9 3448.2; 
 surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0.281; 0.257 0.337]
 
 
-@model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
-    
-    internalize ~ LogNormal(-3.0, 0.01)
-    pYinternalize ~ LogNormal(-3.0, 0.01)
-    sortF ~ Truncated(LogNormal(-1.0, 0.01), 0.0, 1.0)
-    kRec ~ LogNormal(-3.0, 0.01)
-    kDeg ~ LogNormal(-3.0, 0.01)
-    xFwd ~ LogNormal(-3.0, 0.01)
-    gasCur ~ LogNormal(-3.0, 0.01)
-    AXLexpr ~ LogNormal(-3.0, 0.01)
-    Ig2rev ~ LogNormal(-3.0, 0.1)
-    scale ~ LogNormal(-1.0, 0.1)
-    scaleSurf ~ LogNormal(-1.0, 0.1)
-
-    params = vcat(internalize, pYinternalize, sortF, kRec, kDeg, xFwd, gasCur, AXLexpr, zeros(2), Ig2rev, ones(4))
+" Run the model calculations for the A549 measurements. "
+function dataModelCalc(params, scale, scaleSurf)
     pYresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
     totalresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
     surfresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
@@ -41,6 +28,27 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
         totalresids[:, ii] = (data * totAXL)
     end
 
+    return pYresids, totalresids, surfresids
+end
+
+
+" Full Turing A549 fitting model. "
+@model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
+    internalize ~ LogNormal(-3.0, 0.01)
+    pYinternalize ~ LogNormal(-3.0, 0.01)
+    sortF ~ Truncated(LogNormal(-1.0, 0.01), 0.0, 1.0)
+    kRec ~ LogNormal(-3.0, 0.01)
+    kDeg ~ LogNormal(-3.0, 0.01)
+    xFwd ~ LogNormal(-3.0, 0.01)
+    gasCur ~ LogNormal(-3.0, 0.01)
+    AXLexpr ~ LogNormal(-3.0, 0.01)
+    Ig2rev ~ LogNormal(-3.0, 0.1)
+    scale ~ LogNormal(-1.0, 0.1)
+    scaleSurf ~ LogNormal(-1.0, 0.1)
+
+    params = vcat(internalize, pYinternalize, sortF, kRec, kDeg, xFwd, gasCur, AXLexpr, zeros(2), Ig2rev, ones(4))
+    pYresids, totalresids, surfresids = dataModelCalc(params, scale, scaleSurf)
+
     pYresids = vec(pYresids .- transpose(pYDataExp))
     totalresids = vec(totalresids .- transpose(totDataExp))
     surfresids = vec(surfresids .- transpose(surfDataExp))
@@ -52,8 +60,8 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
     totalresids ~ MvNormal(muu, stdd * std(totalresids))
 end
 
+
 function plot_overlay(chn, tps, g6conc) 
-    
     internalize = get(chn, :internalize)[1]
     pYinternalize = get(chn, :pYinternalize)[1]
     sortF = get(chn, :sortF)[1]
@@ -74,21 +82,8 @@ function plot_overlay(chn, tps, g6conc)
     
     for iter = 1:length(samp_params)[1] 
         params = vcat(samp_params[iter,:], zeros(2), Ig2rev[iter], ones(4))
-        params = TAMode.param(params)
-        solInit = TAMode.getAutocrine(params)
 
-        pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
-        surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
-        totAXL = TAMode.total .* TAMode.recpSpecific[1]
-
-        Threads.@threads for ii = 1:length(g6conc)
-            params.gasCur = g6conc[ii]
-            data = TAMode.runTAMinit(tps, params, solInit)
-
-            pY[iter, :, ii] = (data * pYAXL) * scale[iter] 
-            surf[iter, :, ii] = (data * surfAXL) * scaleSurf[iter]
-            tot[iter, :, ii] = (data * totAXL)
-        end
+        pY[iter, :, :], tot[iter, :, :], surf[iter, :, :] = dataModelCalc(params, scale, scaleSurf)
     end
         
     #calculate means
