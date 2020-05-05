@@ -5,15 +5,8 @@ totA549 = @SMatrix [3443.1 3219.7; 3143.4 3353.8; 3018.9 3611.8; 2608.9 3448.2; 
 surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0.281; 0.257 0.337]
 
 
-@model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
-    paramsA ~ MvLogNormal(fill(-3.0, 2), 0.01) # internalize, pYinternalize
-    paramsB ~ Truncated(LogNormal(-1.0, 0.01), 0.0, 1.0) # sortF
-    paramsC ~ MvLogNormal(fill(-3.0, 5), 0.01) # kRec, kDeg, xFwd, gasCur, AXLexpr
-    Ig2rev ~ LogNormal(-3.0, 0.1)
-    scale ~ LogNormal(-1.0, 0.1)
-    scaleSurf ~ LogNormal(-1.0, 0.1)
-
-    params = vcat(paramsA, paramsB, paramsC, zeros(2), Ig2rev, ones(4))
+" Run the model calculations for the A549 measurements. "
+function dataModelCalc(tps, g6conc, params, scale, scaleSurf)
     pYresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
     totalresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
     surfresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
@@ -35,16 +28,68 @@ surfA549 = @SMatrix [0.206 0.239; 0.274 0.316; 0.281 0.251; 0.220 0.302; 0.256 0
         totalresids[:, ii] = (data * totAXL)
     end
 
-    pYresids = vec(pYresids .- transpose(pYDataExp))
-    totalresids = vec(totalresids .- transpose(totDataExp))
-    surfresids = vec(surfresids .- transpose(surfDataExp))
-
-    muu = zeros(length(pYresids))
-    stdd = ones(length(pYresids))
-    pYresids ~ MvNormal(muu, stdd * std(pYresids))
-    surfresids ~ MvNormal(muu, stdd * std(surfresids))
-    totalresids ~ MvNormal(muu, stdd * std(totalresids))
+    return pYresids, totalresids, surfresids
 end
 
+
+@model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
+    internalize ~ LogNormal(log(0.1), 0.1)
+    pYinternalize ~ LogNormal(log(1.0), 0.1)
+    sortF ~ Beta(1.0, 10.0)
+    kRec ~ LogNormal(log(0.1), 0.1)
+    kDeg ~ LogNormal(log(0.01), 0.1)
+    xFwd ~ LogNormal(-3.0, 1.0)
+    gasCur ~ LogNormal(log(0.1), 0.1)
+    AXLexpr ~ LogNormal(log(1.0), 1.0)
+    Ig2rev ~ LogNormal(0.0, 1.0)
+    scale ~ LogNormal(0.0, 1.0)
+    scaleSurf ~ LogNormal(0.0, 1.0)
+
+    params = vcat(internalize, pYinternalize, sortF, kRec, kDeg, xFwd, gasCur, AXLexpr, zeros(2), Ig2rev, ones(4))
+    pYresids, totalresids, surfresids = dataModelCalc(tps, g6conc, params, scale, scaleSurf)
+
+    # The scaling is based on the average stderr, to make these proportional to the std MvNorm
+    # TODO: Identify exact values
+    sqResid = norm(pYresids .- transpose(pYDataExp))
+    sqResid += norm(totalresids .- transpose(totDataExp)) / 100.0
+    sqResid += norm(surfresids .- transpose(surfDataExp)) / 0.038
+
+    sqResid ~ Chisq(length(pYDataExp) + length(totDataExp) + length(surfDataExp))
+end
+
+
+function plot_overlay(chn, tps, g6conc) 
+    Ig2rev = get(chn, :Ig2rev)[1]
+    scale = get(chn, :scale)[1]
+    scaleSurf = get(chn, :scaleSurf)[1] 
+
+    samp_params = Array(chn, [:internalize, :pYinternalize, :sortF, :kRec, :kDeg, :xFwd, :gasCur, :AXLexpr])
+
+    pY = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
+    tot = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
+    surf = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
+    
+    for iter = 1:size(samp_params, 1)
+        params = vcat(samp_params[iter, :], zeros(2), Ig2rev[iter], ones(4))
+
+        pY[iter, :, :], tot[iter, :, :], surf[iter, :, :] = dataModelCalc(tps, g6conc, params, scale, scaleSurf)
+    end
+
+    # Calculate means
+    meanpY = Statistics.median(pY, dims = 1)
+    meantot = Statistics.median(tot, dims = 1)
+    meansurf = Statistics.median(surf, dims = 1)
+
+    plot(g6conc, [meanpY; meansurf; meantot], 
+            label=["1 hr, calc" "4 hr, calc"] , 
+            title=["Phosphorylated receptor" "Surface receptor" "Total receptor"], 
+            lw=3, 
+            layout = (1,3), 
+            size=(1200,400))
+    plot!(g6conc, [pYA549[:, 1:2]; surfA549[:, 1:2]; totA549[:, 1:2]], 
+            label=["1 hr, exp" "4 hr, exp"], 
+            lw=3)
+    xlabel!("Gas6 Concentration (nM)")
+end
 
 A549model = AXLfit(TAMode.pYA549, TAMode.surfA549, TAMode.totA549, TAMode.tpsA549, TAMode.gasA549)
