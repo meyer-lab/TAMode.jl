@@ -58,17 +58,17 @@ end
 end
 
 
-function plot_overlay(chn, tps, g6conc) 
+function plot_overlay(chn, tps, g6conc)
     Ig2rev = get(chn, :Ig2rev)[1]
     scale = get(chn, :scale)[1]
-    scaleSurf = get(chn, :scaleSurf)[1] 
+    scaleSurf = get(chn, :scaleSurf)[1]
 
     samp_params = Array(chn, [:internalize, :pYinternalize, :sortF, :kRec, :kDeg, :xFwd, :gasCur, :AXLexpr])
 
-    pY = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
-    tot = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
-    surf = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
-    
+    pY = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
+    tot = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
+    surf = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
+
     for iter = 1:size(samp_params, 1)
         params = vcat(samp_params[iter, :], zeros(2), Ig2rev[iter], ones(4))
 
@@ -80,15 +80,16 @@ function plot_overlay(chn, tps, g6conc)
     meantot = Statistics.median(tot, dims = 1)
     meansurf = Statistics.median(surf, dims = 1)
 
-    plot(g6conc, [meanpY; meansurf; meantot], 
-            label=["1 hr, calc" "4 hr, calc"] , 
-            title=["Phosphorylated receptor" "Surface receptor" "Total receptor"], 
-            lw=3, 
-            layout = (1,3), 
-            size=(1200,400))
-    plot!(g6conc, [pYA549[:, 1:2]; surfA549[:, 1:2]; totA549[:, 1:2]], 
-            label=["1 hr, exp" "4 hr, exp"], 
-            lw=3)
+    plot(
+        g6conc,
+        [meanpY; meansurf; meantot],
+        label = ["1 hr, calc" "4 hr, calc"],
+        title = ["Phosphorylated receptor" "Surface receptor" "Total receptor"],
+        lw = 3,
+        layout = (1, 3),
+        size = (1200, 400),
+    )
+    plot!(g6conc, [pYA549[:, 1:2]; surfA549[:, 1:2]; totA549[:, 1:2]], label = ["1 hr, exp" "4 hr, exp"], lw = 3)
     xlabel!("Gas6 Concentration (nM)")
 end
 
