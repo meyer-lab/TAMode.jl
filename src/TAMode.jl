@@ -14,7 +14,7 @@ include("bothLigands.jl")
 include("compModel.jl")
 
 
-const solTol = 1.0e-9
+const solTol = 1.0e-4
 
 function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
@@ -39,13 +39,19 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
 
     prob = ODEProblem(TAMreact, solInit, maximum(tps), params)
 
-    sol = AutoTsit5(Rodas5(autodiff = (T == Float64)))
-    solut = solve(prob, sol; saveat = tps, reltol = solTol, isoutofdomain = domainDef).u
+    sol = AutoTsit5(Rodas5(autodiff = (T == Float64)), stiffalgfirst = true)
+    solut = solve(prob, sol; saveat = tps, reltol = solTol, isoutofdomain = domainDef, maxiters = 1e6).u
 
     if length(tps) > 1
         solut = vcat(transpose.(solut)...)
     else
         solut = reshape(solut[1], (1, length(solInit)))
+    end
+
+    if length(tps) > size(solut, 1)
+        println("Solving failed with the following parameters.")
+        println(params)
+        @assert length(tps) == size(solut, 1)
     end
 
     return solut
@@ -70,10 +76,9 @@ function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Lsrates{T}
     if params isa Vector
         if length(params) == 15
             params = param(params)
-        elseif length(params) == 9
-            params = Lsparam(params)
         else
-            @assert false
+            @assert length(params) == 9
+            params = Lsparam(params)
         end
     end
 
@@ -81,10 +86,9 @@ function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Lsrates{T}
 
     if params isa Rates
         params.gasCur = ligStim
-    elseif params isa Lsrates
-        params.curL = ligStim
     else
-        @assert false
+        @assert params isa Lsrates
+        params.curL = ligStim
     end
 
     return runTAMinit(tps, params, solInit)
