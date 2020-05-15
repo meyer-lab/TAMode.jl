@@ -50,9 +50,9 @@ end
 
     # The scaling is based on the average stderr, to make these proportional to the std MvNorm
     # TODO: Identify exact values
-    sqResid = sqeuclidean(pYresids .- transpose(pYDataExp))
-    sqResid += sqeuclidean(totalresids .- transpose(totDataExp)) / 100.0
-    sqResid += sqeuclidean(surfresids .- transpose(surfDataExp)) / 0.038
+    sqResid = sqeuclidean(pYresids, transpose(pYDataExp))
+    sqResid += sqeuclidean(totalresids, transpose(totDataExp)) / 100.0
+    sqResid += sqeuclidean(surfresids, transpose(surfDataExp)) / 0.038
 
     sqResid ~ Chisq(length(pYDataExp) + length(totDataExp) + length(surfDataExp))
 end
