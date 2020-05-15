@@ -7,7 +7,7 @@ import LabelledArrays
 using Turing
 import Statistics
 using DiffEqOperators
-import Distances
+import Distances: sqeuclidean
 
 include("types.jl")
 include("reactCode.jl")
