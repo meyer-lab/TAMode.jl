@@ -135,9 +135,9 @@ version = "0.2.0"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "b0ae6133d365da2dbc88bc43d997b1b95c9df5f6"
+git-tree-sha1 = "48c20c43e157c6eab6cf88326504ec042b05e456"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.9.1"
+version = "3.10.0"
 
 [[CompilerSupportLibraries_jll]]
 deps = ["Libdl", "Pkg"]
@@ -183,9 +183,9 @@ version = "6.33.0"
 
 [[DiffEqJump]]
 deps = ["Compat", "DataStructures", "DiffEqBase", "FunctionWrappers", "LinearAlgebra", "Parameters", "PoissonRandom", "Random", "RandomNumbers", "RecursiveArrayTools", "StaticArrays", "Statistics", "TreeViews"]
-git-tree-sha1 = "79c426a42f09e02223aa792924fe16725e9bf50f"
+git-tree-sha1 = "53dd34de8cb0d256df6c131bcbd2745bb35aec21"
 uuid = "c894b116-72e5-5b58-be3c-e6d8d4ac2b12"
-version = "6.6.3"
+version = "6.7.2"
 
 [[DiffEqOperators]]
 deps = ["BandedMatrices", "BlockBandedMatrices", "DiffEqBase", "ForwardDiff", "LazyArrays", "LinearAlgebra", "ModelingToolkit", "NNlib", "SparseArrays", "StaticArrays", "SuiteSparse"]
@@ -378,6 +378,7 @@ uuid = "1d6d02ad-be62-4b6b-8a6d-2f90e265016e"
 version = "0.1.2"
 
 [[LibGit2]]
+deps = ["Printf"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 
 [[Libdl]]
@@ -519,9 +520,9 @@ version = "1.2.0"
 
 [[OrdinaryDiffEq]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "ExponentialUtilities", "FiniteDiff", "ForwardDiff", "GenericSVD", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "NLsolve", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays", "UnPack"]
-git-tree-sha1 = "de79fdddb8bea093617458a2c7503191f1d533f3"
+git-tree-sha1 = "98ae9c7d2bb987a6ab0e4664ff9f6252052c18fb"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "5.38.0"
+version = "5.38.1"
 
 [[PDMats]]
 deps = ["Arpack", "LinearAlgebra", "SparseArrays", "SuiteSparse", "Test"]
@@ -542,7 +543,7 @@ uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "1.0.4"
 
 [[Pkg]]
-deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Test", "UUIDs"]
+deps = ["Dates", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 
 [[PoissonRandom]]
@@ -778,9 +779,9 @@ deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[UnPack]]
-git-tree-sha1 = "bc9ef72a4a826740895bf2772b48c21f9a1c13a7"
+git-tree-sha1 = "d4bfa022cd30df012700cf380af2141961bb3bfb"
 uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
-version = "1.0.0"
+version = "1.0.1"
 
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"

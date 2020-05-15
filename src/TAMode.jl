@@ -7,6 +7,7 @@ import LabelledArrays
 using Turing
 import Statistics
 using DiffEqOperators
+import Distances
 
 include("types.jl")
 include("reactCode.jl")
