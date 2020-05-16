@@ -1,6 +1,5 @@
-const fraction = 0.1 # Fraction of the cell surface with PS
 const compSize = 100
-const boundary = 10
+const boundary = 10 # Nodes with PS
 const compDX = compSize * Float64.(collect(1:(compSize - 2)))
 const dRdRMaxRMaxR = 1.0/compSize/compSize
 
@@ -20,7 +19,7 @@ end
 function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
     # If we're dealing with the PDE form
     if length(du) > 100
-        for ii = 1:27
+        @views for ii = 1:27
             duu = view(du, ii:27:length(du))
             uu = u[ii:27:end]
 
@@ -48,7 +47,7 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
     end
 
     if reaction
-        for ii = 0:(Int(length(u) / 27) - 1)
+        @views for ii = 0:(Int(length(u) / 27) - 1)
             if ii < boundary
                 gass = r.gasCur * r.gasPart
             else
