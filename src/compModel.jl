@@ -1,7 +1,7 @@
 const fraction = 0.1 # Fraction of the cell surface with PS
 const compSize = 100
 const boundary = 10
-const compDX = compSize * Float64.(collect(1:(compSize + 1)))
+const compDX = compSize * Float64.(collect(1:(compSize - 2)))
 const dRdRMaxRMaxR = 1.0/compSize/compSize
 
 
@@ -25,12 +25,21 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
             uu = u[ii:27:end]
 
             if boundLigC[ii] == 0
-                mul!(duu, bc, uu)
+                @. duu[2:(end-1)] = (-4.0*uu[2:(end-1)] + (2.0-1.0/compDX)*uu[1:(end-2)] + (2.0+1.0/compDX)*uu[3:end])/2/dRdRMaxRMaxR
             else
-                mul!(view(duu, 1:boundary), bcin, uu[1:boundary])
-                mul!(view(duu, (boundary + 1):length(duu)), bcout, uu[(boundary + 1):end])
-                # TODO: Implement one-way flux across boundary
+                @. duu[2:(boundary-1)] = (-4.0*uu[2:(boundary-1)] + (2.0-1.0/compDX[1:(boundary-2)])*uu[1:(boundary-2)] + (2.0+1.0/compDX[1:(boundary-2)])*uu[3:boundary])/2/dRdRMaxRMaxR
+                duu[boundary] = -4.0*(uu[boundary] - uu[boundary - 1])/dRdRMaxRMaxR
+
+                duu[boundary + 1] = 4.0*(uu[boundary + 2] - uu[boundary + 1])/dRdRMaxRMaxR
+                @. duu[(boundary + 2):(end-1)] = (-4.0*uu[(boundary + 2):(end-1)] + (2.0-1.0/compDX[(boundary + 1):end])*uu[(boundary + 1):(end-2)] + (2.0+1.0/compDX[(boundary + 1):end])*uu[(boundary + 3):end])/2/dRdRMaxRMaxR
+
+                # Diffusion into compartment
+                duu[boundary + 1] -= uu[boundary + 1] / dRdRMaxRMaxR
+                duu[boundary] += uu[boundary + 1] / dRdRMaxRMaxR
             end
+
+            duu[1] = 4.0*(uu[2] - uu[1])/dRdRMaxRMaxR
+            duu[end] = -4.0*(uu[end] - uu[end - 1])/dRdRMaxRMaxR
         end
 
         rmul!(du, r.diff)
