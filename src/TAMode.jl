@@ -6,7 +6,6 @@ using LinearAlgebra
 import LabelledArrays
 using Turing
 import Statistics
-using DiffEqOperators
 import Distances: sqeuclidean
 
 include("types.jl")

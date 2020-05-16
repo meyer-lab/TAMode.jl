@@ -6,7 +6,6 @@ version = "0.1.0"
 [deps]
 AxisArrays = "39de3d68-74b9-583c-8d2d-e117c070f3a9"
 DiffEqBase = "2b5f629d-d688-5b77-993f-72d75c75574e"
-DiffEqOperators = "9fdde737-9c7f-55bf-ade8-46b3f136cc48"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 LabelledArrays = "2ee39098-c373-598a-b85f-a56591580800"

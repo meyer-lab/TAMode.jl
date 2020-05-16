@@ -2,6 +2,7 @@ const fraction = 0.1 # Fraction of the cell surface with PS
 const compSize = 100
 const boundary = 10
 const compDX = compSize * Float64.(collect(1:(compSize + 1)))
+const dRdRMaxRMaxR = 1.0/compSize/compSize
 
 
 " Setup the parameters for the full TAM receptor model. "
@@ -14,16 +15,6 @@ function compParamm(params::Vector{T})::comprates{T} where {T}
 
     return detailedBalance(out)
 end
-
-
-function getDiffOp(dx::Vector{Float64})
-    Δ = CenteredDifference(1, 2, dx, length(dx) - 1)
-    return Δ * Neumann0BC(dx, 2)
-end
-
-const bc = getDiffOp(compDX)
-const bcin = getDiffOp(compDX[1:(boundary + 1)])
-const bcout = getDiffOp(compDX[boundary:compSize])
 
 
 function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
