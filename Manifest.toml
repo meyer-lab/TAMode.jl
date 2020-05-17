@@ -163,9 +163,9 @@ version = "1.3.0"
 
 [[DataStructures]]
 deps = ["InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "6166ecfaf2b8bbf2b68d791bc1d54501f345d314"
+git-tree-sha1 = "7d7578b00789cf16c5f68fad71868e773edd58a2"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.17.15"
+version = "0.17.16"
 
 [[Dates]]
 deps = ["Printf"]
@@ -183,9 +183,9 @@ version = "6.33.0"
 
 [[DiffEqJump]]
 deps = ["Compat", "DataStructures", "DiffEqBase", "FunctionWrappers", "LinearAlgebra", "Parameters", "PoissonRandom", "Random", "RandomNumbers", "RecursiveArrayTools", "StaticArrays", "Statistics", "TreeViews"]
-git-tree-sha1 = "53dd34de8cb0d256df6c131bcbd2745bb35aec21"
+git-tree-sha1 = "b337929b13908dcd4851b9f7223ed36383c39b50"
 uuid = "c894b116-72e5-5b58-be3c-e6d8d4ac2b12"
-version = "6.7.2"
+version = "6.7.3"
 
 [[DiffEqOperators]]
 deps = ["BandedMatrices", "BlockBandedMatrices", "DiffEqBase", "ForwardDiff", "LazyArrays", "LinearAlgebra", "ModelingToolkit", "NNlib", "SparseArrays", "StaticArrays", "SuiteSparse"]
