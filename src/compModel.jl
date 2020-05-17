@@ -1,7 +1,7 @@
-const fraction = 0.1 # Fraction of the cell surface with PS
 const compSize = 100
-const boundary = 10
-const compDX = compSize * Float64.(collect(1:(compSize + 1)))
+const boundary = 10 # Nodes with PS
+const compDX = compSize * Float64.(collect(1:(compSize - 2)))
+const dRdRMaxRMaxR = 1.0/compSize/compSize
 
 
 " Setup the parameters for the full TAM receptor model. "
@@ -16,30 +16,29 @@ function compParamm(params::Vector{T})::comprates{T} where {T}
 end
 
 
-function getDiffOp(dx::Vector{Float64})
-    Δ = CenteredDifference(1, 2, dx, length(dx) - 1)
-    return Δ * Neumann0BC(dx, 2)
-end
-
-const bc = getDiffOp(compDX)
-const bcin = getDiffOp(compDX[1:(boundary + 1)])
-const bcout = getDiffOp(compDX[boundary:compSize])
-
-
 function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
     # If we're dealing with the PDE form
     if length(du) > 100
-        for ii = 1:27
+        @views for ii = 1:27
             duu = view(du, ii:27:length(du))
             uu = u[ii:27:end]
 
             if boundLigC[ii] == 0
-                mul!(duu, bc, uu)
+                @. duu[2:(end-1)] = (-4.0*uu[2:(end-1)] + (2.0-1.0/compDX)*uu[1:(end-2)] + (2.0+1.0/compDX)*uu[3:end])/2/dRdRMaxRMaxR
             else
-                mul!(view(duu, 1:boundary), bcin, uu[1:boundary])
-                mul!(view(duu, (boundary + 1):length(duu)), bcout, uu[(boundary + 1):end])
-                # TODO: Implement one-way flux across boundary
+                @. duu[2:(boundary-1)] = (-4.0*uu[2:(boundary-1)] + (2.0-1.0/compDX[1:(boundary-2)])*uu[1:(boundary-2)] + (2.0+1.0/compDX[1:(boundary-2)])*uu[3:boundary])/2/dRdRMaxRMaxR
+                duu[boundary] = -4.0*(uu[boundary] - uu[boundary - 1])/dRdRMaxRMaxR
+
+                duu[boundary + 1] = 4.0*(uu[boundary + 2] - uu[boundary + 1])/dRdRMaxRMaxR
+                @. duu[(boundary + 2):(end-1)] = (-4.0*uu[(boundary + 2):(end-1)] + (2.0-1.0/compDX[(boundary + 1):end])*uu[(boundary + 1):(end-2)] + (2.0+1.0/compDX[(boundary + 1):end])*uu[(boundary + 3):end])/2/dRdRMaxRMaxR
+
+                # Diffusion into compartment
+                duu[boundary + 1] -= uu[boundary + 1] / dRdRMaxRMaxR
+                duu[boundary] += uu[boundary + 1] / dRdRMaxRMaxR
             end
+
+            duu[1] = 4.0*(uu[2] - uu[1])/dRdRMaxRMaxR
+            duu[end] = -4.0*(uu[end] - uu[end - 1])/dRdRMaxRMaxR
         end
 
         rmul!(du, r.diff)
@@ -48,7 +47,7 @@ function TAMreact(du::Vector, u::Vector, r::comprates, t; reaction = true)
     end
 
     if reaction
-        for ii = 0:(Int(length(u) / 27) - 1)
+        @views for ii = 0:(Int(length(u) / 27) - 1)
             if ii < boundary
                 gass = r.gasCur * r.gasPart
             else
