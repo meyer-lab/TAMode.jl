@@ -1,12 +1,9 @@
-rr = TAMode.Lsparam(fill(0.2, 9))
-tps = @SVector Float64[60, 240]
-GasProp = @SVector[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-GasConc = @SVector Float64[64, 16, 4, 1, 0.25, 0]
-PROSConc = @SVector Float64[64, 16, 4, 1, 0.25, 0]
+using Plots
 
 
 "Plot pY vs. ligand proportion."
-function plotLigProp(rr, tps, GasProp)
+function plotLigProp(rr, tps)
+    GasProp = LinRange(0.0, 1.0, 10)
     pY = Array{Float64}(undef, length(tps), length(GasProp))
     
     for i = 1:length(GasProp)
@@ -25,39 +22,29 @@ end
 
 
 "Plot Gas6 dose response."
-function plotGasDose(rr, tps, GasConc)
-    pY = Array{Float64}(undef, length(tps), length(GasConc))
-    
-    for i = 1:length(GasConc)
-        pYdata = TAMode.runTAM(tps, rr, (GasConc[i], 0.0))
-        pY[:, i] = pYdata * TAMode.pYLS
+function plotGasDose(rr, tps, conc; Gas = true)
+    pY = Array{Float64}(undef, length(tps), length(conc))
+
+    for i = 1:length(conc)
+        if Gas
+            stim = (conc[i], 0.0)
+        else
+            stim = (0.0, conc[i])
+        end
+
+        pY[:, i] = TAMode.runTAM(tps, rr, stim) * TAMode.pYLS
     end
 
     pY2g = [[pY[1, :], pY[2, :]]]
-    plot(GasConc, pY2g, label = ["1 hr" "4 hr"], title = "Gas6 Dose Response", lw = 3)
+    plot(conc, pY2g, label = ["1 hr" "4 hr"], title = "Gas6 Dose Response", lw = 3)
     xlabel!("Gas6 Concentration")
     ylabel!("Phosphorylated Receptor (pY)")
 end
 
 
-"Plot PROS1 dose response."
-function plotPROSDose(rr, tps, PROSConc)
-    pY = Array{Float64}(undef, length(tps), length(GasConc))
-    
-    for i = 1:length(PROSConc)
-        pYdata = TAMode.runTAM(tps, rr, (0.0, PROSConc[i]))
-        pY[:, i] = pYdata * TAMode.pYLS
-    end
-
-    pY2p = [[pY[1, :], pY[2, :]]]
-    plot(PROSConc, pY2p, label = ["1 hr" "4 hr"], title = "PROS1 Dose Response", lw = 3)
-    xlabel!("PROS1 Concentration")
-    ylabel!("Phosphorylated Receptor (pY)")
-end
-
-
 "Plot dimer formation at 1 hr and 4 hr."
-function plotDimers(rr, tps, GasProp)
+function plotDimers(rr, tps)
+    GasProp = LinRange(0.0, 1.0, 10)
     GGdimers = vcat(zeros(9), ones(2), zeros(3), zeros(9), ones(2), zeros(5))
     PPdimers = vcat(zeros(11), ones(2), zeros(12), ones(2), zeros(3))
     GPdimers = vcat(zeros(13), 1, zeros(13), 1, zeros(2))

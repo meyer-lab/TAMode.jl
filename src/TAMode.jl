@@ -96,5 +96,6 @@ end
 
 
 include("fitting.jl")
+include("plots.jl")
 
 end # module
