@@ -58,18 +58,18 @@ end
 end
 
 
-function plot_overlay(chn, tps, g6conc) 
+function plot_overlay(chn, tps, g6conc)
     Ig2rev = get(chn, :Ig2rev)[1]
     scale = get(chn, :scale)[1]
-    scaleSurf = get(chn, :scaleSurf)[1] 
+    scaleSurf = get(chn, :scaleSurf)[1]
 
     x = get(chn, [:internalize, :pYinternalize, :sortF, :kRec, :kDeg, :xFwd, :gasCur, :AXLexpr])
     samp_params = hcat(x.internalize, x.pYinternalize, x.sortF, x.kRec, x.kDeg, x.xFwd, x.gasCur, x.AXLexpr)
 
-    pY = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
-    tot = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
-    surf = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc));
-    
+    pY = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
+    tot = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
+    surf = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
+
     for iter = 1:size(samp_params, 1)
         params = vcat(samp_params[iter, :], zeros(2), Ig2rev[iter], ones(4))
 
