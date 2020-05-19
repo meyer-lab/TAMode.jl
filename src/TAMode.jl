@@ -43,8 +43,7 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
     solut = solve(prob, sol; saveat = tps, reltol = solTol, isoutofdomain = domainDef, maxiters = 1e6)
 
     if solut.retcode != :Success
-        println("Solving failed with the following parameters.")
-        println(params)
+        println("Solving failed. Returning NaN.")
         println(solut.retcode)
         return fill(NaN, length(tps), length(solInit))
     else
