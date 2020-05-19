@@ -5,12 +5,12 @@ using Plots
 function plotLigProp(rr, tps)
     GasProp = LinRange(0.0, 1.0, 10)
     pY = Array{Float64}(undef, length(tps), length(GasProp))
-    
+
     for i = 1:length(GasProp)
         gas = GasProp[i]
         pros = 1.0 - gas
         totalconc = 70
-        pYdata = TAMode.runTAM(tps, rr, (gas*totalconc, pros*totalconc))
+        pYdata = TAMode.runTAM(tps, rr, (gas * totalconc, pros * totalconc))
         pY[:, i] = pYdata * TAMode.pYLS
     end
 
@@ -51,12 +51,12 @@ function plotDimers(rr, tps)
     GG = Array{Float64}(undef, length(tps), length(GasProp))
     PP = Array{Float64}(undef, length(tps), length(GasProp))
     GP = Array{Float64}(undef, length(tps), length(GasProp))
-    
+
     for i = 1:length(GasProp)
         gas = GasProp[i]
         pros = 1.0 - gas
         totalconc = 70
-        data = TAMode.runTAM(tps, rr, (gas*totalconc, pros*totalconc))
+        data = TAMode.runTAM(tps, rr, (gas * totalconc, pros * totalconc))
         GG[:, i] = data * GGdimers
         PP[:, i] = data * PPdimers
         GP[:, i] = data * GPdimers
