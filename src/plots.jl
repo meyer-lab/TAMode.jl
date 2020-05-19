@@ -1,4 +1,4 @@
-using Plots
+import Plots: plot, xlabel!, ylabel!, title!
 
 
 "Plot pY vs. ligand proportion."

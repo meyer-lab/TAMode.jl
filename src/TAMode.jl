@@ -14,7 +14,7 @@ include("bothLigands.jl")
 include("compModel.jl")
 
 
-const solTol = 1.0e-4
+const solTol = 1.0e-6
 
 function domainDef(u, p, t)
     return any(x -> x < -solTol, u)
@@ -39,19 +39,22 @@ function runTAMinit(tps::AbstractVector{Float64}, params::Union{Rates{T}, compra
 
     prob = ODEProblem(TAMreact, solInit, maximum(tps), params)
 
-    sol = AutoTsit5(Rodas5(autodiff = (T == Float64)), stiffalgfirst = true)
-    solut = solve(prob, sol; saveat = tps, reltol = solTol, isoutofdomain = domainDef, maxiters = 1e6).u
+    sol = AutoTsit5(Rodas4P(autodiff = (T == Float64)), stiffalgfirst = true)
+    solut = solve(prob, sol; saveat = tps, reltol = solTol, isoutofdomain = domainDef, maxiters = 1e6)
+
+    if solut.retcode != :Success
+        println("Solving failed with the following parameters.")
+        println(params)
+        println(solut.retcode)
+        return fill(NaN, length(tps), length(solInit))
+    else
+        solut = solut.u
+    end
 
     if length(tps) > 1
         solut = vcat(transpose.(solut)...)
     else
         solut = reshape(solut[1], (1, length(solInit)))
-    end
-
-    if length(tps) > size(solut, 1)
-        println("Solving failed with the following parameters.")
-        println(params)
-        @assert length(tps) == size(solut, 1)
     end
 
     return solut
