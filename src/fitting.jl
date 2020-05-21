@@ -1,3 +1,6 @@
+using Plots
+using Statistics
+
 tpsA549 = @SVector Float64[60, 240]
 gasA549 = @SVector Float64[64, 16, 4, 1, 0.25, 0]
 pYA549 = @SMatrix [10.8 8.3; 7.4 7.1; 7.1 7.7; 4.6 8.2; 6.1 7.2; 7.5 7.5]
@@ -72,8 +75,7 @@ function plot_overlay(chn, tps, g6conc)
 
     for iter = 1:size(samp_params, 1)
         params = vcat(samp_params[iter, :], zeros(2), Ig2rev[iter], ones(4))
-
-        pY[iter, :, :], tot[iter, :, :], surf[iter, :, :] = dataModelCalc(tps, g6conc, params, scale, scaleSurf)
+        pY[iter, :, :], tot[iter, :, :], surf[iter, :, :] = dataModelCalc(tps, g6conc, params, scale[iter], scaleSurf[iter])
     end
 
     # Calculate means
@@ -86,13 +88,13 @@ function plot_overlay(chn, tps, g6conc)
     tp1_exp = hcat(pYA549[:,1], surfA549[:,1], totA549[:,1])
     tp2_exp = hcat(pYA549[:,2], surfA549[:,2], totA549[:,2])
 
-    plot(gasA549, [tp1_calcmed, tp2_calcmed], 
+    plot(g6conc, [tp1_calcmed, tp2_calcmed], 
         label=["1 hr, calc" "4 hr, calc"] , 
         title=["Phosphorylated receptor" "Surface receptor" "Total receptor"], 
         lw=3, 
         layout = (1,3), 
         size=(1200,400))
-    plot!(gasA549, [tp1_exp, tp2_exp], 
+    plot!(g6conc, [tp1_exp, tp2_exp], 
         label=["1 hr, exp" "4 hr, exp"], 
         lw=3,
         layout=(1,3))
