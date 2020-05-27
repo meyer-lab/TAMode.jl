@@ -595,9 +595,9 @@ version = "1.0.4"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryTypes", "JSON", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
-git-tree-sha1 = "1b0a6628c8408ef912f9d28307296851dbd9bf91"
+git-tree-sha1 = "a54c18f0ed36a7b60cf53b6062719f2368ad4579"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.3.3"
+version = "1.3.4"
 
 [[Printf]]
 deps = ["Unicode"]
@@ -830,9 +830,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[VectorizationBase]]
 deps = ["CpuId", "LinearAlgebra"]
-git-tree-sha1 = "0b10620bee8d57e672210f45aba990e6ffc18e94"
+git-tree-sha1 = "13463c5703d9e75b2eab93f6c94239426af49221"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.12.2"
+version = "0.12.3"
 
 [[VertexSafeGraphs]]
 deps = ["LightGraphs"]
