@@ -35,7 +35,7 @@ function dataModelCalc(tps, g6conc, params, scale, scaleSurf)
 end
 
 
-@model AXLfit(pYDataExp, surfDataExp, totDataExp, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
+@model AXLfit(pYDataExp, surfDataExp, totDataExp, sqResid, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
     internalize ~ LogNormal(log(0.1), 0.1)
     pYinternalize ~ LogNormal(log(1.0), 0.1)
     sortF ~ Beta(1.0, 10.0)
@@ -101,4 +101,4 @@ function plot_overlay(chn, tps, g6conc)
     xlabel!("Gas6 Concentration (nM)")
 end
 
-A549model = AXLfit(TAMode.pYA549, TAMode.surfA549, TAMode.totA549, TAMode.tpsA549, TAMode.gasA549)
+A549model = AXLfit(TAMode.pYA549, TAMode.surfA549, TAMode.totA549, [0.0], TAMode.tpsA549, TAMode.gasA549)
