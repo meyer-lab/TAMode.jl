@@ -49,7 +49,7 @@ end
 " Setup the parameters for the full TAM receptor model. "
 function param(params::Vector{T})::Rates{T} where {T}
     @assert all(params .>= 0.0)
-    @assert params[3] < 1.0
+    @assert params[3] <= 1.0
 
     TAM, hetRs = paramTAMrate(view(params, 8:15))
 
