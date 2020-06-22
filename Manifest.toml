@@ -264,9 +264,9 @@ version = "4.1.0+3"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "44f561e293987ffc84272cd3d2b14b0b93123d63"
+git-tree-sha1 = "bf726ba7ce99e00d10bf63c031285fb9ab3676ae"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.8.10"
+version = "0.8.11"
 
 [[FiniteDiff]]
 deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
@@ -776,9 +776,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[SparseDiffTools]]
 deps = ["Adapt", "ArrayInterface", "Compat", "DataStructures", "FiniteDiff", "ForwardDiff", "LightGraphs", "LinearAlgebra", "Requires", "SparseArrays", "VertexSafeGraphs"]
-git-tree-sha1 = "bfe68e0d914952932594b3c838f08463b0841037"
+git-tree-sha1 = "567fd5758c8271b81cb6497f1bddf1a2d0dd09af"
 uuid = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
-version = "1.8.0"
+version = "1.9.0"
 
 [[SpecialFunctions]]
 deps = ["OpenSpecFun_jll"]
@@ -830,9 +830,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[Tracker]]
 deps = ["Adapt", "DiffRules", "ForwardDiff", "LinearAlgebra", "MacroTools", "NNlib", "NaNMath", "Printf", "Random", "Requires", "SpecialFunctions", "Statistics", "Test"]
-git-tree-sha1 = "86929a5811dca5ce76c65a1d3fecda92d90c2e49"
+git-tree-sha1 = "1e0b60f070020ed18ef364cccecabcb75c8bc23c"
 uuid = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
-version = "0.2.6"
+version = "0.2.7"
 
 [[TransformVariables]]
 deps = ["ArgCheck", "DocStringExtensions", "ForwardDiff", "LinearAlgebra", "MacroTools", "Parameters", "Pkg", "Random"]
@@ -866,9 +866,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[VectorizationBase]]
 deps = ["CpuId", "LLVM", "Libdl", "LinearAlgebra"]
-git-tree-sha1 = "bcadc352d9c81b0ef9ceebe822d30128b779f56b"
+git-tree-sha1 = "e97fdb99879c7d6c025bb1114ab108c79f6642a7"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.12.8"
+version = "0.12.9"
 
 [[VertexSafeGraphs]]
 deps = ["LightGraphs"]
