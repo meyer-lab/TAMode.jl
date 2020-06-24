@@ -17,7 +17,7 @@ function dataModelCalc(tps, g6conc, params, scale, scaleSurf)
     totAXL = TAMode.total .* TAMode.recpSpecific[1]
 
     paramsStart = param(params)
-    solInit = getAutocrine(params)
+    solInit = getAutocrine(paramsStart)
 
     Threads.@threads for ii = 1:length(g6conc)
         params = deepcopy(paramsStart)
