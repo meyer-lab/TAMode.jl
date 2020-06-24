@@ -87,10 +87,10 @@ function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Lsrates{T}
     solInit = getAutocrine(params)
 
     if params isa Rates
-        params.gasCur = ligStim
+        params.gasCur += ligStim
     else
         @assert params isa Lsrates
-        params.curL = ligStim
+        params.curL .+= ligStim
     end
 
     return runTAMinit(tps, params, solInit)
