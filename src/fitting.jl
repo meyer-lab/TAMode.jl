@@ -16,11 +16,13 @@ function dataModelCalc(tps, g6conc, params, scale, scaleSurf)
     surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
     totAXL = TAMode.total .* TAMode.recpSpecific[1]
 
-    params = param(params)
-    solInit = getAutocrine(params)
+    paramsStart = param(params)
+    solInit = getAutocrine(paramsStart)
 
     Threads.@threads for ii = 1:length(g6conc)
-        params.gasCur = g6conc[ii]
+        params = deepcopy(paramsStart)
+
+        params.gasCur += g6conc[ii]
         data = runTAMinit(tps, params, solInit)
 
         pYresids[:, ii] = (data * pYAXL) * scale
@@ -35,7 +37,7 @@ end
 @model AXLfit(pYDataExp, surfDataExp, totDataExp, sqResid, tps, g6conc, ::Type{TV} = Vector{Float64}) where {TV} = begin
     internalize ~ LogNormal(log(0.1), 0.1)
     pYinternalize ~ LogNormal(log(1.0), 0.1)
-    sortF ~ Beta(1.0, 10.0)
+    sortF ~ Beta(2.0, 20.0)
     kRec ~ LogNormal(log(0.1), 0.1)
     kDeg ~ LogNormal(log(0.01), 0.1)
     xFwd ~ LogNormal(-3.0, 1.0)
