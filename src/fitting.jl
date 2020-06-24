@@ -1,3 +1,6 @@
+import Plots: plot, xlabel!, ylabel!, title!, plot!
+using MCMCChains
+
 tpsA549 = @SVector Float64[60, 240]
 gasA549 = @SVector Float64[64, 16, 4, 1, 0.25, 0]
 pYA549 = @SMatrix [10.8 8.3; 7.4 7.1; 7.1 7.7; 4.6 8.2; 6.1 7.2; 7.5 7.5]
@@ -12,9 +15,9 @@ function dataModelCalc(tps, g6conc, params, scale, scaleSurf)
     surfresids = Matrix{typeof(scale)}(undef, length(tps), length(g6conc))
 
     # Setup reductions
-    pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
-    surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
-    totAXL = TAMode.total .* TAMode.recpSpecific[1]
+    pYAXL = pY .* recpSpecific[1]
+    surfAXL = surface .* recpSpecific[1]
+    totAXL = total .* recpSpecific[1]
 
     paramsStart = param(params)
     solInit = getAutocrine(paramsStart)
@@ -60,39 +63,43 @@ end
 end
 
 
-function plot_overlay(chn, tps, g6conc)
+function plot_overlay(chn)
     Ig2rev = get(chn, :Ig2rev)[1]
     scale = get(chn, :scale)[1]
     scaleSurf = get(chn, :scaleSurf)[1]
 
-    samp_params = Array(chn, [:internalize, :pYinternalize, :sortF, :kRec, :kDeg, :xFwd, :gasCur, :AXLexpr])
+    x = get(chn, [:internalize, :pYinternalize, :sortF, :kRec, :kDeg, :xFwd, :gasCur, :AXLexpr])
+    samp_params = hcat(x.internalize, x.pYinternalize, x.sortF, x.kRec, x.kDeg, x.xFwd, x.gasCur, x.AXLexpr)
 
-    pY = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
-    tot = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
-    surf = Array{Float64}(undef, size(samp_params, 1), length(tps), length(g6conc))
+    pY = Array{Float64}(undef, size(samp_params, 1), length(tpsA549), length(gasA549))
+    tot = Array{Float64}(undef, size(samp_params, 1), length(tpsA549), length(gasA549))
+    surf = Array{Float64}(undef, size(samp_params, 1), length(tpsA549), length(gasA549))
 
     for iter = 1:size(samp_params, 1)
         params = vcat(samp_params[iter, :], zeros(2), Ig2rev[iter], ones(4))
-
-        pY[iter, :, :], tot[iter, :, :], surf[iter, :, :] = dataModelCalc(tps, g6conc, params, scale, scaleSurf)
+        pY[iter, :, :], tot[iter, :, :], surf[iter, :, :] = dataModelCalc(tpsA549, gasA549, params, scale[iter], scaleSurf[iter])
     end
 
-    # Calculate means
-    meanpY = Statistics.median(pY, dims = 1)
-    meantot = Statistics.median(tot, dims = 1)
-    meansurf = Statistics.median(surf, dims = 1)
+    medpY = Statistics.median(pY, dims = 1)
+    medtot = Statistics.median(tot, dims = 1)
+    medsurf = Statistics.median(surf, dims = 1)
+    
+    tp1_calcmed = hcat(transpose(medpY[:,1,:]), transpose(medsurf[:,1,:]), transpose(medtot[:,1,:]))
+    tp2_calcmed = hcat(transpose(medpY[:,2,:]), transpose(medsurf[:,2,:]), transpose(medtot[:,2,:]))
+    tp1_exp = hcat(pYA549[:,1], surfA549[:,1], totA549[:,1])
+    tp2_exp = hcat(pYA549[:,2], surfA549[:,2], totA549[:,2])
 
-    plot(
-        g6conc,
-        [meanpY; meansurf; meantot],
-        label = ["1 hr, calc" "4 hr, calc"],
-        title = ["Phosphorylated receptor" "Surface receptor" "Total receptor"],
-        lw = 3,
-        layout = (1, 3),
-        size = (1200, 400),
-    )
-    plot!(g6conc, [pYA549[:, 1:2]; surfA549[:, 1:2]; totA549[:, 1:2]], label = ["1 hr, exp" "4 hr, exp"], lw = 3)
-    xlabel!("Gas6 Concentration (nM)")
+    plot(gasA549, [tp1_calcmed, tp2_calcmed], 
+        label=["1 hr, calc" "4 hr, calc"] , 
+        title=["Phosphorylated receptor" "Surface receptor" "Total receptor"], 
+        lw=3, 
+        layout = (1,3), 
+        size=(1200,400))
+    plot!(gasA549, [tp1_exp, tp2_exp], 
+        label=["1 hr, exp" "4 hr, exp"], 
+        lw=3,
+        layout=(1,3))
+        xlabel!("Gas6 Concentration (nM)")
 end
 
-A549model = AXLfit(TAMode.pYA549, TAMode.surfA549, TAMode.totA549, [0.0], TAMode.tpsA549, TAMode.gasA549)
+A549model = AXLfit(pYA549, surfA549, totA549, [0.0], tpsA549, gasA549)
