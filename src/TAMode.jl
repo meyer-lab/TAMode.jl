@@ -90,7 +90,7 @@ function runTAM(tps::AbstractVector{Float64}, params::Union{Rates{T}, Lsrates{T}
         params.gasCur += ligStim
     else
         @assert params isa Lsrates
-        params.curL += ligStim
+        params.curL .+= ligStim
     end
 
     return runTAMinit(tps, params, solInit)
