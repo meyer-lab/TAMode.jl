@@ -83,23 +83,23 @@ function plot_overlay(chn)
     medpY = Statistics.median(pY, dims = 1)
     medtot = Statistics.median(tot, dims = 1)
     medsurf = Statistics.median(surf, dims = 1)
-    
-    tp1_calcmed = hcat(transpose(medpY[:,1,:]), transpose(medsurf[:,1,:]), transpose(medtot[:,1,:]))
-    tp2_calcmed = hcat(transpose(medpY[:,2,:]), transpose(medsurf[:,2,:]), transpose(medtot[:,2,:]))
-    tp1_exp = hcat(pYA549[:,1], surfA549[:,1], totA549[:,1])
-    tp2_exp = hcat(pYA549[:,2], surfA549[:,2], totA549[:,2])
 
-    plot(gasA549, [tp1_calcmed, tp2_calcmed], 
-        label=["1 hr, calc" "4 hr, calc"] , 
-        title=["Phosphorylated receptor" "Surface receptor" "Total receptor"], 
-        lw=3, 
-        layout = (1,3), 
-        size=(1200,400))
-    plot!(gasA549, [tp1_exp, tp2_exp], 
-        label=["1 hr, exp" "4 hr, exp"], 
-        lw=3,
-        layout=(1,3))
-        xlabel!("Gas6 Concentration (nM)")
+    tp1_calcmed = hcat(transpose(medpY[:, 1, :]), transpose(medsurf[:, 1, :]), transpose(medtot[:, 1, :]))
+    tp2_calcmed = hcat(transpose(medpY[:, 2, :]), transpose(medsurf[:, 2, :]), transpose(medtot[:, 2, :]))
+    tp1_exp = hcat(pYA549[:, 1], surfA549[:, 1], totA549[:, 1])
+    tp2_exp = hcat(pYA549[:, 2], surfA549[:, 2], totA549[:, 2])
+
+    plot(
+        gasA549,
+        [tp1_calcmed, tp2_calcmed],
+        label = ["1 hr, calc" "4 hr, calc"],
+        title = ["Phosphorylated receptor" "Surface receptor" "Total receptor"],
+        lw = 3,
+        layout = (1, 3),
+        size = (1200, 400),
+    )
+    plot!(gasA549, [tp1_exp, tp2_exp], label = ["1 hr, exp" "4 hr, exp"], lw = 3, layout = (1, 3))
+    xlabel!("Gas6 Concentration (nM)")
 end
 
 A549model = AXLfit(pYA549, surfA549, totA549, [0.0], tpsA549, gasA549)
