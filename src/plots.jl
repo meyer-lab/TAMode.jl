@@ -74,3 +74,26 @@ function plotDimers(rr, tps)
     xlabel!("Proportion of Gas6")
     ylabel!("Dimer Concentration")
 end
+
+
+"Plot Comp Model."
+function plotComp(pp, tps)
+    pY = Array{Float64}(undef, length(tps), 2700)
+    
+    pY = TAMode.compTAM(tps, pp)
+    pYnew = reshape(pY, (5, 27, 100))
+    
+    plot = Array{Float64}(undef, 5, 100)
+
+    for i = 1:length(tps)
+        for r = 1:100
+            pYdata = view(pYnew, i, :, r)
+            plot[i, r] = pYdata * TAMode.pYc
+        end
+    end
+    
+    plotpY = [[plot[1, :], plot[2, :], plot[3, :], plot[4, :], plot[5, :]]]
+    plot(1:100, plotpY, title = "Compartmental Model pY", lw = 3)
+    xlabel!("Radius")
+    ylabel!("pY")
+end
