@@ -81,19 +81,27 @@ function plotComp(pp, tps)
     pY = Array{Float64}(undef, length(tps), 2700)
     
     pY = TAMode.compTAM(tps, pp)
-    pYnew = reshape(pY, (5, 27, 100))
     
-    plot = Array{Float64}(undef, 5, 100)
+    pYnew = reshape(pY, (length(tps), 27, 100))
+    cplot = Array{Float64}(undef, length(tps), 100)
 
     for i = 1:length(tps)
         for r = 1:100
             pYdata = view(pYnew, i, :, r)
-            plot[i, r] = pYdata * TAMode.pYc
+            cplot[i, :] .= dot(pYdata, TAMode.pYc)
         end
     end
+
+    plotpY = cplot[1, :]
+    plot(r, plotpY, title = "Compartmental Model pY", lw = 3)
     
-    plotpY = [[plot[1, :], plot[2, :], plot[3, :], plot[4, :], plot[5, :]]]
-    plot(1:100, plotpY, title = "Compartmental Model pY", lw = 3)
+    if length(tps) > 1
+        for ii = 2:length(tps)
+            plotpY = cplot[ii, :]
+            plot!(r, plotpY, lw = 3)
+        end
+    end
     xlabel!("Radius")
     ylabel!("pY")
+    
 end
