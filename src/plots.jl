@@ -77,21 +77,21 @@ end
 
 "Plot pY receptor expression"
 function plotpYExpression(chn, AXLexpr, MerTKexpr, Tyro3expr, cellName)
-    
-    tps = range(0.0, 1440, length=200)
-    
+
+    tps = range(0.0, 1440, length = 200)
+
     pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
     pYTyro3 = TAMode.pY .* TAMode.recpSpecific[3]
-    
+
     data = calcData(chn, AXLexpr, MerTKexpr, Tyro3expr, tps)
     pYA = (data * pYAXL)  # normal pYA
     pYT = (data * pYTyro3)  # normal pYT
-    
+
     # AXL knockdown
     A_data = calcData(chn, 0.0, MerTKexpr, Tyro3expr, tps)
     A_pYA = (A_data * pYAXL) # AXLkd pYA
     A_pYT = (A_data * pYTyro3) # AXLkd pYT
-    
+
     # Tyro3 knockdown
     T_data = calcData(chn, AXLexpr, MerTKexpr, 0.0, tps)
     T_pYA = (T_data * pYAXL) # Tyrokd pYA
@@ -99,27 +99,33 @@ function plotpYExpression(chn, AXLexpr, MerTKexpr, Tyro3expr, cellName)
 
     pyAXL = vcat(pYA[1], pYA[2], A_pYA[1], A_pYA[2], T_pYA[1], T_pYA[2])
     pyTyro3 = vcat(pYT[1], pYT[2], A_pYT[1], A_pYT[2], T_pYT[1], T_pYT[2])
-    
+
     count = vcat(pyAXL, pyTyro3)
     treatment = repeat(["Normal", "Normal", "AXL Knockdown", "AXL Knockdown", "Tyro3 Knockdown", "Tyro3 Knockdown"], outer = 2)
     time = repeat(["1 hr", "8 hr"], outer = 6)
     receptorType = repeat(["Phosphyrlated AXL", "Phosphyrlated Tyro3"], inner = 6)
-    
+
     D = DataFrame(Treatment = treatment, Time = time, ReceptorType = receptorType, Count = count)
 
-    p2 = Gadfly.plot(D, x=:Time, y=:Count, color=:ReceptorType, xgroup=:Treatment,
-    Geom.subplot_grid(Geom.bar(position=:stack)),
-    Guide.xlabel("Treatment"),
-    Guide.title(cellName))
-    
+    p2 = Gadfly.plot(
+        D,
+        x = :Time,
+        y = :Count,
+        color = :ReceptorType,
+        xgroup = :Treatment,
+        Geom.subplot_grid(Geom.bar(position = :stack)),
+        Guide.xlabel("Treatment"),
+        Guide.title(cellName),
+    )
+
 end
 
 "Plot expression over time"
 function plotTimeSeries(chn, AXLexpr, MerTKexpr, Tyro3expr)
-    
-    tps = range(0.0, 1440, length=200)
+
+    tps = range(0.0, 1440, length = 200)
     data = calcData(chn, AXLexpr, MerTKexpr, Tyro3expr, tps)
-    
+
     pYAXL = TAMode.pY .* TAMode.recpSpecific[1]
     surfAXL = TAMode.surface .* TAMode.recpSpecific[1]
     totAXL = TAMode.total .* TAMode.recpSpecific[1]
@@ -130,39 +136,43 @@ function plotTimeSeries(chn, AXLexpr, MerTKexpr, Tyro3expr)
 
     pYTyro3 = TAMode.pY .* TAMode.recpSpecific[3]
     surfTyro3 = TAMode.surface .* TAMode.recpSpecific[3]
-    totTyro3 = TAMode.total .* TAMode.recpSpecific[3];
-    
-    pYA = (data * pYAXL) 
-    surfA = (data * surfAXL) 
-    totalA = (data * totAXL) 
+    totTyro3 = TAMode.total .* TAMode.recpSpecific[3]
 
-    pYM = (data * pYMerTK) 
+    pYA = (data * pYAXL)
+    surfA = (data * surfAXL)
+    totalA = (data * totAXL)
+
+    pYM = (data * pYMerTK)
     surfM = (data * surfMerTK)
-    totalM = (data * totMerTK) 
+    totalM = (data * totMerTK)
 
-    pYT = (data * pYTyro3) 
-    surfT = (data * surfTyro3) 
-    totalT = (data * totTyro3) 
-    
+    pYT = (data * pYTyro3)
+    surfT = (data * surfTyro3)
+    totalT = (data * totTyro3)
+
     A = hcat(pYA, surfA, totalA)
     M = hcat(pYM, surfM, totalM)
     T = hcat(pYT, surfT, totalT)
-    plot(tps, [A, M, T], lw = 3, 
+    plot(
+        tps,
+        [A, M, T],
+        lw = 3,
         xlabel = "Time (min)",
-        label = ["AXL" "AXL" "AXL" "MerTK" "MerTK"  "MerTK" "Tyro3" "Tyro3" "Tyro3"], 
-        title = ["pY" "surf" "total"], 
-        layout = (1,3), size=(950,400))
+        label = ["AXL" "AXL" "AXL" "MerTK" "MerTK" "MerTK" "Tyro3" "Tyro3" "Tyro3"],
+        title = ["pY" "surf" "total"],
+        layout = (1, 3),
+        size = (950, 400),
+    )
 end
 
 function calcData(chn, AXLexpr, MerTKexpr, Tyro3expr, tps)
     index = 201
     Ig2rev = get(chn, :Ig2rev)[1]
 
-    x = get(chn, [:internalize, :pYinternalize, :sortF, :kRec, :kDeg, :xFwd, :gasCur, :AXLexpr]);
-    samp_params = hcat(x.internalize, x.pYinternalize, x.sortF, x.kRec, x.kDeg, x.xFwd, x.gasCur);
-    params = vcat(samp_params[index, :], AXLexpr, MerTKexpr, Tyro3expr, Ig2rev[index], [1.0, 1.0, 1.8, 100.0]);
-    
+    x = get(chn, [:internalize, :pYinternalize, :sortF, :kRec, :kDeg, :xFwd, :gasCur, :AXLexpr])
+    samp_params = hcat(x.internalize, x.pYinternalize, x.sortF, x.kRec, x.kDeg, x.xFwd, x.gasCur)
+    params = vcat(samp_params[index, :], AXLexpr, MerTKexpr, Tyro3expr, Ig2rev[index], [1.0, 1.0, 1.8, 100.0])
+
     data = TAMode.runTAM(tps, params, 10)
     return data
 end
-
