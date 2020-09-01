@@ -70,7 +70,7 @@ function compTAM(tps::AbstractVector{Float64}, params::Union{comprates{T}, Vecto
     
     sol = runTAMinit(tps, params, u0)
 
-    return reshape(sol, (length(tps), 27, 100))
+    return reshape(sol, (length(tps), 27, compSize))
 end
 
 
