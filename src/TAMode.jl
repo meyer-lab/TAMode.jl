@@ -67,7 +67,7 @@ function compTAM(tps::AbstractVector{Float64}, params::Union{comprates{T}, Vecto
 
     solInit = getAutocrine(params)
     u0 = repeat(solInit; outer = [compSize])
-    
+
     sol = runTAMinit(tps, params, u0)
 
     return reshape(sol, (length(tps), 27, compSize))

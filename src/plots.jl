@@ -193,7 +193,7 @@ function plotComp(pp, tps)
 
     plotpY = cplot[1, :]
     plot(r, plotpY, title = "Compartmental Model pY", lw = 3)
-    
+
     if length(tps) > 1
         for tt = 2:length(tps)
             plotpY = cplot[tt, :]
@@ -202,5 +202,5 @@ function plotComp(pp, tps)
     end
     xlabel!("Radius")
     ylabel!("pY")
-    
+
 end
