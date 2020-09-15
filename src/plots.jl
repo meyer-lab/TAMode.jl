@@ -182,22 +182,22 @@ end
 function plotComp(pp, tps)
     r = 1:100
     pY = TAMode.compTAM(tps, pp)
-    cplot = Array{Float64}(undef, length(tps), 100)
+    cplot = Array{Float64}(undef, length(tps), length(tps), 100)
 
     for rr = 1:100
         for t = 1:length(tps)
             pYdata = view(pY, t, :, rr)
-            cplot[:, rr] .= dot(pYdata, TAMode.pYc)
+            cplot[t, :, rr] .= dot(pYdata, TAMode.pYc)
         end
     end
 
-    plotpY = cplot[1, :]
-    plot(r, plotpY, title = "Compartmental Model pY", lw = 3)
+    plotpY = cplot[1, 1, :]
+    plot(r, plotpY, title = "Compartmental Model pY", label = tps[1], lw = 3)
 
     if length(tps) > 1
         for tt = 2:length(tps)
-            plotpY = cplot[tt, :]
-            plot!(r, plotpY, lw = 3)
+            plotpY = view(cplot, tt, tt, :)
+            plot!(r, plotpY, label = tps[tt], lw = 3)
         end
     end
     xlabel!("Radius")
