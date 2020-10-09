@@ -1,4 +1,6 @@
 import Plots: plot, xlabel!, ylabel!, title!
+using DataFrames
+using Gadfly
 
 
 "Plot pY vs. ligand proportion."
