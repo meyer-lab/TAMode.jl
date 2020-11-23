@@ -55,3 +55,27 @@ mutable struct Lsrates{T}
     curL::MVector{2, T}
     xFwd::T
 end
+
+function flatten(d::Union{TAMrates{T}, hetRates{T}, Rates{T}, comprates{T}, Lsrates{T}, TAMsType{T}, hetRType{T}}) where{T}
+    arr::ArrayPartition{T}
+    if d isa TAMrates{T}
+        arr = ArrayPartition(d.binding, d.xRev, d.expression, d.xFwd6)
+    elseif d isa hetRates{T}
+        arr = ArrayPartition(d.xRev, d.xFwd15, d.xFwd16)
+    elseif d isa Rates{T}
+        arr = ArrayPartition(flatten(d.TAMs), d.internalize, d.pYinternalize, d.fElse, d.kRec, d.kDeg, d.xFwd, d.gasCur, flatten(d.hetR))
+    elseif d isa comprates{T}
+        arr = ArrayPartition(flatten(d.TAMs), d.diff, d.gasPart, d.gasCur, d.xFwd, flatten(d.hetR))
+    elseif d isa Lsrates{T}
+        arr = ArrayPartition(d.GBinding, d.PBinding, d.xRev, d.xFwd27, d.xFwd29, d.kRec, d.kDeg, d.fElse, d.internalize, d.pYinternalize, d.expression, d.curL, d.xFwd)
+    elseif d isa TAMsType{T}
+        arr = ArrayPartition(flatten(d.Axl), flatten(d.MerTK), flatten(d.Tyro3))
+    elseif d isa hetRates{T}
+        arr = ArrayPartition(flatten(d.AM), flatten(d.MT), flatten(d.TM))
+    return arr
+end
+
+#works for TAMrates, hetRates, LsRates
+function unflatten(a::ArrayPartition{T}, type::DataType) where{T}
+    return type(a.x...)
+end
