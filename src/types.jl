@@ -72,6 +72,7 @@ function flatten(d::Union{TAMrates{T}, hetRates{T}, Rates{T}, comprates{T}, Lsra
         arr = ArrayPartition(flatten(d.Axl), flatten(d.MerTK), flatten(d.Tyro3))
     elseif d isa hetRates{T}
         arr = ArrayPartition(flatten(d.AM), flatten(d.MT), flatten(d.TM))
+    end
     return arr
 end
 
