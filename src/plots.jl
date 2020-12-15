@@ -184,7 +184,7 @@ end
 function plotComp(pp, tps)
     r = 1:100
     pY = TAMode.compTAM(tps, pp)
-    cplot = Array{Float64}(undef, length(tps), 100)
+    cplot = Array{Float64}(undef, length(tps), length(tps), 100)
 
     for rr = 1:100
         for t = 1:length(tps)
@@ -193,13 +193,73 @@ function plotComp(pp, tps)
         end
     end
 
-    plotpY = cplot[1, :]
-    plot(r, plotpY, title = "Compartmental Model pY", lw = 3)
+    plotpY = view(cplot, 1, 1, :)
+    plot(r, plotpY, title = "Total Receptor pY", label = tps[1], lw = 3)
+    
+    if length(tps) > 1
+        for tt = 2:length(tps)
+            plotpY = view(cplot, tt, tt, :)
+            plot!(r, plotpY, label = tps[tt], lw = 3)
+        end
+    end
+    xlabel!("Radius")
+    ylabel!("pY")
+
+end
+
+
+"Plot Comp Model Dimers."
+function plotCompDimers(pp, tps, dimerVector)
+    r = 1:100
+    pY = TAMode.compTAM(tps, pp)
+    dimerData = Array{Float64}(undef, length(tps), 100)
+
+    for rr = 1:100
+        for t = 1:length(tps)
+            pYdata = view(pY, t, :, rr)
+            dimerData[:, rr] .= dot(pYdata, dimerVector)
+        end
+    end
+
+    plot_dimers = dimerData[1, :]
+    plot(r, plot_dimers, label = tps[1], lw = 3)
+
+    if length(tps) > 1
+            for tt = 2:length(tps)
+                plot_dimers = dimerData[tt, :]
+                plot!(r, plot_dimers, label = tps[tt], lw = 3)
+            end
+    end
+
+    title!("Dimer Formation")
+    xlabel!("Radius")
+    ylabel!("Dimer Concentration")
+
+end
+
+
+"Plot receptor-specific pY."
+function plotRecpSpecific(pp, tps, recpVector)
+    r = 1:100
+    pY = TAMode.compTAM(tps, pp)
+    pYrecp = TAMode.pYc .* recpVector
+
+    cplot_recp = Array{Float64}(undef, length(tps), length(tps), 100)
+
+    for rr = 1:100
+        for t = 1:length(tps)
+            pYdata = view(pY, t, :, r)
+            cplot_recp[t, :, rr] .= dot(pYdata, pYrecp)
+        end
+    end
+
+    plotpY_recp = view(cplot_recp, 1, 1, :)
+    plot(r, plotpY_recp, title = "Receptor-Specific pY", label = tps[1], lw = 3)
 
     if length(tps) > 1
         for tt = 2:length(tps)
-            plotpY = cplot[tt, :]
-            plot!(r, plotpY, lw = 3)
+            plotpY_recp = view(cplot_recp, tt, tt, :)
+            plot!(r, plotpY_recp, label = tps[tt], lw = 3)
         end
     end
     xlabel!("Radius")
