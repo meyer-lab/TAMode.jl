@@ -193,14 +193,14 @@ function plotComp(pp, tps)
         end
     end
 
-    plotpY = view(cplot, 1, 1, :)
-    plot(r, plotpY, title = "Total Receptor pY", label = tps[1], lw = 3)
-    
-    if length(tps) > 1
-        for tt = 2:length(tps)
-            plotpY = view(cplot, tt, tt, :)
-            plot!(r, plotpY, label = tps[tt], lw = 3)
-        end
+    plotpY = view(cplot, 1, 1, :)
+    plot(r, plotpY, title = "Total Receptor pY", label = tps[1], lw = 3)
+
+    if length(tps) > 1
+        for tt = 2:length(tps)
+            plotpY = view(cplot, tt, tt, :)
+            plot!(r, plotpY, label = tps[tt], lw = 3)
+        end
     end
     xlabel!("Radius")
     ylabel!("pY")
@@ -224,11 +224,11 @@ function plotCompDimers(pp, tps, dimerVector)
     plot_dimers = dimerData[1, :]
     plot(r, plot_dimers, label = tps[1], lw = 3)
 
-    if length(tps) > 1
-            for tt = 2:length(tps)
-                plot_dimers = dimerData[tt, :]
-                plot!(r, plot_dimers, label = tps[tt], lw = 3)
-            end
+    if length(tps) > 1
+        for tt = 2:length(tps)
+            plot_dimers = dimerData[tt, :]
+            plot!(r, plot_dimers, label = tps[tt], lw = 3)
+        end
     end
 
     title!("Dimer Formation")
